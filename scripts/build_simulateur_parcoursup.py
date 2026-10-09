@@ -25,6 +25,9 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import simulate_ppl_art2 as sim  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.pages import build_page  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT_JSON = ROOT / "data" / "processed" / "simulateur_parcoursup.json"
 TPL = ROOT / "app" / "simulateur_template.html"
@@ -60,8 +63,7 @@ def main() -> None:
     data = export(df)
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     if TPL.exists():
-        payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-        OUT_PAGE.write_text(TPL.read_text(encoding="utf-8").replace("__DATA__", payload), encoding="utf-8")
+        build_page(TPL, OUT_PAGE, data)
         print(f"-> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e6:.1f} Mo)")
     print(f"{len(data['formations']):,} formations -> {OUT_JSON}")
 

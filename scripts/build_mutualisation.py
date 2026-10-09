@@ -27,6 +27,9 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_indice_specialites as b  # noqa: E402  (appariement des colonnes filles / garçons)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.geo import EARTH_KM, haversine_matrix  # noqa: E402,F401
+from spedago.pages import build_page  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -40,14 +43,6 @@ R_KM = 20.0
 SEUIL = 12            # élèves : taille minimale d'un groupe de spécialité pour envisager une ouverture commune
 MAX_MEMBRES = 4       # au-delà, un groupe commun n'est plus réaliste (horaires, transports)
 MIN_LYCEES_OFFRE = 50  # spécialités proposées par moins de lycées (danse, cirque…) : hors champ
-EARTH_KM = 6371.0
-
-
-def haversine_matrix(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
-    la, lo = np.radians(lat)[:, None], np.radians(lon)[:, None]
-    dlat, dlon = la - la.T, lo - lo.T
-    h = np.sin(dlat / 2) ** 2 + np.cos(la) * np.cos(la.T) * np.sin(dlon / 2) ** 2
-    return 2 * EARTH_KM * np.arcsin(np.sqrt(np.clip(h, 0, 1)))
 
 
 def specialty_status(t: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
@@ -204,10 +199,7 @@ def main() -> None:
             "groupes": [[keep.index(g["specialite"]), g["membres"], round(g["demande"], 1), round(g["rayon_km"], 1)] for g in groups]}
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     if TPL.exists():
-        payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-        page = (TPL.read_text(encoding="utf-8").replace("__RENTREE__", str(an)).replace("__RAYON__", f"{R_KM:.0f}")
-                .replace("__SEUIL__", str(SEUIL)).replace("__DATA__", payload))
-        OUT_PAGE.write_text(page, encoding="utf-8")
+        build_page(TPL, OUT_PAGE, data, {"__RENTREE__": str(an), "__RAYON__": f"{R_KM:.0f}", "__SEUIL__": str(SEUIL)})
         print(f"-> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e6:.1f} Mo)")
     print(f"{len(lyc):,} lycées, {len(pairs):,} couples absents, {len(groups)} groupes -> {OUT_MD}")
 

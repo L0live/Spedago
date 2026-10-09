@@ -6,14 +6,16 @@ Sortie  : app/boussole-des-masters.html  (contenu de page sans <html>/<head>/<bo
 """
 from pathlib import Path
 import json
+import sys
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))  # paquet spedago
+from spedago.pages import build_page  # noqa: E402
+
 TPL = ROOT / "app" / "boussole_template.html"
 DATA = ROOT / "data" / "processed" / "monmaster_simulateur.json"
 OUT = ROOT / "app" / "boussole-des-masters.html"
 
 if __name__ == "__main__":
-    d = json.loads(DATA.read_text(encoding="utf-8"))
-    raw = json.dumps(d, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")  # pas de </script> dans les données
-    OUT.write_text(TPL.read_text(encoding="utf-8").replace("__DATA__", raw), encoding="utf-8")
+    build_page(TPL, OUT, json.loads(DATA.read_text(encoding="utf-8")))
     print(f"-> {OUT} ({OUT.stat().st_size / 1e6:.1f} Mo)")

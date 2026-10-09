@@ -28,6 +28,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.stats import ols  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -147,20 +150,6 @@ def simulate_neutral(t: pd.DataFrame, niveau: str, obs: pd.DataFrame, n: int = 1
 
 
 # ---------- analyse ----------
-
-def ols(y: pd.Series, X: pd.DataFrame) -> pd.DataFrame:
-    """MCO avec erreurs-types robustes (HC1). Variables explicatives standardisées en amont."""
-    d = pd.concat([y, X], axis=1).dropna()
-    yv, Xv = d.iloc[:, 0].to_numpy(float), np.column_stack([np.ones(len(d)), d.iloc[:, 1:].to_numpy(float)])
-    beta, *_ = np.linalg.lstsq(Xv, yv, rcond=None)
-    e = yv - Xv @ beta
-    n, k = Xv.shape
-    bread = np.linalg.inv(Xv.T @ Xv)
-    cov = bread @ (Xv.T * e**2) @ Xv @ bread * n / (n - k)
-    se = np.sqrt(np.diag(cov))
-    r2 = 1 - (e @ e) / ((yv - yv.mean()) @ (yv - yv.mean()))
-    return pd.DataFrame({"coef": beta, "se": se, "t": beta / se}, index=["constante", *X.columns]).round(3).assign(n=n, r2=round(r2, 3))
-
 
 def by_quartile(d: pd.DataFrame, col: str, label: str) -> pd.DataFrame:
     q = pd.qcut(d[col], 4, labels=[f"Q1 ({label} faible)", "Q2", "Q3", f"Q4 ({label} fort)"])

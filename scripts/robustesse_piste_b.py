@@ -22,6 +22,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_indice_specialites as b  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.stats import ols_cluster  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TAB = ROOT / "data" / "processed" / "specialites_lycees.csv"
@@ -59,25 +61,6 @@ def simulate(t: pd.DataFrame, niveau: str, obs: pd.DataFrame, pf: np.ndarray, pg
 
 
 # ---------- 2. régression à effets fixes, erreurs regroupées ----------
-
-def ols_cluster(y: pd.Series, X: pd.DataFrame, cluster: pd.Series) -> pd.DataFrame:
-    """MCO, erreurs-types robustes regroupées (CR1). X contient déjà les indicatrices d'effets fixes."""
-    d = pd.concat([y.rename("_y"), X, cluster.rename("_g")], axis=1).dropna()
-    yv = d["_y"].to_numpy(float)
-    Xv = np.column_stack([np.ones(len(d)), d[X.columns].to_numpy(float)])
-    bread = np.linalg.pinv(Xv.T @ Xv)
-    beta = bread @ Xv.T @ yv
-    e = yv - Xv @ beta
-    meat = np.zeros((Xv.shape[1],) * 2)
-    for _, idx in d.groupby("_g").indices.items():
-        s = Xv[idx].T @ e[idx]
-        meat += np.outer(s, s)
-    n, k, g = len(d), Xv.shape[1], d["_g"].nunique()
-    cov = bread @ meat @ bread * (g / (g - 1)) * ((n - 1) / (n - k))
-    se = np.sqrt(np.diag(cov))
-    names = ["constante", *X.columns]
-    return pd.DataFrame({"coef": beta, "se": se, "t": beta / se}, index=names).assign(n=n, grappes=g)
-
 
 def size_fe(d: pd.DataFrame) -> pd.DataFrame:
     dec = pd.qcut(d.effectif_total.rank(method="first"), 10, labels=False)

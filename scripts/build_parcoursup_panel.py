@@ -15,6 +15,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.io import to_csv_gz  # noqa: E402
+from spedago.stats import ratio  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -68,10 +72,6 @@ def harmonize(df: pd.DataFrame) -> pd.DataFrame:
     df["academie"] = df["acad_mies"].replace({"Besançon": "Besancon"})
     df["idf"] = df["academie"].isin(["Paris", "Créteil", "Versailles"])
     return df
-
-
-def ratio(num: pd.Series, den: pd.Series) -> pd.Series:
-    return num.where(den > 0) / den.where(den > 0)
 
 
 def derive(df: pd.DataFrame) -> pd.DataFrame:
@@ -143,7 +143,7 @@ def quality_report(df: pd.DataFrame) -> str:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     df = derive(load())
-    df.to_csv(OUT / "parcoursup_panel_2020_2025.csv.gz", sep=";", index=False)
+    to_csv_gz(df, OUT / "parcoursup_panel_2020_2025.csv.gz", sep=";", index=False)  # octets identiques à chaque exécution
     (REP / "parcoursup_panel_qualite.md").write_text(quality_report(df), encoding="utf-8")
     print(f"{len(df):,} lignes -> {OUT / 'parcoursup_panel_2020_2025.csv.gz'}")
 

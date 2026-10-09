@@ -21,6 +21,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import build_monmaster as mm  # noqa: E402
 
+sys.path.insert(0, str(ROOT / "tests"))
+from jsharness import extract_page  # noqa: E402
+
 PAGE = ROOT / "app" / "boussole-des-masters.html"
 pytestmark = pytest.mark.skipif(not PAGE.exists() or shutil.which("node") is None, reason="page construite ou node absents")
 
@@ -39,8 +42,7 @@ process.stdout.write(JSON.stringify({ est, ranks }, (k, v) => (typeof v === 'num
 @pytest.fixture(scope="module")
 def page_parts(tmp_path_factory):
     html = PAGE.read_text(encoding="utf-8")
-    calc = re.search(r'<script id="calc">(.*?)</script>', html, re.S).group(1)
-    data = re.search(r'<script type="application/json" id="data">(.*?)</script>', html, re.S).group(1).replace("<\\/", "</")
+    calc, data = extract_page(html)
     d = tmp_path_factory.mktemp("js")
     (d / "calc.js").write_text(calc, encoding="utf-8")
     (d / "data.json").write_text(data, encoding="utf-8")
@@ -163,8 +165,7 @@ def sim_js(tmp_path_factory):
     if not PAGE_SIM.exists():
         pytest.skip("page simulateur absente")
     html = PAGE_SIM.read_text(encoding="utf-8")
-    calc = re.search(r'<script id="calc">(.*?)</script>', html, re.S).group(1)
-    data = re.search(r'<script type="application/json" id="data">(.*?)</script>', html, re.S).group(1).replace("<\\/", "</")
+    calc, data = extract_page(html)
     d = tmp_path_factory.mktemp("sim")
     (d / "calc.js").write_text(calc, encoding="utf-8")
     (d / "data.json").write_text(data, encoding="utf-8")
@@ -244,8 +245,7 @@ def mut_js(tmp_path_factory):
     if not PAGE_MUT.exists():
         pytest.skip("page carte absente")
     html = PAGE_MUT.read_text(encoding="utf-8")
-    calc = re.search(r'<script id="calc">(.*?)</script>', html, re.S).group(1)
-    data = re.search(r'<script type="application/json" id="data">(.*?)</script>', html, re.S).group(1).replace("<\\/", "</")
+    calc, data = extract_page(html)
     D = json.loads(data)
     acads = ["", "Poitiers", "Créteil", "Strasbourg"]
     assert set(acads[1:]) <= {l[4] for l in D["lycees"]}

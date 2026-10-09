@@ -23,6 +23,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.stats import KAPPA_MAX, KAPPA_MIN, Z, _moments, shrink, wilson  # noqa: E402,F401
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw" / "monmaster_2024_2025.csv"
@@ -33,17 +36,6 @@ OUT_MD = ROOT / "reports" / "piste_C_monmaster.md"
 PROFILS = {"lg3": "L3 générale", "lp3": "Licence pro", "but3": "BUT 3e année", "master": "Déjà en master",
            "autre": "Autre inscription", "noninscri": "Non inscrit en 2024-25 / reprise d'études"}
 MIN_CANDIDATS = 10
-Z = 1.96
-
-
-def wilson(k: np.ndarray, n: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    k, n = np.asarray(k, float), np.asarray(n, float)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        p = k / n
-        den = 1 + Z**2 / n
-        c = (p + Z**2 / (2 * n)) / den
-        h = Z * np.sqrt(p * (1 - p) / n + Z**2 / (4 * n**2)) / den
-    return np.where(n > 0, c - h, np.nan), np.where(n > 0, c + h, np.nan)
 
 
 def load(path: Path = RAW) -> pd.DataFrame:
@@ -160,19 +152,7 @@ def report(m: pd.DataFrame, long: pd.DataFrame) -> str:
 
 # ---------- correction statistique (bayésien empirique) ----------
 
-KAPPA_MIN, KAPPA_MAX, MIN_FORMATIONS_PRIOR = 2.0, 1000.0, 5
-
-
-def _moments(k: np.ndarray, n: np.ndarray) -> tuple[float, float]:
-    """Loi a priori Bêta(m, κ) par la méthode des moments (bêta-binomiale) : m = moyenne poolée,
-    variance « vraie » entre formations = variance observée − bruit binomial attendu."""
-    m = k.sum() / n.sum()
-    p = k / n
-    var_obs = np.average((p - m) ** 2, weights=n)
-    bruit = np.average(m * (1 - m) / n, weights=n)
-    tau2 = max(var_obs - bruit, 1e-6)
-    kappa = float(np.clip(m * (1 - m) / tau2 - 1, KAPPA_MIN, KAPPA_MAX))
-    return float(m), kappa
+MIN_FORMATIONS_PRIOR = 5
 
 
 def fit_priors(long: pd.DataFrame) -> pd.DataFrame:
@@ -189,11 +169,6 @@ def fit_priors(long: pd.DataFrame) -> pd.DataFrame:
             (m, kappa), src = nat[pro], "national"
         rows.append({"mention": men, "profil": pro, "m": m, "kappa": kappa, "source": src})
     return pd.DataFrame(rows).set_index(["mention", "profil"])
-
-
-def shrink(k, n, m, kappa):
-    """Moyenne a posteriori : (k + κ·m) / (n + κ). Peu de candidats → proche de m ; beaucoup → proche de k/n."""
-    return (np.asarray(k, float) + kappa * m) / (np.asarray(n, float) + kappa)
 
 
 def backtest(long: pd.DataFrame, n_eval: int = 30) -> tuple[pd.DataFrame, pd.DataFrame]:
