@@ -34,11 +34,19 @@ Inchangé : inversion de `list_com` 2024-2025, CNED exclu, persistance de la ten
 | Carte : taille des groupes | Groupes de 26 lycées à Paris | Plafond de 4 lycées, les plus proches du pivot |
 | Carte : lycées masqués | Lycées à effectifs NSI masqués ignorés comme offre → faux « isolés » à Poitiers | Masqué = offre probable pour les voisins (204 → 74 groupes ; NSI isolés 232 → 178) |
 
+## Référentiel commun et site (10 octobre 2026)
+
+| Point | Contrôle | Correction |
+|---|---|---|
+| Noms d'académie différents d'une page à l'autre | « Besancon », « Etranger », « Polynésie Française », « Nouvelle Calédonie » selon la source | Graphie canonique unique (`spedago/referentiel.py`) dans toutes les pages ; graphie inconnue = arrêt du script |
+| Lycées avec 1re générale absents de l'annuaire | 9 lycées (sans coordonnées) disparaissaient du référentiel | Gardés dans le référentiel ; toujours hors carte (pas de position) |
+| « Mon académie » | Nombres recalculés en Python | Identiques au Simulateur, à la Carte, à la Boussole et à la table de tension (tests) |
+
 ## Reproductibilité
 
 - `scripts/download_data.py` + `data/raw/MANIFEST.csv` (empreintes SHA-256) ; `requirements.txt` ; `run_all.sh`.
 - Pipeline relancé de zéro : sorties identiques à l'archive (hors effet attendu du correctif IFSI : 56 cellules 2024).
-- 40 tests (`python3 -m pytest tests/`).
+- 98 tests (`python3 -m pytest tests/`), dont parité JavaScript/Python des 4 outils et concordance entre pages.
 - Externe : places en apprentissage 2025 = 264 386 (CESPM : 264 800), part ≈ 25,6 % (CESPM : « 26 % »).
 
 ## Limites qui restent (non vérifiables avec l'open data)
