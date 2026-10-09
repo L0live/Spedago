@@ -2,42 +2,65 @@
 __COMMUN__
 <style>
 /* Mise en page : une colonne de lecture ; sélecteur d'académie, quatre chiffres clés, puis trois sections (Parcoursup, spécialités, masters) */
-:root { --track: #e7ecf0; --warn: #b0413e }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --track: #24323d; --warn: #e57a74 } }
-:root[data-theme="dark"] { --track: #24323d; --warn: #e57a74 }
 .wrap { max-width: 1000px; margin: 0 auto }
-header { padding-block: 28px 8px }
+header { padding-block: 40px 8px }
 .lede { color: var(--muted); max-width: 70ch; margin: 0 }
-h2 { font-family: var(--display); font-weight: 600; font-size: 24px; margin: 0 0 6px }
-.pick { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: end; margin-block: 18px 6px }
+h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0 0 12px }
+.pick { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: end; margin-block: 24px 8px }
 .pick label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
-.pick select { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 240px }
+.pick select { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 260px; box-shadow: var(--shadow-sm) }
 .pick select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 .pick .zone { color: var(--muted); font-size: 14px; padding-bottom: 9px }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-block: 14px 8px }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-block: 16px 8px }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0 }
-.stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0 }
+.stat.sim { background: var(--orange-soft); border-color: var(--orange-line) }
+.stat.sim b { color: var(--orange-ink) }
+.stat b { display: block; font-family: var(--display); font-size: 32px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.1; margin-bottom: 4px }
 .stat span { font-size: 13px; color: var(--muted) }
-section.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 18px }
-section.bloc > p { margin: 0 0 10px; max-width: 75ch }
-.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px }
+section.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-top: 24px }
+@media (max-width: 640px) { section.bloc { padding: 16px } }
+section.bloc > p { margin: 0 0 12px; max-width: 75ch }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--orange-ink); margin-bottom: 4px }
 .tablewrap { overflow-x: auto; margin-block: 8px }
 table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 560px }
-th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: bottom }
-td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: bottom }
+td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+tbody tr { transition: background-color .15s ease-out }
+tbody tr:hover { background: var(--bg) }
+tbody tr:last-child td { border-bottom: 0 }
 td.r, th.r { text-align: right }
 td small { display: block; color: var(--muted); font-size: 12px }
-.more { display: inline-block; margin-top: 6px; font-weight: 600; color: var(--accent); text-decoration: none }
-.more:hover { text-decoration: underline }
+.more { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 600; font-size: 14px; color: var(--accent); text-decoration: none;
+        border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; transition: background-color .15s ease-out, border-color .15s ease-out }
+.more:hover { background: var(--accent-soft); border-color: #bfdbfe }
 .note { font-size: 13px; color: var(--muted) }
 td.mention { font-size: 13px; letter-spacing: .01em }
-.hot { color: var(--warn); font-weight: 600 }
+.hot { color: var(--orange-ink); font-weight: 600 }
+.hot small { font-weight: 400 }
+/* Jauge : part de l'académie (barre) et repère France (trait) ; orange si nettement au-dessus de la France */
+.meter { position: relative; height: 6px; background: var(--track); border-radius: 999px; margin: 6px 0 3px auto; width: 100%; max-width: 140px }
+.meter span { position: absolute; inset: 0 auto 0 0; background: var(--accent-mark); border-radius: 999px }
+.meter.hot span { background: var(--orange) }
+.meter i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); border-radius: 1px }
 .empty { color: var(--muted); font-style: italic }
 section.explain { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
 @media (max-width: 760px) { section.explain { grid-template-columns: 1fr } }
 section.explain h2 { font-size: 19px }
 section.explain ul { padding-left: 18px; margin: 0 }
+/* Mobile : chaque ligne de tableau devient une fiche (libellé au-dessus de chaque valeur) */
+@media (max-width: 640px) {
+  .tablewrap { overflow: visible }
+  table { min-width: 0 }
+  thead { display: none }
+  table, tbody, td { display: block }
+  tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding-block: 12px; border-bottom: 1px solid var(--line) }
+  td { border: 0; padding: 0; text-align: left !important }
+  td:first-child { grid-column: 1 / -1; font-weight: 600 }
+  td:first-child small { font-weight: 400 }
+  td[data-l]::before { content: attr(data-l); display: block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px }
+  .meter { margin-left: 0 }
+}
 footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
 </style>
 
@@ -156,7 +179,7 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
       [a.ps ? "+" + fmtInt(a.ps.sim[0]) : "–", "places avec la règle de départ du simulateur"],
       [m ? fmtInt(m.places) : "–", m ? `places en master dans ${fmtInt(m.formations)} formations` : "pas de master sur la plateforme"],
     ];
-    $("stats").innerHTML = cards.map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join("");
+    $("stats").innerHTML = cards.map(([b, t], i) => `<div class="stat${i === 2 ? " sim" : ""}"><b>${b}</b><span>${t}</span></div>`).join("");
   }
 
   function blocPs(a) {
@@ -165,16 +188,17 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
     const [ajout, couvert, visees] = a.ps.sim, [ajFr, coFr] = FR.ps.sim;
     const rows = a.ps.filieres.map((r) => {
       const x = C.ps(r.slice(1)), n = frFil.get(r[0]);
-      const hot = x.partSat > n.partSat + 0.1 ? ' class="r hot"' : ' class="r"';
+      const chaud = x.partSat > n.partSat + 0.1, hot = chaud ? ' class="r hot"' : ' class="r"';
+      const meter = `<div class="meter${chaud ? " hot" : ""}" aria-hidden="true"><span style="width:${(x.partSat * 100).toFixed(1)}%"></span><i style="left:calc(${(n.partSat * 100).toFixed(1)}% - 1px)"></i></div>`;
       return `<tr><td>${esc(D.filieres[r[0]])}<small>${fmtInt(x.formations)} formation${x.formations > 1 ? "s" : ""}</small></td>
-        <td class="r">${fmtInt(x.places)}</td><td class="r">${fmtDec(x.vpp)}<small>France ${fmtDec(n.vpp)}</small></td>
-        <td class="r">${fmtPct(x.remp)}<small>France ${fmtPct(n.remp)}</small></td>
-        <td${hot}>${fmtPct(x.partSat)}<small>France ${fmtPct(n.partSat)}</small></td></tr>`;
+        <td class="r" data-l="Places">${fmtInt(x.places)}</td><td class="r" data-l="Vœux par place">${fmtDec(x.vpp)}<small>France ${fmtDec(n.vpp)}</small></td>
+        <td class="r" data-l="Places pourvues">${fmtPct(x.remp)}<small>France ${fmtPct(n.remp)}</small></td>
+        <td${hot} data-l="Dans des formations pleines">${fmtPct(x.partSat)}${meter}<small>France ${fmtPct(n.partSat)}</small></td></tr>`;
     }).join("");
     $("ps").innerHTML = `
       <p>${fmtInt(t.places)} places et ${fmtInt(t.voeux)} vœux confirmés, soit <strong>${fmtDec(t.vpp)} vœux par place</strong> (France : ${fmtDec(f.vpp)}).
       ${fmtPct(t.partSat)} des places sont dans des formations pleines à 95 % ou plus (France : ${fmtPct(f.partSat)}) ; ${fmtInt(t.vac)} places sont restées vacantes.</p>
-      <div class="tablewrap"><table><thead><tr><th>Filière</th><th class="r">Places</th><th class="r">Vœux par place</th><th class="r">Places pourvues</th><th class="r">Places dans des formations pleines</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="tablewrap"><table><thead><tr><th>Filière</th><th class="r">Places</th><th class="r">Vœux par place</th><th class="r">Places pourvues</th><th class="r">Places dans des formations pleines<br><small style="text-transform:none;letter-spacing:0;font-weight:500">barre : académie · trait : France</small></th></tr></thead><tbody>${rows}</tbody></table></div>
       <p>Règle de départ du simulateur (+${fmtPct(D.alpha)} de places aux formations pleines et parmi les plus demandées de leur filière) :
       <strong>+${fmtInt(ajout)} places</strong> dans ${fmtInt(visees)} formations, soit ${fmtPct(ajout / ajFr, 1)} des places ajoutées en France.
       ${ajout ? `Au plus ${fmtInt(couvert)} (${fmtPct(couvert / ajout)}) pourraient venir de places restées vides dans une formation de même spécialité de l'académie (France : ${fmtPct(coFr / ajFr)}).` : ""}</p>
@@ -184,9 +208,9 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
   function blocSpe(a) {
     if (!a.spe) { $("spe").innerHTML = `<p class="empty">Pas de lycée de cette académie sur la carte des spécialités (effectifs ou coordonnées absents).</p>`; return; }
     const rows = C.speRows(a.spe.spe).map((r) => `<tr><td>${esc(LIB(D.specialites[r.sp]))}</td>
-      <td class="r">${fmtInt(r.propose)}${r.incertain ? `<small>+ ${fmtInt(r.incertain)} incertain${r.incertain > 1 ? "s" : ""}</small>` : ""}</td>
-      <td class="r">${fmtInt(r.voisin)}</td><td class="r">${fmtInt(r.commune)}<small>${fmtInt(r.groupes)} groupe${r.groupes > 1 ? "s" : ""}</small></td>
-      <td class="r${r.isole ? " hot" : ""}">${fmtInt(r.isole)}<small>${fmtInt(r.eIsole)} élèves de 1re</small></td></tr>`).join("");
+      <td class="r" data-l="La proposent">${fmtInt(r.propose)}${r.incertain ? `<small>+ ${fmtInt(r.incertain)} incertain${r.incertain > 1 ? "s" : ""}</small>` : ""}</td>
+      <td class="r" data-l="Voisin à moins de 20 km">${fmtInt(r.voisin)}</td><td class="r" data-l="Ouverture commune">${fmtInt(r.commune)}<small>${fmtInt(r.groupes)} groupe${r.groupes > 1 ? "s" : ""}</small></td>
+      <td class="r${r.isole ? " hot" : ""}" data-l="Sans solution proche">${fmtInt(r.isole)}<small>${fmtInt(r.eIsole)} élèves de 1re</small></td></tr>`).join("");
     const tot = a.spe.spe.reduce((s, r) => s + r[4], 0);
     $("spe").innerHTML = `
       <p>${fmtInt(a.spe.lycees)} lycées avec une 1re générale (rentrée ${D.rentree}). Pour chaque spécialité, combien la proposent, et pour les autres :
@@ -202,9 +226,9 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
     const t = C.mm(a.mm.total), f = C.mm(FR.mm.total);
     const rows = a.mm.mentions.map(([m, nf, pl, n, k, nN, kN]) => {
       const [lo, hi] = C.wilson(k, n);
-      return `<tr><td class="mention">${esc(m)}<small>${fmtInt(nf)} formation${nf > 1 ? "s" : ""}</small></td><td class="r">${fmtInt(pl)}</td>
-        <td class="r">${n ? fmtPct(k / n) : "–"}<small>${n ? `entre ${fmtPct(lo)} et ${fmtPct(hi)} · ${fmtInt(n)} cand.` : "aucun candidat"}</small></td>
-        <td class="r">${fmtPct(kN / nN)}</td></tr>`;
+      return `<tr><td class="mention">${esc(m)}<small>${fmtInt(nf)} formation${nf > 1 ? "s" : ""}</small></td><td class="r" data-l="Places">${fmtInt(pl)}</td>
+        <td class="r" data-l="Proposition, L3 générale">${n ? fmtPct(k / n) : "–"}<small>${n ? `entre ${fmtPct(lo)} et ${fmtPct(hi)} · ${fmtInt(n)} cand.` : "aucun candidat"}</small></td>
+        <td class="r" data-l="Même mention, France">${fmtPct(kN / nN)}</td></tr>`;
     }).join("");
     $("mm").innerHTML = `
       <p>${fmtInt(t.formations)} formations, ${fmtInt(t.places)} places, ${fmtInt(t.cand)} candidatures : <strong>${fmtPct(t.taux)}</strong> ont reçu une proposition d'admission (France : ${fmtPct(f.taux)}).

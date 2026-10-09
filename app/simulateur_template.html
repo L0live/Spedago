@@ -3,12 +3,8 @@ __COMMUN__
 <style>
 /* Mise en page : réglages à gauche (colonne étroite, collante), résultats à droite ; une colonne sur mobile */
 :root {
-  --add: #2f7d4f; --idf: #8a4f9e; --track: #e7ecf0;
+  --add: #2f7d4f; --idf: #8a4f9e;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark }
 .wrap { max-width: 1120px; margin: 0 auto }
 header { padding-block: 32px 16px }
 h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 0 8px }
@@ -30,10 +26,10 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .reset { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 8px; padding: 6px 10px; cursor: pointer; justify-self: start }
 .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px }
 @media (max-width: 640px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0 }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; min-width: 0 }
 .stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
 .stat span { font-size: 13px; color: var(--muted) }
-.note { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; margin: 0 0 16px }
+.note { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; margin: 0 0 16px }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; min-width: 0 }
 .tablewrap { overflow-x: auto }
 table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums }
@@ -43,7 +39,8 @@ td.r, th.r { text-align: right }
 td.barcell { width: 34%; min-width: 120px }
 .hbar { height: 10px; background: var(--track); border-radius: 5px; overflow: hidden }
 .hbar span { display: block; height: 100%; background: var(--add); border-radius: 5px }
-tr.moi td { background: var(--accent-soft); font-weight: 600 }
+tr.moi td { background: var(--orange-soft); font-weight: 600 }
+tr.moi td:first-child { box-shadow: inset 3px 0 0 var(--orange) }
 tr.idf td:first-child::after { content: "IdF"; margin-left: 6px; font-size: 10px; font-weight: 700; color: var(--idf); border: 1px solid var(--idf); border-radius: 3px; padding: 0 3px; vertical-align: middle }
 .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 }
 section.explain { margin-top: 28px; display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)) }

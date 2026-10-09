@@ -1,34 +1,51 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style id="commun-css">
-/* Spédago — styles communs à toutes les pages (jetons de couleur, typographie, barre de navigation) */
+/* Spédago — système visuel commun (thème clair uniquement).
+   Jetons alignés sur Tailwind : neutres slate, couleur principale blue-700 (liens, navigation, focus),
+   couleur secondaire orange (repères : académie choisie, valeurs à surveiller, porte « décideurs »).
+   Règle 60-30-10 : neutres partout, bleu pour agir, orange pour signaler — jamais pour décorer. */
 :root {
-  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6;
-  --accent: #1d5f8a; --accent-soft: #e3eef6;
+  color-scheme: light;
+  --bg: #f8fafc; --surface: #ffffff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --track: #f1f5f9;
+  --accent: #1d4ed8; --accent-strong: #1e40af; --accent-soft: #eff6ff; --accent-mark: #2563eb;
+  --orange: #ea580c; --orange-ink: #c2410c; --orange-soft: #fff7ed; --orange-line: #fed7aa;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / .05), 0 1px 3px rgb(15 23 42 / .04);
+  --shadow-md: 0 6px 16px -4px rgb(15 23 42 / .10), 0 2px 4px rgb(15 23 42 / .04);
   --display: "Newsreader", Georgia, "Times New Roman", serif;
   --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; color-scheme: dark }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px; margin: 0 }
-h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
-.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
-.site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-block: 14px 10px; border-bottom: 1px solid var(--line); font-size: 14px }
-.site-nav .brand { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--ink); text-decoration: none; margin-right: 8px }
-.site-nav .door { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px }
-.site-nav .door > span { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted) }
-.site-nav .door a { color: var(--accent); text-decoration: none; padding: 2px 0; border-bottom: 2px solid transparent }
-.site-nav .door a:hover { border-bottom-color: var(--line) }
-.site-nav .door a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent) }
+html { background: var(--bg) }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 0 48px; margin: 0;
+       -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(32px, 5vw, 46px); line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance }
+h2 { letter-spacing: -0.01em }
+::selection { background: var(--orange-line) }
+a { color: var(--accent) }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+         color: var(--orange-ink); background: var(--orange-soft); border: 1px solid var(--orange-line); border-radius: 999px; padding: 3px 10px; margin-bottom: 16px }
+.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--orange) }
+.lede { line-height: 1.6 }
+
+/* Barre du site : marque, puis les deux portes */
+.site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding-block: 16px 12px; border-bottom: 1px solid var(--line); font-size: 14px }
+.site-nav .brand { display: inline-flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 600; font-size: 20px; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; margin-right: 8px }
+.site-nav .brand::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: linear-gradient(135deg, var(--accent-mark) 0 50%, var(--orange) 50% 100%) }
+.site-nav .door { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px }
+.site-nav .door > span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+.site-nav .door a { color: var(--accent); text-decoration: none; padding: 3px 0; border-bottom: 2px solid transparent; transition: color .15s ease-out, border-color .15s ease-out }
+.site-nav .door a:hover { color: var(--accent-strong); border-bottom-color: var(--line) }
+.site-nav .door a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--orange) }
 .site-nav .sep { width: 1px; height: 18px; background: var(--line) }
 @media (max-width: 640px) { .site-nav .sep { display: none } .site-nav .door { width: 100% } }
-.site-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+/* Surfaces : une seule élévation pour toutes les cartes du site */
+.stat, .panel, .row, .mapbox, .count, .controls, section.bloc, .door-card { box-shadow: var(--shadow-sm) }
+footer { color: var(--muted) }
 </style>
 <script id="commun">
 // Spédago — fonctions communes : identifiant d'académie dans l'adresse (#poitiers), liens de navigation qui le gardent.

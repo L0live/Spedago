@@ -3,12 +3,8 @@ __COMMUN__
 <style>
 /* Mise en page : colonne de lecture unique, barre de filtres puis résultats en liste ; chaque formation = une ligne de relevé */
 :root {
-  --hi: #2f7d4f; --mid: #b07a12; --lo: #b0413e; --track: #e7ecf0;
+  --hi: #2f7d4f; --mid: #b07a12; --lo: #b0413e;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark }
 .wrap { max-width: 980px; margin: 0 auto }
 header { padding-block: 32px 8px }
 .lede { color: var(--muted); max-width: 66ch; margin: 0 }
@@ -18,16 +14,16 @@ header { padding-block: 32px 8px }
 .filters input:focus-visible, .filters select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 @media (max-width: 720px) { .filters { grid-template-columns: 1fr 1fr; position: static } .filters label:first-child { grid-column: 1 / -1 } }
 .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-block: 20px }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0 }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; min-width: 0 }
 .stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
 .stat span { font-size: 13px; color: var(--muted) }
 @media (max-width: 720px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.note { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-block: 0 16px }
+.note { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; margin-block: 0 16px }
 .note strong { color: var(--ink) }
 .tools { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); margin-block: 8px }
 .tools select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px }
 .list { display: grid; gap: 8px }
-.row { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 6px 18px; align-items: center }
+.row { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 6px 18px; align-items: center }
 .row h3 { font-size: 15px; font-weight: 600; margin: 0; overflow-wrap: anywhere }
 .meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px }
 .tag { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px }

@@ -1,26 +1,40 @@
 <title>Spédago</title>
 __COMMUN__
 <style>
-/* Mise en page : présentation courte, puis deux portes d'entrée côte à côte (élèves / décideurs) ; empilées sur mobile */
-.wrap { max-width: 1000px; margin: 0 auto }
-header { padding-block: 36px 8px }
-.lede { color: var(--muted); max-width: 68ch; margin: 0; font-size: 16px }
-.doors { display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; margin-top: 24px; align-items: start }
+/* Accueil : en-tête éditorial, trois chiffres de cadrage, puis deux portes (bleu = élèves, orange = décideurs).
+   Espacements sur l'échelle Tailwind (8, 12, 16, 24, 32, 48 px) ; une seule élévation (shadow-sm), shadow-md au survol. */
+.wrap { max-width: 1040px; margin: 0 auto }
+header { padding-block: 48px 8px }
+header h1 { font-size: clamp(40px, 7vw, 60px) }
+.lede { color: var(--muted); max-width: 62ch; margin: 0; font-size: 17px }
+.figures { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 24px 0 0; padding: 0; list-style: none }
+.figures li { display: grid; gap: 0 }
+.figures b { font-family: var(--display); font-size: 30px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.1 }
+.figures span { font-size: 13px; color: var(--muted) }
+.doors { display: grid; grid-template-columns: 1fr 1.35fr; gap: 24px; margin-top: 32px; align-items: start }
 @media (max-width: 760px) { .doors { grid-template-columns: 1fr } }
-.door-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px }
-.door-card > .who { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent) }
-.door-card h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 2px 0 12px }
-.tool { display: block; padding: 12px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none }
-.tool:hover strong { text-decoration: underline }
-.tool strong { color: var(--accent); font-size: 16px }
-.tool span { display: block; color: var(--muted); font-size: 14px; margin-top: 2px }
-a:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.go { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px }
-.go select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; flex: 1 1 180px }
-.go button { font: inherit; font-weight: 600; color: var(--surface); background: var(--ink); border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer }
-section.how { margin-top: 28px; font-size: 14px; color: var(--muted); max-width: 75ch }
-section.how h2 { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ink); margin: 0 0 6px }
-section.how ul { padding-left: 18px; margin: 0 }
+.door-card { --door: var(--accent); --door-soft: var(--accent-soft); background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--door);
+             border-radius: var(--radius); padding: 24px }
+.door-card.decideurs { --door: var(--orange); --door-soft: var(--orange-soft) }
+.door-card > .who { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent) }
+.door-card.decideurs > .who { color: var(--orange-ink) }
+.door-card h2 { font-family: var(--display); font-weight: 600; font-size: 28px; margin: 4px 0 16px }
+.tool { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 12px; margin-inline: -12px; border-radius: var(--radius-sm);
+        color: inherit; text-decoration: none; transition: background-color .15s ease-out }
+.tool + .tool, .go + .tool { border-top: 1px solid var(--line); border-radius: 0 }
+.tool:hover { background: var(--door-soft); border-radius: var(--radius-sm) }
+.tool strong { color: var(--ink); font-size: 16px; font-weight: 600 }
+.tool span { grid-column: 1; color: var(--muted); font-size: 14px }
+.tool::after { content: "→"; grid-column: 2; grid-row: 1 / span 2; color: var(--door); font-size: 18px; transition: transform .15s ease-out }
+.tool:hover::after { transform: translateX(3px) }
+.go { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 12px }
+.go select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 0; flex: 1 1 180px }
+.go button { font: inherit; font-weight: 600; color: #fff; background: var(--orange-ink); border: 0; border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;
+             box-shadow: var(--shadow-sm); transition: background-color .15s ease-out }
+.go button:hover { background: #9a3412 }
+section.how { margin-top: 48px; font-size: 14px; color: var(--muted); max-width: 75ch }
+section.how h2 { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ink); margin: 0 0 8px }
+section.how ul { padding-left: 18px; margin: 0; display: grid; gap: 4px }
 footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
 </style>
 
@@ -30,6 +44,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
     <span class="badge">Projet indépendant · données publiques</span>
     <h1>Spédago</h1>
     <p class="lede">Des outils construits sur les données ouvertes de l'éducation, pour regarder les faits dont on débat : les places en tension à l'entrée du supérieur, l'accès aux spécialités au lycée, l'admission en master. Les règles de calcul sont affichées, les limites aussi.</p>
+    <ul class="figures" id="figures"></ul>
   </header>
 
   <div class="doors">
@@ -39,7 +54,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <a class="tool" href="boussole-des-masters.html" data-page="boussole-des-masters.html"><strong>Boussole des masters</strong>
         <span>Pour une mention et votre parcours, la part des candidats qui ont reçu une proposition en 2024 et 2025, master par master, et où candidater avec votre profil.</span></a>
     </div>
-    <div class="door-card">
+    <div class="door-card decideurs">
       <div class="who">Décideurs, élus, rectorats, syndicats, journalistes</div>
       <h2>Comprendre et décider</h2>
       <a class="tool" href="mon-academie.html" data-page="mon-academie.html"><strong>Mon académie</strong>
@@ -47,7 +62,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <form class="go" id="go" autocomplete="off">
         <select id="acad" aria-label="Académie"></select><button type="submit">Ouvrir la fiche</button>
       </form>
-      <a class="tool" href="simulateur-parcoursup.html" data-page="simulateur-parcoursup.html" style="margin-top:12px"><strong>Simulateur des places en tension</strong>
+      <a class="tool" href="simulateur-parcoursup.html" data-page="simulateur-parcoursup.html"><strong>Simulateur des places en tension</strong>
         <span>Que donnerait une règle « les places suivent la pression de l'année précédente » ? Combien de places, où, et quelle part prise sur des places restées vides.</span></a>
       <a class="tool" href="mutualisation.html" data-page="mutualisation.html"><strong>Carte des spécialités partagées</strong>
         <span>Pour chaque spécialité de 1re, les lycées qui ne la proposent pas : un voisin la propose-t-il, une ouverture commune est-elle possible ?</span></a>
@@ -71,7 +86,9 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 (() => {
   const D = JSON.parse(document.getElementById("data").textContent);
   const sel = document.getElementById("acad");
-  D.forEach(([nom, slug]) => { const o = document.createElement("option"); o.value = slug; o.textContent = nom; sel.appendChild(o); });
+  document.getElementById("figures").innerHTML = D.chiffres
+    .map(([n, t]) => `<li><b>${Math.round(n).toLocaleString("fr-FR")}</b><span>${t}</span></li>`).join("");
+  D.academies.forEach(([nom, slug]) => { const o = document.createElement("option"); o.value = slug; o.textContent = nom; sel.appendChild(o); });
   if (!Spedago.pick(sel)) sel.value = "poitiers";
   document.getElementById("go").addEventListener("submit", (e) => { e.preventDefault(); location.href = "mon-academie.html#" + sel.value; });
   sel.addEventListener("change", () => Spedago.setHash(sel.selectedOptions[0].textContent));

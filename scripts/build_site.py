@@ -18,8 +18,13 @@ SITE = ROOT / "site"
 
 
 def main() -> None:
-    acad = json.loads((PROCESSED / "mon_academie.json").read_text(encoding="utf-8"))["academies"]
-    build_page(APP / "index_template.html", APP / "index.html", [[a["nom"], a["slug"]] for a in acad])
+    M = json.loads((PROCESSED / "mon_academie.json").read_text(encoding="utf-8"))
+    fr = M["france"]
+    chiffres = [[fr["ps"]["total"][0], f"formations Parcoursup {M['session']}"],
+                [fr["spe"]["lycees"], f"lycées avec une 1re générale (rentrée {M['rentree']})"],
+                [fr["mm"]["total"][0], f"masters sur Mon Master {M['session']}"]]
+    build_page(APP / "index_template.html", APP / "index.html",
+               {"academies": [[a["nom"], a["slug"]] for a in M["academies"]], "chiffres": chiffres})
     SITE.mkdir(exist_ok=True)
     for f, _, _ in PAGES:
         src = APP / f

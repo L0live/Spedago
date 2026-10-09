@@ -87,8 +87,10 @@ def test_navigation_commune_sur_toutes_les_pages():
         assert html.count('<nav class="site-nav"') == 1 and nav(f) in html, f
         assert html.count(f'data-page="{f}" aria-current="page"') == 1, f
         assert html.count('<script id="commun">') == 1 and commun.strip() in html, f
+        assert "prefers-color-scheme: dark" not in html and 'data-theme="dark"' not in html, f"thème sombre restant dans {f}"
         hrefs = re.findall(r'href="([^"#]+)', nav(f))
         assert sorted(set(hrefs)) == sorted(NOMS), (f, hrefs)
+    assert "color-scheme: light" in commun and "--orange:" in commun
     for t in APP.glob("*_template.html"):
         s = t.read_text(encoding="utf-8")
         assert "__COMMUN__" in s and "__NAV__" in s, t.name
