@@ -1,0 +1,5 @@
+# Versions avec lesquelles les résultats de Spédago ont été produits (Python 3.10.12)
+pandas==2.3.3
+numpy==2.2.6
+tabulate==0.10.0
+pytest==9.1.1

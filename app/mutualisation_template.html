@@ -1,0 +1,249 @@
+<title>Carte des spécialités partagées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Mise en page : carte (points des lycées, projection simple) à gauche, fiche et groupes à droite ; empilé sur mobile */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6; --accent: #1d5f8a; --accent-soft: #e3eef6;
+  --offre: #2f7d4f; --voisin: #c68a12; --commun: #2c64c6; --isole: #c0413c; --incertain: #aab4bd; --land: #e9edf1;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47; --accent: #6fb0dc; --accent-soft: #1b3346;
+  --offre: #5fbf86; --voisin: #e0a93e; --commun: #6f9ef0; --isole: #e57a74; --incertain: #4b5965; --land: #1a2731; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47; --accent: #6fb0dc; --accent-soft: #1b3346;
+  --offre: #5fbf86; --voisin: #e0a93e; --commun: #6f9ef0; --isole: #e57a74; --incertain: #4b5965; --land: #1a2731; color-scheme: dark }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px }
+.wrap { max-width: 1180px; margin: 0 auto }
+header { padding-block: 32px 12px }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
+h2 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0 0 8px }
+.lede { color: var(--muted); max-width: 72ch; margin: 0 }
+.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
+.filters { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; margin-block: 14px }
+@media (max-width: 760px) { .filters { grid-template-columns: 1fr 1fr } }
+.filters label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
+.filters select, .filters input { font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0 }
+select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px }
+@media (max-width: 760px) { .counts { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.count { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; border-left: 5px solid var(--c) }
+.count b { display: block; font-family: var(--display); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
+.count span { font-size: 13px; color: var(--muted) }
+.layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) } }
+.mapbox { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; min-width: 0 }
+svg#map { width: 100%; height: auto; display: block; touch-action: manipulation }
+svg#map circle { cursor: pointer }
+svg#map .grp { stroke: var(--commun); stroke-width: 1.4; opacity: .7 }
+svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); padding: 6px 4px 2px }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 5px; vertical-align: middle }
+.side { display: grid; gap: 14px; min-width: 0 }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0 }
+.fiche dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 14px }
+.fiche dt { color: var(--muted) } .fiche dd { margin: 0 }
+.spes { display: grid; gap: 4px; margin-top: 10px; font-size: 14px }
+.spes div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding-block: 3px }
+.spes small { color: var(--muted); text-align: right }
+.pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--surface); background: var(--c); border-radius: 4px; padding: 0 6px; white-space: nowrap }
+.groups { display: grid; gap: 8px; max-height: 520px; overflow-y: auto }
+.group { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; cursor: pointer; background: transparent; text-align: left; font: inherit; color: inherit; width: 100% }
+.group:hover { background: var(--accent-soft) }
+.group b { font-variant-numeric: tabular-nums }
+.group small { color: var(--muted); display: block }
+.empty { color: var(--muted); font-size: 14px }
+section.explain { margin-top: 26px; display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)) }
+section.explain p, section.explain li { font-size: 14px; color: var(--muted); max-width: 64ch }
+section.explain ul { padding-left: 18px; margin: 0 }
+@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } }
+footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="badge">Projet indépendant · données publiques, 1re générale __RENTREE__</span>
+    <h1>Carte des spécialités partagées</h1>
+    <p class="lede">Les petits lycées proposent moins de spécialités. Pour chaque spécialité, la carte montre les lycées qui ne la proposent pas et ce qui serait possible : la suivre dans un lycée voisin, l'ouvrir en commun avec d'autres lycées proches qui ne l'ont pas, ou rien de tout cela à moins de __RAYON__ km.</p>
+  </header>
+
+  <form class="filters" id="filters" autocomplete="off">
+    <label for="spe">Spécialité <select id="spe"></select></label>
+    <label for="statut">Statut <select id="statut"><option value="">Tous</option><option value="Public">Public</option><option value="Privé">Privé</option></select></label>
+    <label for="acad">Académie <select id="acad"><option value="">Toutes</option></select></label>
+    <label for="cherche">Lycée <input id="cherche" list="lycees" placeholder="Nom ou commune"><datalist id="lycees"></datalist></label>
+  </form>
+
+  <div class="counts" id="counts"></div>
+
+  <div class="layout">
+    <div class="mapbox">
+      <svg id="map" viewBox="0 0 600 620" role="img" aria-label="Carte des lycées de métropole"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="side">
+      <div class="panel fiche" id="fiche"><h2>Fiche lycée</h2><p class="empty">Cliquez un point sur la carte ou cherchez un lycée.</p></div>
+      <div class="panel"><h2 id="g-title">Ouvertures communes possibles</h2><div class="groups" id="groups"></div></div>
+    </div>
+  </div>
+
+  <section class="explain">
+    <div>
+      <h2>Comment c'est calculé</h2>
+      <ul>
+        <li>Un lycée « ne propose pas » une spécialité quand ses effectifs publiés sont à zéro. Quand ils sont masqués (secret statistique), le lycée est gris : on ne sait pas.</li>
+        <li>Accès voisin : un lycée du même statut la propose à moins de __RAYON__ km à vol d'oiseau.</li>
+        <li>Ouverture commune : sinon, 2 à 4 lycées proches qui ne l'ont pas atteignent ensemble __SEUIL__ élèves estimés.</li>
+        <li>Élèves estimés = effectif de 1re × part des élèves qui suivent la spécialité dans tous les lycées (estimation basse). Avec la part observée là où elle est proposée, les ouvertures possibles seraient plus nombreuses.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la carte ne sait pas</h2>
+      <ul>
+        <li>Les temps de transport réels, les horaires, la disponibilité d'un enseignant.</li>
+        <li>Les goûts des élèves d'un lycée donné : la demande est une moyenne nationale.</li>
+        <li>Les enseignements déjà partagés par convention entre établissements, ou suivis au CNED.</li>
+        <li>Outre-mer : lycées comptés et listés, mais pas dessinés sur la carte.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Sources : ministère de l'Éducation nationale (DEPP), effectifs par spécialité en 1re générale, et annuaire de l'éducation (Licence Ouverte 2.0) ; traitement Spédago.
+    Outil indépendant. Les catégories sont calculées par un script testé ; la page ne fait que les afficher.
+  </footer>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script id="calc">
+// Fonctions de calcul pures (aucun accès au DOM) : exécutées par la page ET par les tests (Node.js).
+// Codes de statut : 0 proposée, 2 incertaine, 3 accès voisin, 4 ouverture commune, 5 isolé.
+const MutCalc = (() => {
+  const STAT = 3, ACAD = 4, EFF = 8, ST = 9;
+  const visible = (l, statut, acad) => (statut === "" || l[STAT] === statut) && (acad === "" || l[ACAD] === acad);
+  // Nombre de lycées par code et élèves de 1re concernés (codes 3, 4, 5), pour une spécialité et un filtre.
+  function summary(D, sp, statut = "", acad = "") {
+    const n = { 0: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, eleves = { 3: 0, 4: 0, 5: 0 };
+    for (const l of D.lycees) {
+      if (!visible(l, statut, acad)) continue;
+      const c = l[ST][sp]; n[c] += 1; if (c in eleves) eleves[c] += l[EFF];
+    }
+    return { n, eleves };
+  }
+  // Groupes d'ouverture commune de la spécialité dont au moins un membre est visible, par demande décroissante.
+  function groups(D, sp, statut = "", acad = "") {
+    return D.groupes.filter((g) => g[0] === sp && g[1].some((m) => visible(D.lycees[m], statut, acad)))
+      .sort((a, b) => b[2] - a[2] || a[1][0] - b[1][0]);
+  }
+  return { visible, summary, groups };
+})();
+if (typeof module !== "undefined") module.exports = MutCalc;
+</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmtInt = (x) => Math.round(x).toLocaleString("fr-FR");
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const LIB = (s) => s.replace(/_/g, " ").replace(/\bsc\b/g, "sciences").replace(/^./, (c) => c.toUpperCase());
+  // codes : 0 proposée, 2 incertaine, 3 accès voisin, 4 ouverture commune, 5 isolé
+  const CAT = { 0: ["Proposée", "--offre"], 3: ["Accès voisin", "--voisin"], 4: ["Ouverture commune", "--commun"], 5: ["Sans solution proche", "--isole"], 2: ["Incertain", "--incertain"] };
+  const L = D.lycees, I = { uai: 0, nom: 1, com: 2, stat: 3, acad: 4, bassin: 5, lat: 6, lon: 7, eff: 8, st: 9, near: 10 };
+  const idx = new Map(L.map((l, i) => [l[I.uai], i]));
+
+  // ---- projection (métropole) : équirectangulaire corrigée de la latitude moyenne
+  const LAT0 = 46.5, K = Math.cos(LAT0 * Math.PI / 180), BOX = { lon: [-5.3, 9.7], lat: [41.2, 51.2] };
+  const W = 600, H = 620, PAD = 10;
+  const sx = (W - 2 * PAD) / ((BOX.lon[1] - BOX.lon[0]) * K), sy = (H - 2 * PAD) / (BOX.lat[1] - BOX.lat[0]), s = Math.min(sx, sy);
+  const px = (lon) => PAD + (lon - BOX.lon[0]) * K * s, py = (lat) => H - PAD - (lat - BOX.lat[0]) * s;
+  const inMetro = (l) => l[I.lat] > 41 && l[I.lat] < 51.5 && l[I.lon] > -5.5 && l[I.lon] < 10;
+
+  // ---- options
+  D.specialites.forEach((sp, i) => { const o = document.createElement("option"); o.value = i; o.textContent = LIB(sp); $("spe").appendChild(o); });
+  [...new Set(L.map((l) => l[I.acad]))].sort((a, b) => a.localeCompare(b, "fr")).forEach((a) => { const o = document.createElement("option"); o.value = a; o.textContent = a; $("acad").appendChild(o); });
+  L.forEach((l) => { const o = document.createElement("option"); o.value = `${l[I.nom]} — ${l[I.com]}`; $("lycees").appendChild(o); });
+  const byLabel = new Map(L.map((l, i) => [`${l[I.nom]} — ${l[I.com]}`, i]));
+  $("legend").innerHTML = [0, 3, 4, 5, 2].map((c) => `<span><i style="--c:var(${CAT[c][1]})"></i>${CAT[c][0]}</span>`).join("");
+
+  // ---- carte
+  const svg = $("map"), gLines = document.createElementNS(NS, "g"), gDots = document.createElementNS(NS, "g");
+  svg.append(gLines, gDots);
+  const dots = L.map((l, i) => {
+    if (!inMetro(l)) return null;
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", px(l[I.lon]).toFixed(1)); c.setAttribute("cy", py(l[I.lat]).toFixed(1));
+    c.dataset.i = i; const t = document.createElementNS(NS, "title"); c.appendChild(t); gDots.appendChild(c); return c;
+  });
+  let selected = null;
+
+  const visible = (l) => MutCalc.visible(l, $("statut").value, $("acad").value);
+
+  function render() {
+    const sp = +$("spe").value, { n, eleves: el } = MutCalc.summary(D, sp, $("statut").value, $("acad").value);
+    L.forEach((l, i) => {
+      const code = l[I.st][sp], vis = visible(l), d = dots[i];
+      if (!d) return;
+      d.hidden = !vis;
+      d.setAttribute("r", code === 0 ? 2.2 : code === 2 ? 1.6 : 3);
+      d.style.fill = `var(${CAT[code][1]})`; d.style.opacity = code === 0 || code === 2 ? 0.55 : 0.9;
+      d.firstChild.textContent = `${l[I.nom]} (${l[I.com]}) — ${CAT[code][0]}`;
+      d.classList.toggle("sel", selected === i);
+    });
+    // les points « problème » au-dessus
+    [3, 4, 5].forEach((c) => L.forEach((l, i) => { if (dots[i] && l[I.st][sp] === c) gDots.appendChild(dots[i]); }));
+    if (selected !== null && dots[selected]) gDots.appendChild(dots[selected]);
+    $("counts").innerHTML = [[0, n[0], "lycées la proposent"], [3, n[3], `sans elle · voisin à moins de ${D.rayon_km} km`],
+      [4, n[4], "sans elle · ouverture commune possible"], [5, n[5], `sans elle · rien à moins de ${D.rayon_km} km (${fmtInt(el[5])} élèves de 1re)`]]
+      .map(([c, v, t]) => `<div class="count" style="--c:var(${CAT[c][1]})"><b>${fmtInt(v)}</b><span>${t}</span></div>`).join("");
+    // groupes
+    gLines.innerHTML = "";
+    const grs = MutCalc.groups(D, sp, $("statut").value, $("acad").value);
+    $("g-title").textContent = `Ouvertures communes possibles (${grs.length})`;
+    $("groups").innerHTML = grs.length ? "" : '<p class="empty">Aucune pour cette spécialité et cette sélection.</p>';
+    grs.forEach((g) => {
+      const pts = g[1].filter((m) => dots[m]).map((m) => [px(L[m][I.lon]), py(L[m][I.lat])]);
+      for (let k = 1; k < pts.length; k++) {
+        const ln = document.createElementNS(NS, "line"); ln.setAttribute("class", "grp");
+        ln.setAttribute("x1", pts[0][0]); ln.setAttribute("y1", pts[0][1]); ln.setAttribute("x2", pts[k][0]); ln.setAttribute("y2", pts[k][1]); gLines.appendChild(ln);
+      }
+      const b = document.createElement("button"); b.type = "button"; b.className = "group";
+      b.innerHTML = `<b>${fmtInt(g[2])} élèves estimés</b> · ${g[1].length} lycées · ${String(g[3]).replace(".", ",")} km au plus<small>${g[1].map((m) => esc(`${L[m][I.nom]} (${L[m][I.com]})`)).join(" · ")}</small>`;
+      b.addEventListener("click", () => select(g[1][0]));
+      $("groups").appendChild(b);
+    });
+    renderFiche();
+  }
+
+  function renderFiche() {
+    const f = $("fiche");
+    if (selected === null) { f.innerHTML = '<h2>Fiche lycée</h2><p class="empty">Cliquez un point sur la carte ou cherchez un lycée.</p>'; return; }
+    const l = L[selected];
+    const rows = D.specialites.map((sp, j) => {
+      const c = l[I.st][j], nr = l[I.near][j];
+      const extra = nr ? `${String(nr[0]).replace(".", ",")} km · ${esc(L[idx.get(nr[1])][I.nom])}` : "";
+      return `<div><span>${esc(LIB(sp))}</span><small><span class="pill" style="--c:var(${CAT[c][1]})">${CAT[c][0]}</span>${extra ? "<br>Plus proche : " + extra : ""}</small></div>`;
+    }).join("");
+    f.innerHTML = `<h2>${esc(l[I.nom])}</h2><dl><dt>Commune</dt><dd>${esc(l[I.com])}</dd><dt>Académie</dt><dd>${esc(l[I.acad])}</dd>
+      <dt>Statut</dt><dd>${esc(l[I.stat])}</dd>${l[I.bassin] ? `<dt>Bassin</dt><dd>${esc(l[I.bassin])}</dd>` : ""}<dt>Élèves de 1re</dt><dd>${fmtInt(l[I.eff])}</dd></dl>
+      <div class="spes">${rows}</div>`;
+  }
+
+  function select(i) { selected = i; render(); }
+  gDots.addEventListener("click", (e) => { const c = e.target.closest("circle"); if (c) select(+c.dataset.i); });
+  $("filters").addEventListener("change", render);
+  $("filters").addEventListener("submit", (e) => e.preventDefault());
+  $("cherche").addEventListener("input", () => { const i = byLabel.get($("cherche").value); if (i !== undefined) select(i); });
+
+  // État initial : spécialité NSI, premier groupe sélectionné (exemple réel)
+  const nsi = D.specialites.indexOf("numerique_et_sciences_informatiques");
+  $("spe").value = nsi >= 0 ? nsi : 0;
+  const g0 = D.groupes.filter((g) => g[0] === +$("spe").value).sort((a, b) => b[2] - a[2])[0];
+  selected = g0 ? g0[1][0] : null;
+  render();
+})();
+</script>

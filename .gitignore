@@ -1,0 +1,12 @@
+# Données : téléchargées par scripts/download_data.py (empreintes dans data/raw/MANIFEST.csv)
+data/raw/*
+!data/raw/MANIFEST.csv
+data/processed/
+# Pages générées par les scripts build_* (les gabarits *_template.html sont versionnés)
+app/*.html
+!app/*_template.html
+# Divers
+_anciens/
+__pycache__/
+.pytest_cache/
+*.pyc
