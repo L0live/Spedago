@@ -1,0 +1,226 @@
+<title>Mon académie</title>
+__COMMUN__
+<style>
+/* Mise en page : une colonne de lecture ; sélecteur d'académie, quatre chiffres clés, puis trois sections (Parcoursup, spécialités, masters) */
+:root { --track: #e7ecf0; --warn: #b0413e }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --track: #24323d; --warn: #e57a74 } }
+:root[data-theme="dark"] { --track: #24323d; --warn: #e57a74 }
+.wrap { max-width: 1000px; margin: 0 auto }
+header { padding-block: 28px 8px }
+.lede { color: var(--muted); max-width: 70ch; margin: 0 }
+h2 { font-family: var(--display); font-weight: 600; font-size: 24px; margin: 0 0 6px }
+.pick { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: end; margin-block: 18px 6px }
+.pick label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
+.pick select { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 240px }
+.pick select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.pick .zone { color: var(--muted); font-size: 14px; padding-bottom: 9px }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-block: 14px 8px }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0 }
+.stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
+.stat span { font-size: 13px; color: var(--muted) }
+section.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 18px }
+section.bloc > p { margin: 0 0 10px; max-width: 75ch }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px }
+.tablewrap { overflow-x: auto; margin-block: 8px }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 560px }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: bottom }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+td.r, th.r { text-align: right }
+td small { display: block; color: var(--muted); font-size: 12px }
+.more { display: inline-block; margin-top: 6px; font-weight: 600; color: var(--accent); text-decoration: none }
+.more:hover { text-decoration: underline }
+.note { font-size: 13px; color: var(--muted) }
+td.mention { font-size: 13px; letter-spacing: .01em }
+.hot { color: var(--warn); font-weight: 600 }
+.empty { color: var(--muted); font-style: italic }
+section.explain { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
+@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } }
+section.explain h2 { font-size: 19px }
+section.explain ul { padding-left: 18px; margin: 0 }
+footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
+</style>
+
+<div class="wrap">
+  __NAV__
+  <header>
+    <span class="badge">Projet indépendant · données publiques 2025</span>
+    <h1>Mon académie</h1>
+    <p class="lede">Les trois outils Spédago vus depuis une académie : la tension à l'entrée du supérieur, l'accès aux spécialités au lycée, l'admission en master. Chaque bloc renvoie à l'outil détaillé, où l'académie est déjà choisie.</p>
+  </header>
+
+  <form class="pick" id="pick" autocomplete="off">
+    <label for="acad">Académie <select id="acad"></select></label>
+    <span class="zone" id="zone"></span>
+  </form>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="bloc" id="b-ps" aria-labelledby="h-ps">
+    <div class="kicker">Entrée dans le supérieur · Parcoursup 2025</div>
+    <h2 id="h-ps">Où la demande dépasse l'offre</h2>
+    <div id="ps"></div>
+  </section>
+
+  <section class="bloc" id="b-spe" aria-labelledby="h-spe">
+    <div class="kicker">Lycée · spécialités de 1re générale</div>
+    <h2 id="h-spe">Qui n'a pas accès à quelle spécialité</h2>
+    <div id="spe"></div>
+  </section>
+
+  <section class="bloc" id="b-mm" aria-labelledby="h-mm">
+    <div class="kicker">Après la licence · Mon Master 2025</div>
+    <h2 id="h-mm">Les chances d'admission en master</h2>
+    <div id="mm"></div>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h2>Lire ces chiffres</h2>
+      <ul>
+        <li>Les vœux et les candidatures ne sont pas des personnes : un candidat compte dans chaque formation demandée.</li>
+        <li>Comparer la pression d'une filière à celle d'une autre n'a pas de sens (IFSI et PASS fonctionnent en listes communes) ; la colonne « France » sert de repère pour la même filière.</li>
+        <li>L'académie est celle du lieu de la formation ou du lycée, pas celle du domicile des candidats.</li>
+        <li>« Sans solution proche » : aucun lycée qui propose la spécialité à moins de 20 km, et trop peu d'élèves pour une ouverture commune (seuil 12, estimation basse).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la page ne dit pas</h2>
+      <ul>
+        <li>Combien de candidats seraient admis en plus : il faudrait les vœux individuels, réservés aux chercheurs.</li>
+        <li>Le coût des places ou des ouvertures (enseignants, locaux, transports).</li>
+        <li>Les emplois du temps : deux lycées voisins ne peuvent partager un cours que si leurs horaires s'accordent.</li>
+        <li>Apprentissage et CNED exclus de Parcoursup ; masters hors plateforme nationale absents.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Sources : ministère de l'Enseignement supérieur (Parcoursup 2025, Mon Master 2025) et ministère de l'Éducation nationale (DEPP, spécialités en 1re générale ; annuaire de l'éducation), Licence Ouverte 2.0 ; traitement Spédago.
+    Outil indépendant. Mêmes règles et mêmes nombres que les autres pages du site, vérifiés par des tests automatiques.
+  </footer>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script id="calc">
+// Fonctions de calcul pures (aucun accès au DOM) : exécutées par la page ET par les tests (Node.js).
+const AcadCalc = (() => {
+  const Z = 1.96;
+  // Intervalle de Wilson à 95 % (identique à spedago.stats.wilson).
+  function wilson(k, n) {
+    if (!n) return [NaN, NaN];
+    const p = k / n, d = 1 + Z * Z / n, c = (p + Z * Z / (2 * n)) / d, h = (Z * Math.sqrt(p * (1 - p) / n + Z * Z / (4 * n * n))) / d;
+    return [c - h, c + h];
+  }
+  const ratio = (a, b) => (b ? a / b : NaN);
+  // [formations, places, admis, vœux, places des formations pleines, vacantes] -> indicateurs
+  function ps(t) {
+    const [formations, places, admis, voeux, sat, vac] = t;
+    return { formations, places, admis, voeux, sat, vac, vpp: ratio(voeux, places), remp: ratio(admis, places), partSat: ratio(sat, places) };
+  }
+  // Spécialités : une ligne par spécialité, les plus difficiles d'accès d'abord.
+  function speRows(spe) {
+    return spe.map((r, sp) => ({ sp, propose: r[0], incertain: r[1], voisin: r[2], commune: r[3], isole: r[4],
+                                 eVoisin: r[5], eCommune: r[6], eIsole: r[7], groupes: r[8] }))
+      .sort((a, b) => b.isole - a.isole || b.eIsole - a.eIsole || a.sp - b.sp);
+  }
+  // [formations, places, candidatures, propositions, candidatures L3 générale, propositions L3 générale]
+  function mm(t) {
+    const [formations, places, cand, prop, candL3, propL3] = t;
+    return { formations, places, cand, prop, candL3, propL3, taux: ratio(prop, cand), tauxL3: ratio(propL3, candL3) };
+  }
+  const indexOf = (D, slug) => D.academies.findIndex((a) => a.slug === slug);
+  return { wilson, ps, speRows, mm, indexOf };
+})();
+if (typeof module !== "undefined") module.exports = AcadCalc;
+</script>
+<script>
+(() => {
+  const C = AcadCalc, D = JSON.parse(document.getElementById("data").textContent), FR = D.france;
+  const $ = (id) => document.getElementById(id);
+  const fmtInt = (x) => Math.round(x).toLocaleString("fr-FR");
+  const fmtPct = (x, d = 0) => (isFinite(x) ? (x * 100).toFixed(d).replace(".", ",") + " %" : "–");
+  const fmtDec = (x, d = 1) => (isFinite(x) ? x.toFixed(d).replace(".", ",") : "–");
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const LIB = (s) => s.replace(/_/g, " ").replace(/\bsc\b/g, "sciences").replace(/^./, (c) => c.toUpperCase());
+  const link = (page, a, txt) => `<a class="more" href="${page}#${a.slug}">${txt} →</a>`;
+
+  D.academies.forEach((a, i) => { const o = document.createElement("option"); o.value = i; o.textContent = a.nom; $("acad").appendChild(o); });
+  if (!Spedago.pick($("acad"))) $("acad").value = Math.max(0, C.indexOf(D, "poitiers"));  // exemple par défaut
+
+  function stats(a) {
+    const r = a.ref || [0, 0, 0, 0, 0, 0], p = a.ps ? C.ps(a.ps.total) : null, m = a.mm ? C.mm(a.mm.total) : null;
+    const cards = [
+      [fmtInt(r[0]), `lycées, dont ${fmtInt(r[1])} avec une 1re générale`],
+      [p ? fmtInt(p.places) : "–", p ? `places Parcoursup dans ${fmtInt(p.formations)} formations` : "pas de formation Parcoursup"],
+      [a.ps ? "+" + fmtInt(a.ps.sim[0]) : "–", "places avec la règle de départ du simulateur"],
+      [m ? fmtInt(m.places) : "–", m ? `places en master dans ${fmtInt(m.formations)} formations` : "pas de master sur la plateforme"],
+    ];
+    $("stats").innerHTML = cards.map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join("");
+  }
+
+  function blocPs(a) {
+    if (!a.ps) { $("ps").innerHTML = `<p class="empty">Pas de formation Parcoursup recensée dans cette académie.</p>`; return; }
+    const t = C.ps(a.ps.total), f = C.ps(FR.ps.total), frFil = new Map(FR.ps.filieres.map((r) => [r[0], C.ps(r.slice(1))]));
+    const [ajout, couvert, visees] = a.ps.sim, [ajFr, coFr] = FR.ps.sim;
+    const rows = a.ps.filieres.map((r) => {
+      const x = C.ps(r.slice(1)), n = frFil.get(r[0]);
+      const hot = x.partSat > n.partSat + 0.1 ? ' class="r hot"' : ' class="r"';
+      return `<tr><td>${esc(D.filieres[r[0]])}<small>${fmtInt(x.formations)} formation${x.formations > 1 ? "s" : ""}</small></td>
+        <td class="r">${fmtInt(x.places)}</td><td class="r">${fmtDec(x.vpp)}<small>France ${fmtDec(n.vpp)}</small></td>
+        <td class="r">${fmtPct(x.remp)}<small>France ${fmtPct(n.remp)}</small></td>
+        <td${hot}>${fmtPct(x.partSat)}<small>France ${fmtPct(n.partSat)}</small></td></tr>`;
+    }).join("");
+    $("ps").innerHTML = `
+      <p>${fmtInt(t.places)} places et ${fmtInt(t.voeux)} vœux confirmés, soit <strong>${fmtDec(t.vpp)} vœux par place</strong> (France : ${fmtDec(f.vpp)}).
+      ${fmtPct(t.partSat)} des places sont dans des formations pleines à 95 % ou plus (France : ${fmtPct(f.partSat)}) ; ${fmtInt(t.vac)} places sont restées vacantes.</p>
+      <div class="tablewrap"><table><thead><tr><th>Filière</th><th class="r">Places</th><th class="r">Vœux par place</th><th class="r">Places pourvues</th><th class="r">Places dans des formations pleines</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p>Règle de départ du simulateur (+${fmtPct(D.alpha)} de places aux formations pleines et parmi les plus demandées de leur filière) :
+      <strong>+${fmtInt(ajout)} places</strong> dans ${fmtInt(visees)} formations, soit ${fmtPct(ajout / ajFr, 1)} des places ajoutées en France.
+      ${ajout ? `Au plus ${fmtInt(couvert)} (${fmtPct(couvert / ajout)}) pourraient venir de places restées vides dans une formation de même spécialité de l'académie (France : ${fmtPct(coFr / ajFr)}).` : ""}</p>
+      ${link("simulateur-parcoursup.html", a, "Changer la règle dans le simulateur")}`;
+  }
+
+  function blocSpe(a) {
+    if (!a.spe) { $("spe").innerHTML = `<p class="empty">Pas de lycée de cette académie sur la carte des spécialités (effectifs ou coordonnées absents).</p>`; return; }
+    const rows = C.speRows(a.spe.spe).map((r) => `<tr><td>${esc(LIB(D.specialites[r.sp]))}</td>
+      <td class="r">${fmtInt(r.propose)}${r.incertain ? `<small>+ ${fmtInt(r.incertain)} incertain${r.incertain > 1 ? "s" : ""}</small>` : ""}</td>
+      <td class="r">${fmtInt(r.voisin)}</td><td class="r">${fmtInt(r.commune)}<small>${fmtInt(r.groupes)} groupe${r.groupes > 1 ? "s" : ""}</small></td>
+      <td class="r${r.isole ? " hot" : ""}">${fmtInt(r.isole)}<small>${fmtInt(r.eIsole)} élèves de 1re</small></td></tr>`).join("");
+    const tot = a.spe.spe.reduce((s, r) => s + r[4], 0);
+    $("spe").innerHTML = `
+      <p>${fmtInt(a.spe.lycees)} lycées avec une 1re générale (rentrée ${D.rentree}). Pour chaque spécialité, combien la proposent, et pour les autres :
+      un lycée voisin à moins de 20 km, une ouverture commune possible avec d'autres lycées, ou aucune solution proche.
+      ${tot ? "" : "<strong>Aucun cas « sans solution proche » dans l'académie.</strong>"}</p>
+      <div class="tablewrap"><table><thead><tr><th>Spécialité</th><th class="r">La proposent</th><th class="r">Voisin à moins de 20 km</th><th class="r">Ouverture commune possible</th><th class="r">Sans solution proche</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="note">« Incertain » : effectif masqué par le secret statistique, la spécialité est probablement proposée.</p>
+      ${link("mutualisation.html", a, "Voir les lycées sur la carte")}`;
+  }
+
+  function blocMm(a) {
+    if (!a.mm) { $("mm").innerHTML = `<p class="empty">Pas de master de cette académie sur la plateforme nationale.</p>`; return; }
+    const t = C.mm(a.mm.total), f = C.mm(FR.mm.total);
+    const rows = a.mm.mentions.map(([m, nf, pl, n, k, nN, kN]) => {
+      const [lo, hi] = C.wilson(k, n);
+      return `<tr><td class="mention">${esc(m)}<small>${fmtInt(nf)} formation${nf > 1 ? "s" : ""}</small></td><td class="r">${fmtInt(pl)}</td>
+        <td class="r">${n ? fmtPct(k / n) : "–"}<small>${n ? `entre ${fmtPct(lo)} et ${fmtPct(hi)} · ${fmtInt(n)} cand.` : "aucun candidat"}</small></td>
+        <td class="r">${fmtPct(kN / nN)}</td></tr>`;
+    }).join("");
+    $("mm").innerHTML = `
+      <p>${fmtInt(t.formations)} formations, ${fmtInt(t.places)} places, ${fmtInt(t.cand)} candidatures : <strong>${fmtPct(t.taux)}</strong> ont reçu une proposition d'admission (France : ${fmtPct(f.taux)}).
+      Pour les candidatures venant d'une 3e année de licence générale : ${fmtPct(t.tauxL3)} (France : ${fmtPct(f.tauxL3)}).</p>
+      <div class="tablewrap"><table><thead><tr><th>Mentions qui offrent le plus de places</th><th class="r">Places</th><th class="r">Proposition, L3 générale</th><th class="r">Même mention, France</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${link("boussole-des-masters.html", a, "Comparer les masters avec la Boussole")}`;
+  }
+
+  function render() {
+    const a = D.academies[+$("acad").value];
+    $("zone").textContent = a.zone;
+    stats(a); blocPs(a); blocSpe(a); blocMm(a);
+  }
+  $("acad").addEventListener("change", () => { Spedago.setHash(D.academies[+$("acad").value].nom); render(); });
+  $("pick").addEventListener("submit", (e) => e.preventDefault());
+  window.addEventListener("hashchange", () => { if (Spedago.pick($("acad"))) render(); });
+  render();
+})();
+</script>

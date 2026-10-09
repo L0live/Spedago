@@ -1,28 +1,17 @@
 <title>Boussole des masters</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+__COMMUN__
 <style>
 /* Mise en page : colonne de lecture unique, barre de filtres puis résultats en liste ; chaque formation = une ligne de relevé */
 :root {
-  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6;
-  --accent: #1d5f8a; --accent-soft: #e3eef6;
   --hi: #2f7d4f; --mid: #b07a12; --lo: #b0413e; --track: #e7ecf0;
-  --display: "Newsreader", Georgia, "Times New Roman", serif;
-  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark } }
+  --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark }
-* { box-sizing: border-box }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px }
+  --hi: #5fbf86; --mid: #e0a93e; --lo: #e57a74; --track: #24323d; color-scheme: dark }
 .wrap { max-width: 980px; margin: 0 auto }
 header { padding-block: 32px 8px }
-h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
 .lede { color: var(--muted); max-width: 66ch; margin: 0 }
-.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
 .filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 14px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; grid-template-columns: 2fr 1.2fr 1.4fr 1fr }
 .filters label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
 .filters input, .filters select { font: inherit; font-size: 15px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0 }
@@ -60,7 +49,6 @@ section.explain h2 { font-family: var(--display); font-size: 22px; font-weight: 
 section.explain p, section.explain li { font-size: 14px; color: var(--muted); max-width: 62ch }
 section.explain ul { padding-left: 18px; margin: 0 }
 @media (max-width: 720px) { section.explain { grid-template-columns: 1fr } }
-[hidden] { display: none !important }
 @media (max-width: 600px) {
   table.rank { min-width: 0 }
   table.rank thead { display: none }
@@ -87,6 +75,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 </style>
 
 <div class="wrap">
+  __NAV__
   <header>
     <span class="badge">Projet indépendant · données publiques 2024-2025</span>
     <h1>Boussole des masters</h1>
@@ -249,6 +238,7 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
   const dl = $("mentions");
   D.mentions.forEach((m) => { if (m) { const o = document.createElement("option"); o.value = m; dl.appendChild(o); } });
   D.academies.forEach((a, i) => { if (a) { const o = document.createElement("option"); o.value = i; o.textContent = a; $("academie").appendChild(o); } });
+  Spedago.pick($("academie"));  // #poitiers dans l'adresse -> académie présélectionnée
   D.secteurs.forEach((a, i) => { if (a) { const o = document.createElement("option"); o.value = i; o.textContent = a; $("secteur").appendChild(o); } });
   PROFILS_CHOIX.forEach((p) => { const o = document.createElement("option"); o.value = p; o.textContent = D.libelles_profils[p]; $("profil").appendChild(o); });
   const mentionIndex = new Map(D.mentions.map((m, i) => [m.toUpperCase(), i]));
@@ -354,6 +344,8 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
   ["mention", "academie", "profil", "modalite", "tri", "secteur"].forEach((id) =>
     $(id).addEventListener(id === "mention" ? "input" : "change", () => { shown = 30; shownInv = 40; render(); }));
   $("filters").addEventListener("submit", (e) => e.preventDefault());
+  $("academie").addEventListener("change", () => Spedago.setHash($("academie").value === "" ? "" : $("academie").selectedOptions[0].textContent));
+  window.addEventListener("hashchange", () => { if (!Spedago.pick($("academie"))) $("academie").value = ""; render(); });
   $("more").addEventListener("click", () => { shown += 30; render(); });
   $("more-inv").addEventListener("click", () => { shownInv += 40; render(); });
   $("tab-mention").addEventListener("click", () => setVue("mention"));

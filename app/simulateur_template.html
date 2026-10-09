@@ -1,29 +1,18 @@
 <title>Simulateur des places en tension</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+__COMMUN__
 <style>
 /* Mise en page : réglages à gauche (colonne étroite, collante), résultats à droite ; une colonne sur mobile */
 :root {
-  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6;
-  --accent: #1d5f8a; --accent-soft: #e3eef6; --add: #2f7d4f; --idf: #8a4f9e; --track: #e7ecf0;
-  --display: "Newsreader", Georgia, "Times New Roman", serif;
-  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --add: #2f7d4f; --idf: #8a4f9e; --track: #e7ecf0;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark } }
+  --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
-  --accent: #6fb0dc; --accent-soft: #1b3346; --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark }
-* { box-sizing: border-box }
-[hidden] { display: none !important }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px }
+  --add: #5fbf86; --idf: #c08fd4; --track: #24323d; color-scheme: dark }
 .wrap { max-width: 1120px; margin: 0 auto }
 header { padding-block: 32px 16px }
-h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
 h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 0 8px }
 .lede { color: var(--muted); max-width: 70ch; margin: 0 }
-.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
 .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start }
 @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr) } }
 .controls { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 16px }
@@ -54,6 +43,7 @@ td.r, th.r { text-align: right }
 td.barcell { width: 34%; min-width: 120px }
 .hbar { height: 10px; background: var(--track); border-radius: 5px; overflow: hidden }
 .hbar span { display: block; height: 100%; background: var(--add); border-radius: 5px }
+tr.moi td { background: var(--accent-soft); font-weight: 600 }
 tr.idf td:first-child::after { content: "IdF"; margin-left: 6px; font-size: 10px; font-weight: 700; color: var(--idf); border: 1px solid var(--idf); border-radius: 3px; padding: 0 3px; vertical-align: middle }
 .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 }
 section.explain { margin-top: 28px; display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)) }
@@ -65,6 +55,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 </style>
 
 <div class="wrap">
+  __NAV__
   <header>
     <span class="badge">Projet indépendant · données publiques Parcoursup 2025</span>
     <h1>Simulateur des places en tension</h1>
@@ -181,15 +172,18 @@ const SimCalc = (() => {
     const cells = new Map();
     F.forEach((f, i) => {
       const key = f[A] + "|" + f[FIL] + "|" + f[SPE] + "|" + f[IDF];
-      let c = cells.get(key); if (!c) { c = { besoin: 0, gisement: 0, fil: f[FIL], idf: f[IDF] }; cells.set(key, c); }
+      let c = cells.get(key); if (!c) { c = { besoin: 0, gisement: 0, fil: f[FIL], a: f[A], idf: f[IDF] }; cells.set(key, c); }
       c.besoin += add[i];
       if (f[MOB] === 1 && f[ACC] / f[CAP] < sous) c.gisement += Math.max(0, f[CAP] - f[ACC]);
     });
-    let couvert = 0; const couvertFil = new Map();
-    cells.forEach((c) => { const x = Math.min(c.besoin, c.gisement); couvert += x; couvertFil.set(c.fil, (couvertFil.get(c.fil) || 0) + x); });
+    let couvert = 0; const couvertFil = new Map(), couvertA = new Map();
+    cells.forEach((c) => {
+      const x = Math.min(c.besoin, c.gisement); couvert += x;
+      couvertFil.set(c.fil, (couvertFil.get(c.fil) || 0) + x); couvertA.set(c.a, (couvertA.get(c.a) || 0) + x);
+    });
     let total = 0, places = 0, idf = 0, nElig = 0;
     F.forEach((f, i) => { total += add[i]; places += f[CAP]; if (f[IDF]) idf += add[i]; if (elig[i]) nElig += 1; });
-    return { add, elig, total, places, idf, nElig, couvert, couvertFil, ...demande(D, add) };
+    return { add, elig, total, places, idf, nElig, couvert, couvertFil, couvertA, ...demande(D, add) };
   }
 
   // Demande non servie dans les formations qui reçoivent des places : candidats classés jamais appelés
@@ -241,7 +235,12 @@ if (typeof module !== "undefined") module.exports = SimCalc;
 
   function table(id, rows, cells) {
     const tb = $(id).tBodies[0]; tb.innerHTML = "";
-    rows.forEach((r) => { const tr = document.createElement("tr"); if (r.idf && id === "t-acad") tr.className = "idf"; tr.innerHTML = cells(r); tb.appendChild(tr); });
+    const moi = Spedago.hashSlug();  // #poitiers dans l'adresse -> ligne de l'académie surlignée
+    rows.forEach((r) => {
+      const tr = document.createElement("tr");
+      if (id === "t-acad") { if (r.idf) tr.classList.add("idf"); if (moi && Spedago.slug(D.academies[r.key]) === moi) tr.classList.add("moi"); }
+      tr.innerHTML = cells(r); tb.appendChild(tr);
+    });
   }
 
   function render() {
@@ -285,6 +284,7 @@ if (typeof module !== "undefined") module.exports = SimCalc;
   $("controls").addEventListener("change", render);
   $("controls").addEventListener("submit", (e) => e.preventDefault());
   $("reset").addEventListener("click", reset);
+  window.addEventListener("hashchange", render);
   render();
 })();
 </script>

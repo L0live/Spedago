@@ -1,0 +1,68 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style id="commun-css">
+/* Spédago — styles communs à toutes les pages (jetons de couleur, typographie, barre de navigation) */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6;
+  --accent: #1d5f8a; --accent-soft: #e3eef6;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
+  --accent: #6fb0dc; --accent-soft: #1b3346; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47;
+  --accent: #6fb0dc; --accent-soft: #1b3346; color-scheme: dark }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px; margin: 0 }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
+.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
+.site-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-block: 14px 10px; border-bottom: 1px solid var(--line); font-size: 14px }
+.site-nav .brand { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--ink); text-decoration: none; margin-right: 8px }
+.site-nav .door { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px }
+.site-nav .door > span { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted) }
+.site-nav .door a { color: var(--accent); text-decoration: none; padding: 2px 0; border-bottom: 2px solid transparent }
+.site-nav .door a:hover { border-bottom-color: var(--line) }
+.site-nav .door a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent) }
+.site-nav .sep { width: 1px; height: 18px; background: var(--line) }
+@media (max-width: 640px) { .site-nav .sep { display: none } .site-nav .door { width: 100% } }
+.site-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+</style>
+<script id="commun">
+// Spédago — fonctions communes : identifiant d'académie dans l'adresse (#poitiers), liens de navigation qui le gardent.
+// slug() est identique à spedago.referentiel.slug (testé).
+const Spedago = (() => {
+  function slug(nom) {
+    let s = String(nom).normalize("NFKD").replace(/[^\x00-\x7f]/g, "").toUpperCase();
+    s = s.replace(/[-'\s]+/g, " ").trim().replace(/^ST /, "SAINT ");
+    return s.toLowerCase().replace(/ /g, "-");
+  }
+  const hashSlug = () => { try { return decodeURIComponent((typeof location !== "undefined" ? location.hash : "").slice(1)); } catch (e) { return ""; } };
+  // Garde l'académie choisie d'une page à l'autre : chaque lien de la barre reçoit le #slug courant.
+  function syncNav() {
+    if (typeof document === "undefined") return;
+    const h = hashSlug();
+    document.querySelectorAll(".site-nav a[data-page]").forEach((a) => { a.href = a.dataset.page + (h ? "#" + h : ""); });
+  }
+  function setHash(nom) {
+    const s = nom ? slug(nom) : "";
+    try { history.replaceState(null, "", s ? "#" + s : location.pathname + location.search); } catch (e) { location.hash = s; }
+    syncNav();
+  }
+  // Sélectionne dans <select> l'option dont le libellé correspond au #slug ; renvoie vrai si trouvée.
+  function pick(select) {
+    const h = hashSlug(); if (!h || !select) return false;
+    const o = [...select.options].find((x) => x.value !== "" && slug(x.textContent) === h);
+    if (o) select.value = o.value;
+    return !!o;
+  }
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", syncNav);
+    window.addEventListener("hashchange", syncNav);
+  }
+  return { slug, hashSlug, syncNav, setHash, pick };
+})();
+if (typeof module !== "undefined") module.exports = Spedago;
+</script>

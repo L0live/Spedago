@@ -1,29 +1,18 @@
 <title>Carte des spécialités partagées</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+__COMMUN__
 <style>
 /* Mise en page : carte (points des lycées, projection simple) à gauche, fiche et groupes à droite ; empilé sur mobile */
 :root {
-  --bg: #f4f6f8; --surface: #ffffff; --ink: #142230; --muted: #5b6b7a; --line: #d9e0e6; --accent: #1d5f8a; --accent-soft: #e3eef6;
   --offre: #2f7d4f; --voisin: #c68a12; --commun: #2c64c6; --isole: #c0413c; --incertain: #aab4bd; --land: #e9edf1;
-  --display: "Newsreader", Georgia, "Times New Roman", serif;
-  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47; --accent: #6fb0dc; --accent-soft: #1b3346;
   --offre: #5fbf86; --voisin: #e0a93e; --commun: #6f9ef0; --isole: #e57a74; --incertain: #4b5965; --land: #1a2731; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0f1820; --surface: #16222c; --ink: #e6edf2; --muted: #9aabb9; --line: #2a3a47; --accent: #6fb0dc; --accent-soft: #1b3346;
   --offre: #5fbf86; --voisin: #e0a93e; --commun: #6f9ef0; --isole: #e57a74; --incertain: #4b5965; --land: #1a2731; color-scheme: dark }
-* { box-sizing: border-box }
-[hidden] { display: none !important }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 48px }
 .wrap { max-width: 1180px; margin: 0 auto }
 header { padding-block: 32px 12px }
-h1 { font-family: var(--display); font-weight: 600; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; text-wrap: balance }
 h2 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0 0 8px }
 .lede { color: var(--muted); max-width: 72ch; margin: 0 }
-.badge { display: inline-block; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-bottom: 14px }
 .filters { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; margin-block: 14px }
 @media (max-width: 760px) { .filters { grid-template-columns: 1fr 1fr } }
 .filters label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
@@ -65,6 +54,7 @@ footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px
 </style>
 
 <div class="wrap">
+  __NAV__
   <header>
     <span class="badge">Projet indépendant · données publiques, 1re générale __RENTREE__</span>
     <h1>Carte des spécialités partagées</h1>
@@ -166,6 +156,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
   // ---- options
   D.specialites.forEach((sp, i) => { const o = document.createElement("option"); o.value = i; o.textContent = LIB(sp); $("spe").appendChild(o); });
   [...new Set(L.map((l) => l[I.acad]))].sort((a, b) => a.localeCompare(b, "fr")).forEach((a) => { const o = document.createElement("option"); o.value = a; o.textContent = a; $("acad").appendChild(o); });
+  Spedago.pick($("acad"));  // #poitiers dans l'adresse -> académie présélectionnée
   L.forEach((l) => { const o = document.createElement("option"); o.value = `${l[I.nom]} — ${l[I.com]}`; $("lycees").appendChild(o); });
   const byLabel = new Map(L.map((l, i) => [`${l[I.nom]} — ${l[I.com]}`, i]));
   $("legend").innerHTML = [0, 3, 4, 5, 2].map((c) => `<span><i style="--c:var(${CAT[c][1]})"></i>${CAT[c][0]}</span>`).join("");
@@ -237,12 +228,14 @@ if (typeof module !== "undefined") module.exports = MutCalc;
   gDots.addEventListener("click", (e) => { const c = e.target.closest("circle"); if (c) select(+c.dataset.i); });
   $("filters").addEventListener("change", render);
   $("filters").addEventListener("submit", (e) => e.preventDefault());
+  $("acad").addEventListener("change", () => Spedago.setHash($("acad").value));
+  window.addEventListener("hashchange", () => { if (!Spedago.pick($("acad"))) $("acad").value = ""; render(); });
   $("cherche").addEventListener("input", () => { const i = byLabel.get($("cherche").value); if (i !== undefined) select(i); });
 
   // État initial : spécialité NSI, premier groupe sélectionné (exemple réel)
   const nsi = D.specialites.indexOf("numerique_et_sciences_informatiques");
   $("spe").value = nsi >= 0 ? nsi : 0;
-  const g0 = D.groupes.filter((g) => g[0] === +$("spe").value).sort((a, b) => b[2] - a[2])[0];
+  const g0 = MutCalc.groups(D, +$("spe").value, "", $("acad").value)[0];  // premier groupe (de l'académie choisie, s'il y en a une)
   selected = g0 ? g0[1][0] : null;
   render();
 })();

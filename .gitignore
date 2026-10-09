@@ -5,8 +5,10 @@ data/processed/
 # Pages générées par les scripts build_* (les gabarits *_template.html sont versionnés)
 app/*.html
 !app/*_template.html
+!app/_commun.html
 # Divers
 _anciens/
 __pycache__/
 .pytest_cache/
 *.pyc
+site/
