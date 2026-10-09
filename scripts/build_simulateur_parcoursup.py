@@ -27,6 +27,7 @@ import simulate_ppl_art2 as sim  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.pages import build_page  # noqa: E402
+from spedago.referentiel import academie_canonique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_JSON = ROOT / "data" / "processed" / "simulateur_parcoursup.json"
@@ -37,6 +38,7 @@ SESSION = 2025
 
 def export(df: pd.DataFrame, session: int = SESSION) -> dict:
     d = df[df.session == session].copy()
+    d["academie"] = d.academie.map(academie_canonique, na_action="ignore")  # graphie commune aux pages
     dicts = {}
     for c in ("academie", "fili_harmo", "fil_lib_voe_acc"):
         vals = sorted(d[c].fillna("").astype(str).unique().tolist())

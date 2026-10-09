@@ -26,6 +26,7 @@ import pandas as pd
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.stats import KAPPA_MAX, KAPPA_MIN, Z, _moments, shrink, wilson  # noqa: E402,F401
+from spedago.referentiel import academie_canonique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw" / "monmaster_2024_2025.csv"
@@ -203,6 +204,7 @@ def export_json(long: pd.DataFrame, priors: pd.DataFrame | None = None) -> dict:
     """Une entrée par formation (ifc) : métadonnées + par profil et session [candidats, propositions]."""
     meta_cols = ["eta_nom", "lieu_acad_lib", "mention", "parcours", "alternance", "secteur_disci_lib"]
     last = long.sort_values("session").groupby("ifc").last()
+    last["lieu_acad_lib"] = last.lieu_acad_lib.map(academie_canonique, na_action="ignore")  # graphie commune aux pages
     sessions = sorted(long.session.unique().tolist())
     profils = list(PROFILS) + ["etab", "hors_etab"]
     cube = long.pivot_table(index="ifc", columns=["profil", "session"], values=["candidats", "propositions"], aggfunc="sum").fillna(-1)
