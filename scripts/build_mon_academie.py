@@ -25,7 +25,7 @@ import simulate_ppl_art2 as sim  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.pages import build_page  # noqa: E402
-from spedago.paths import APP, PROCESSED  # noqa: E402
+from spedago.paths import APP, PROCESSED, RAW  # noqa: E402
 from spedago.libelles import FILIERES, SPECIALITES  # noqa: E402
 from spedago.referentiel import IDF, OUTRE_MER, academie_canonique, cle, slug  # noqa: E402
 
@@ -133,6 +133,24 @@ def referentiel(r: pd.DataFrame) -> tuple[dict, dict]:
     return {a: ligne(g) for a, g in r.groupby("academie")}, ligne(r)
 
 
+VOIES = ["Bac général", "Bac technologique", "Bac professionnel"]
+POURSUITE_COLS = {"univ": ["univ"], "iut": ["iut"], "cpge": ["cpge_prive", "cpge_public"], "sts": ["sts_nr", "sts_prive", "sts_public"],
+                  "autre": ["autre_nr", "autre_prive", "autre_public"]}
+
+
+def poursuite(p: pd.DataFrame) -> tuple[dict, list, int]:
+    """Néo-bacheliers de la dernière session qui poursuivent dans le supérieur, par voie et filière (SIES).
+    Les colonnes « _flux » et « _stable » s'additionnent (leur somme redonne le taux de poursuite publié) ;
+    on ne commente pas leur partage, non documenté dans la fiche du jeu."""
+    an = int(p.rentree_session.max())
+    p = p[p.rentree_session == an].assign(academie=lambda x: x.aca_lib.map(academie_canonique))
+    for k, cs in POURSUITE_COLS.items():
+        p[k] = sum(p[f"{c}_flux"] + p[f"{c}_stable"] for c in cs)
+    cols = ["bacheliers", *POURSUITE_COLS]
+    ligne = lambda g: [[v, *[int(round(float(g.loc[g.voie_du_baccalaureat == v, c].sum()))) for c in cols]] for v in VOIES]  # noqa: E731
+    return {a: ligne(g) for a, g in p.groupby("academie")}, ligne(p), an
+
+
 def zone(a: str) -> str:
     return "Île-de-France" if a in IDF else "Outre-mer" if a in OUTRE_MER else "Métropole hors Île-de-France"
 
@@ -144,20 +162,21 @@ def build() -> dict:
     sp, sp_fr = specialites(M)
     mm, mm_fr = masters(pd.read_csv(PROCESSED / "monmaster_formations.csv", sep=";", low_memory=False))
     ref, ref_fr = referentiel(pd.read_csv(PROCESSED / "referentiel_uai.csv", sep=";", dtype={"uai": str}))
+    po, po_fr, an_po = poursuite(pd.read_csv(RAW / "poursuite_academie.csv", sep=";"))
     noms = sorted((set(ps) | set(sp) | set(mm)) - {"Étranger"}, key=cle)
     assert all(academie_canonique(a) == a for a in noms)
-    acads = [{"nom": a, "slug": slug(a), "zone": zone(a), "ref": ref.get(a), "ps": ps.get(a), "spe": sp.get(a), "mm": mm.get(a)}
-             for a in noms]
+    acads = [{"nom": a, "slug": slug(a), "zone": zone(a), "ref": ref.get(a), "ps": ps.get(a), "spe": sp.get(a), "mm": mm.get(a),
+              "pours": po.get(a)} for a in noms]
     return {"session": SESSION, "rentree": M["rentree"], "alpha": ALPHA, "filieres": filieres, "specialites": M["specialites"],
-            "libelles_filieres": FILIERES, "libelles_specialites": SPECIALITES,
-            "france": {"nom": "France entière", "ref": ref_fr, "ps": ps_fr, "spe": sp_fr, "mm": mm_fr},
+            "libelles_filieres": FILIERES, "libelles_specialites": SPECIALITES, "rentree_poursuite": an_po,
+            "france": {"nom": "France entière", "ref": ref_fr, "ps": ps_fr, "spe": sp_fr, "mm": mm_fr, "pours": po_fr},
             "academies": acads}
 
 
 def main() -> None:
     D = build()
     OUT_JSON.write_text(json.dumps(D, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    build_page(TPL, OUT_PAGE, D)
+    build_page(TPL, OUT_PAGE, D, {"__RENTREE_PO__": str(D["rentree_poursuite"])})
     print(f"{len(D['academies'])} académies -> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e3:.0f} ko)")
 
 

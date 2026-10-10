@@ -88,6 +88,12 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
     <div id="ps"></div>
   </section>
 
+  <section class="bloc" id="b-po" aria-labelledby="h-po">
+    <div class="kicker">Après le bac · rentrée __RENTREE_PO__</div>
+    <h2 id="h-po">Où poursuivent les bacheliers de l'académie</h2>
+    <div id="po"></div>
+  </section>
+
   <section class="bloc" id="b-spe" aria-labelledby="h-spe">
     <div class="kicker">Lycée · spécialités de 1re générale</div>
     <h2 id="h-spe">Qui n'a pas accès à quelle spécialité</h2>
@@ -272,6 +278,24 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
     Spedago.sortable($("t-mm"));
   }
 
+  function blocPo(a) {
+    if (!a.pours) { $("po").innerHTML = `<p class="empty">Académie hors du champ de ce jeu de données (France métropolitaine et DROM, hors COM).</p>`; return; }
+    const k = cmpObj(), nom = cmpNom(), ref = new Map((k.pours || []).map((r) => [r[0], r]));
+    const pc = (r, i) => (r && r[1] ? r[i] / r[1] : NaN), tot = (r) => (r ? r.slice(2).reduce((s, x) => s + x, 0) : 0);
+    const cols = [["Université (hors IUT)", 2], ["IUT", 3], ["Classes prépa", 4], ["BTS", 5], ["Autres écoles et formations", 6]];
+    const rows = a.pours.map((r) => {
+      const c = ref.get(r[0]), t = r[1] ? tot(r) / r[1] : NaN, tc = c && c[1] ? tot(c) / c[1] : NaN;
+      return `<tr><td data-v="${esc(r[0])}">${esc(r[0])}<small>${fmtInt(r[1])} bacheliers</small></td>
+        <td class="r" data-l="Poursuivent" data-v="${t}"><strong>${fmtPct(t)}</strong><small>${esc(nom)} ${fmtPct(tc)}</small></td>
+        ${cols.map(([l, i]) => `<td class="r" data-l="${l}" data-v="${pc(r, i)}">${fmtPct(pc(r, i))}<small>${esc(nom)} ${fmtPct(pc(c, i))}</small></td>`).join("")}</tr>`;
+    }).join("");
+    $("po").innerHTML = `<p>Part des bacheliers de la session ${D.rentree_poursuite}, ayant passé le bac dans l'académie, inscrits dans le supérieur à la rentrée suivante, où qu'ils étudient.</p>
+      ${toolbar("po", "la poursuite d'études")}
+      <div class="tablewrap"><table id="t-po"><caption class="sr-only">Poursuite d'études des bacheliers par voie et par filière</caption><thead><tr><th>Voie du bac</th><th class="r">Poursuivent</th>${cols.map(([l]) => `<th class="r">${l}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="note">Source : SIES, taux de poursuite des néo-bacheliers par académie d'obtention du bac. Apprentissage en BTS compris ; formations hors du champ du ministère non comptées.</p>`;
+    Spedago.sortable($("t-po"));
+  }
+
   // ---- export : les lignes affichées (ordre de tri compris), valeurs brutes
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-export]"); if (!b) return;
@@ -282,7 +306,7 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
   function render() {
     const a = D.academies[+$("acad").value];
     $("zone").textContent = a.zone;
-    stats(a); blocPs(a); blocSpe(a); blocMm(a);
+    stats(a); blocPs(a); blocPo(a); blocSpe(a); blocMm(a);
     Spedago.announce(`Fiche de l'académie ${a.nom}, comparée à ${cmpNom()}`);
   }
   $("acad").addEventListener("change", () => { Spedago.setHash(D.academies[+$("acad").value].nom); render(); });

@@ -46,6 +46,17 @@ DATASETS = {
     "ips_lycees_ap2023": (EDU, "fr-en-ips-lycees-ap2023"),
     "eloignement_lycees": (EDU, "fr-en-indice_eloignement_lycee_ap2020"),
     "remplacement_2nd_degre": (EDU, "fr-en-remplacement-second-degre"),
+    # InserSup : masters LMD, diplômés, tous publics confondus (une ligne par établissement × mention × promotion)
+    "insersup_master": (ESR, "fr-esr-insersup",
+                        "select=uo_lib,etablissement,uai_fresq,aca_nom,libelle_diplome,discipli_lib,promo,source,"
+                        "nb_sortants_12,nb_sortants_18,nb_sortants_30,nb_sortants_en_emploi_sal_fr_12,nb_sortants_en_emploi_sal_fr_18,"
+                        "nb_sortants_en_emploi_sal_fr_30,tx_sortants_en_emploi_sal_fr_12,tx_sortants_en_emploi_sal_fr_18,"
+                        "tx_sortants_en_emploi_sal_fr_30,tx_sortants_en_emploi_stable_18,salaire_q2_18,salaire_q2_30,diplome"
+                        "&where=type_diplome_long%3D%22Master%20LMD%22%20and%20genre%3D%22ensemble%22%20and%20nationalite%3D%22ensemble%22"
+                        "%20and%20regime_inscription%3D%22ensemble%22%20and%20obtention_diplome%3D%22dipl%C3%B4m%C3%A9%22"),
+    # Poursuite d'études des bacheliers par académie (SIES) ; résultats des lycées GT (IVAL)
+    "poursuite_academie": (ESR, "fr-esr-taux-poursuite-enseignement-superieur-par-academie"),
+    "ival_lycees_gt": (EDU, "fr-en-indicateurs-de-resultat-des-lycees-gt_v2"),
     # Annuaire : lycées seulement, colonnes utiles (coordonnées, bassin de formation, statut)
     "annuaire_lycees": (EDU, "fr-en-annuaire-education",
                         "select=identifiant_de_l_etablissement,nom_etablissement,statut_public_prive,nom_commune,"

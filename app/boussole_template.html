@@ -121,6 +121,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
         <option value="prudent">Chances, estimation prudente</option>
         <option value="taux">Taux observé</option>
         <option value="places">Nombre de places</option>
+        <option value="insertion">Insertion à 18 mois</option>
         <option value="nom">Établissement</option>
       </select>
     </label>
@@ -145,7 +146,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <span><button type="button" class="btn-ghost" id="sel-export">Exporter (CSV)</button> <button type="button" class="btn-ghost" id="sel-clear">Vider</button></span></div>
     <p class="note">Gardée dans ce navigateur. Estimations pour le profil choisi plus haut ; cliquez un en-tête pour trier.</p>
     <div class="tablewrap"><table class="rank" id="t-sel"><caption class="sr-only">Masters gardés, comparés</caption>
-      <thead><tr><th scope="col">Formation</th><th scope="col" class="r">Places</th><th scope="col" class="r">Chances (profil)</th><th scope="col" class="r">Observé</th><th scope="col" class="r">Dernier appelé</th><th scope="col" data-nosort><span class="sr-only">Retirer</span></th></tr></thead>
+      <thead><tr><th scope="col">Formation</th><th scope="col" class="r">Places</th><th scope="col" class="r">Chances (profil)</th><th scope="col" class="r">Observé</th><th scope="col" class="r">Dernier appelé</th><th scope="col" class="r">Insertion 18 mois</th><th scope="col" data-nosort><span class="sr-only">Retirer</span></th></tr></thead>
       <tbody></tbody></table></div>
   </section>
 
@@ -164,6 +165,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
         <li>Un même candidat est compté dans chaque formation demandée, et ceux qui se sont désistés restent comptés.</li>
         <li>Le profil et l'établissement d'origine ne sont pas croisés : le taux « même établissement » mêle tous les profils.</li>
         <li>Hors plateforme : candidats « Études en France », redoublants, admissions de droit, certains masters internationaux.</li>
+        <li>Insertion (InserSup) : elle est publiée pour la mention dans l'établissement, pas pour chaque parcours ; elle compte l'emploi salarié en France (pas l'emploi à l'étranger ni les indépendants) et seulement les diplômés qui ont arrêté leurs études.</li>
       </ul>
     </div>
   </section>
@@ -171,7 +173,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
   </main>
 
   <footer>
-    Source : ministère de l'Enseignement supérieur, jeu de données ouvert « Mon Master » (sessions 2024 et 2025, Licence Ouverte 2.0), traitement Spédago.
+    Insertion : ministère de l'Enseignement supérieur, InserSup (diplômés de master, emploi salarié en France à 18 mois). Source : ministère de l'Enseignement supérieur, jeu de données ouvert « Mon Master » (sessions 2024 et 2025, Licence Ouverte 2.0), traitement Spédago.
     Outil indépendant, sans lien avec la plateforme officielle d'admission en master. Taux observé : propositions / candidats (phases principale et complémentaire). Estimation : moyenne a posteriori bêta-binomiale, loi a priori par mention et profil.
   </footer>
 </div>
@@ -299,7 +301,9 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
 
     const tri = $("tri").value;
     const key = (r) => (isNaN(r.p) ? -1 : tri === "prudent" ? r.lo : r.p);
+    const insV = (f) => (insOf(f) ? insOf(f)[0] : -1);
     rows.sort((a, b) => (ouverte(b.f) - ouverte(a.f)) || (tri === "places" ? (b.f[7][LAST] || 0) - (a.f[7][LAST] || 0)
+      : tri === "insertion" ? insV(b.f) - insV(a.f)
       : tri === "nom" ? D.etablissements[a.f[1]].localeCompare(D.etablissements[b.f[1]], "fr")
       : key(b) - key(a)));
     $("count").textContent = `${fmtInt(rows.length)} formation${rows.length > 1 ? "s" : ""} · profil : ${D.libelles_profils[profil]}`;
@@ -323,7 +327,7 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
         <button type="button" class="star" data-ifc="${esc(f[0])}" aria-pressed="${kept}">${kept ? "★ Gardé" : "☆ Garder"}<span class="sr-only"> : ${esc(D.etablissements[f[1]])}, ${esc(f[4] || "parcours non précisé")}</span></button>
         <div class="meta"><span>${esc(f[4] || "Parcours non précisé")}</span><span>${esc(D.academies[f[2]])}</span>${f[5] ? '<span class="tag">Alternance</span>' : ""}${ouverte(f) ? "" : `<span class="tag">Non proposée en ${ANNEE}</span>`}</div></div>
         ${rate}
-        <div class="sub"><span>Places ${ANNEE} : <em>${pl ?? "–"}</em></span><span>Dernier appelé ${ANNEE} (phase principale) : <em>${rang != null ? "rang " + fmtInt(rang) : "–"}</em></span>${ins}</div>`;
+        <div class="sub"><span>Places ${ANNEE} : <em>${pl ?? "–"}</em></span><span>Dernier appelé ${ANNEE} (phase principale) : <em>${rang != null ? "rang " + fmtInt(rang) : "–"}</em></span>${ins}${insertion(f)}</div>`;
       frag.appendChild(el);
     });
     list.appendChild(frag);
@@ -361,6 +365,15 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
     $("lab-mention").hidden = v !== "mention"; $("lab-secteur").hidden = v !== "inverse";
     render();
   }
+  // ---- insertion (InserSup) : taux de la mention dans l'établissement, repère national de la mention
+  const INS = D.insertion || { formations: {}, mentions: {}, mois: 18 };
+  const insOf = (f) => INS.formations[String(f[0])] || null;
+  function insertion(f) {
+    const x = insOf(f), nat = INS.mentions[String(f[3])];
+    if (!x) return `<span>Insertion : <em>non publiée</em></span>`;
+    return `<span>En emploi salarié ${INS.mois} mois après le diplôme : <em>${fmtPct(x[0])}</em> (promo ${x[2]}, ${fmtInt(x[1])} diplômés${x[3] ? `, salaire net médian ${fmtInt(x[3])} €` : ""})${nat != null ? ` · mention, France : ${fmtPct(nat)}` : ""}</span>`;
+  }
+
   // ---- Ma sélection (ce navigateur)
   const SKEY = "spedago.selection", byIfc = new Map(D.formations.map((f) => [String(f[0]), f]));
   let selection_ = new Set(); try { selection_ = new Set((JSON.parse(localStorage.getItem(SKEY)) || []).filter((x) => byIfc.has(String(x)))); } catch (e) { /* vide */ }
@@ -375,6 +388,7 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
         <td class="r" data-v="${isNaN(p) ? "" : p}">${isNaN(p) ? "–" : fmtPct(p)}<small>${isNaN(p) ? "aucun candidat de ce profil" : `${fmtPct(lo)} – ${fmtPct(hi)}`}</small></td>
         <td class="r" data-v="${n ? k / n : ""}">${n ? `${k} / ${fmtInt(n)}` : "–"}</td>
         <td class="r" data-v="${f[8][LAST] ?? ""}">${f[8][LAST] != null ? "rang " + fmtInt(f[8][LAST]) : "–"}</td>
+        <td class="r" data-v="${insOf(f) ? insOf(f)[0] : ""}">${insOf(f) ? fmtPct(insOf(f)[0]) : "–"}<small>${insOf(f) ? "promo " + insOf(f)[2] : "non publiée"}</small></td>
         <td><button type="button" class="btn-ghost" data-remove="${esc(f[0])}">Retirer<span class="sr-only"> ${esc(D.etablissements[f[1]])}</span></button></td>`;
       tb.appendChild(tr);
     });
@@ -389,9 +403,10 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
   $("sel-clear").addEventListener("click", () => { selection_.clear(); saveSel(); render(); Spedago.announce("Sélection vidée"); });
   $("sel-export").addEventListener("click", () => {
     const profil = $("profil").value;
-    const rows = [["Établissement", "Mention", "Parcours", "Académie", `Places ${ANNEE}`, "Estimation", "Bas", "Haut", "Candidats du profil", "Propositions", `Dernier appelé ${ANNEE}`, "Profil"]];
+    const rows = [["Établissement", "Mention", "Parcours", "Académie", `Places ${ANNEE}`, "Estimation", "Bas", "Haut", "Candidats du profil", "Propositions", `Dernier appelé ${ANNEE}`, `Emploi salarié ${INS.mois} mois`, "Promotion", "Diplômés", "Salaire médian", "Profil"]];
     selection_.forEach((ifc) => { const f = byIfc.get(String(ifc)), [n, k, p, lo, hi] = C.estimate(D, f, profil);
-      rows.push([D.etablissements[f[1]], D.mentions[f[3]], f[4], D.academies[f[2]], f[7][LAST], p, lo, hi, n, k, f[8][LAST], D.libelles_profils[profil]]); });
+      const x = insOf(f) || [];
+      rows.push([D.etablissements[f[1]], D.mentions[f[3]], f[4], D.academies[f[2]], f[7][LAST], p, lo, hi, n, k, f[8][LAST], x[0], x[2], x[1], x[3], D.libelles_profils[profil]]); });
     Spedago.download("spedago-ma-selection-masters.csv", Spedago.csv(rows));
   });
   const render = () => { (vue === "mention" ? renderMention() : renderInverse()); renderSel(); };

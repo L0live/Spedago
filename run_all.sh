@@ -21,6 +21,7 @@ python3 scripts/build_indice_specialites.py
 python3 scripts/robustesse_piste_b.py
 python3 scripts/build_monmaster.py
 python3 scripts/build_referentiel.py
+python3 scripts/build_insertion.py
 python3 scripts/build_page_boussole.py
 python3 scripts/build_simulateur_parcoursup.py
 python3 scripts/build_mutualisation.py

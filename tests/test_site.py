@@ -109,6 +109,17 @@ def test_accessibilite_structure():
         assert "Spedago.announce(" in html or f == "index.html", f"pas d'annonce des mises à jour dans {f}"
 
 
+def test_tous_les_scripts_sont_valides(tmp_path):
+    """Chaque bloc <script> de chaque page passe `node --check` (une erreur de syntaxe casse toute la page)."""
+    for f in NOMS:
+        html = NOMS[f].read_text(encoding="utf-8")
+        for i, js in enumerate(re.findall(r"<script(?: id=\"[a-z]+\")?>(.*?)</script>", html, re.S)):
+            p = tmp_path / f"{f}.{i}.js"
+            p.write_text(js, encoding="utf-8")
+            r = subprocess.run(["node", "--check", str(p)], capture_output=True, text=True)
+            assert r.returncode == 0, (f, i, r.stderr[:400])
+
+
 def test_documents_complets_du_site():
     for f, _, _ in PAGES:
         s = (SITE / f).read_text(encoding="utf-8")

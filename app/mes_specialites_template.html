@@ -41,6 +41,11 @@ tr.cur td { background: var(--orange-soft) }
 .linklike { font: inherit; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px }
 .note { font-size: 13px; color: var(--muted) }
 .empty { color: var(--muted); font-style: italic }
+.h3 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 20px 0 8px }
+.ival { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 640px) { .ival { grid-template-columns: 1fr } }
+.ival div { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px }
+.ival b { display: block; font-family: var(--display); font-size: 24px; font-weight: 600 } .ival span { display: block; font-size: 13px } .ival small { color: var(--muted); font-size: 12px }
 .trend { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px }
 .trend span { font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-variant-numeric: tabular-nums }
 section.explain { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
@@ -225,7 +230,7 @@ if (typeof module !== "undefined") module.exports = SpeCalc;
     const fam = $("fam").value, q = norm($("q").value.trim()), tri = $("tri").value;
     let rows = C.groupes(D, d).filter((r) => r.n > 0 && (!fam || D.groupes[r.key][2] === fam)
       && (!q || norm(D.groupes[r.key][1]).includes(q) || D.formations.some((f) => f[0] === r.key && norm(f[1]).includes(q))));
-    const key = { demande: (r) => -r.n, chances: (r) => -(isNaN(r.lo) ? -1 : r.lo), ecart: (r) => -(isNaN(r.lo) || isNaN(r.pO) ? -9 : r.lo - r.pO),  // écart prudent : bas de l'intervalle nom: () => 0 }[tri];
+    const key = { demande: (r) => -r.n, chances: (r) => -(isNaN(r.lo) ? -1 : r.lo), ecart: (r) => -(isNaN(r.lo) || isNaN(r.pO) ? -9 : r.lo - r.pO), nom: () => 0 }[tri];  // écart prudent : bas de l'intervalle
     rows.sort((a, b) => key(a) - key(b) || D.groupes[a.key][1].localeCompare(D.groupes[b.key][1], "fr"));
     return rows;
   }
@@ -294,7 +299,11 @@ if (typeof module !== "undefined") module.exports = SpeCalc;
       if (r.etat === "hors_carte") return `<li><span class="unk">– Non couverte</span> ${nom} <small class="note">(pas dans les données de la carte)</small></li>`;
       const near = r.uai && byUai.has(r.uai) ? D.lycees[byUai.get(r.uai)] : null;
       return `<li><span class="ko">✗ Pas proposée</span> ${nom}${near ? ` — la plus proche : <strong>${esc(near[1])}</strong> (${esc(near[2])}), ${String(r.km).replace(".", ",")} km à vol d'oiseau` : ""}</li>`;
-    }).join("")}</ul><p class="note">Offre de 1re (rentrée ${D.rentree_carte}), même statut public/privé pour le lycée le plus proche. <a href="mutualisation.html#${Spedago.slug(l[3])}">Voir la carte des spécialités →</a></p>`;
+    }).join("")}</ul><p class="note">Offre de 1re (rentrée ${D.rentree_carte}), même statut public/privé pour le lycée le plus proche. <a href="mutualisation.html#${Spedago.slug(l[3])}">Voir la carte des spécialités →</a></p>
+      ${l[6] ? `<h3 class="h3">Résultats du lycée au bac ${D.annee_ival}</h3><div class="ival">${[
+        ["Réussite au bac", l[6][0], l[6][1]], ["Élèves de 2de qui obtiennent le bac dans le lycée", l[6][2], l[6][3]], ["Mentions", l[6][4], l[6][5]],
+      ].map(([t, v, va]) => `<div><b>${v == null ? "–" : Math.round(v) + " %"}</b><span>${t}</span><small>${va == null ? "valeur ajoutée non publiée" : `valeur ajoutée ${va > 0 ? "+" : va < 0 ? "−" : ""}${Math.abs(va)} pt${Math.abs(va) > 1 ? "s" : ""}`}</small></div>`).join("")}</div>
+      <p class="note">Valeur ajoutée : écart entre le résultat du lycée et celui attendu compte tenu de ses élèves (âge, origine sociale, résultats au brevet). Positive : le lycée fait mieux que prévu.</p>` : ""}`;
     box.hidden = false;
   }
 

@@ -115,7 +115,16 @@ def build() -> dict:
     tot_v2 = v2[v2.groupe == "Ensemble des bacheliers"].groupby("annee_du_bac")[["voeux"]].sum()["voeux"].astype(int).to_dict()
     # offre de spécialités par lycée (carte) : on garde le strict nécessaire
     M = json.loads((PROCESSED / "mutualisation.json").read_text(encoding="utf-8"))
-    lyc = [[l[0], l[1], l[2], l[4], l[9], {k: v for k, v in l[10].items()}] for l in M["lycees"]]
+    # résultats du lycée (IVAL, dernière session) : réussite, accès de la 2de au bac, mentions ; valeurs ajoutées
+    iv = pd.read_csv(RAW / "ival_lycees_gt.csv", sep=";", low_memory=False)
+    an_ival = int(iv.annee.max())
+    iv = iv[iv.annee == an_ival].drop_duplicates("uai").set_index("uai")
+    IV = ["taux_reu_total", "va_reu_total", "taux_acces_2nde", "va_acces_2nde", "taux_men_total", "va_men_total"]
+    def ival(u):
+        if u not in iv.index:
+            return None
+        return [None if pd.isna(v) else float(v) for v in iv.loc[u, IV]]
+    lyc = [[l[0], l[1], l[2], l[4], l[9], {k: v for k, v in l[10].items()}, ival(l[0])] for l in M["lycees"]]
     return {
         "annee": int(l0.annee_du_bac.iloc[0]), "rayon_km": M["rayon_km"], "rentree_carte": M["rentree"],
         "eds": [[i, lib, keys] for i, lib, _, keys in EDS], "carte_specialites": M["specialites"],
@@ -126,7 +135,7 @@ def build() -> dict:
         "formations": [[gi[g], f] for g, f in fines],
         "f": [[di[r.d], fi[(r.groupe, r.formation)], int(r.voeux), int(r.propositions_d_admissions), int(r.acceptations)] for r in l2.itertuples()],
         "tendance": tend, "total_annees": {str(k): v for k, v in tot_v2.items()} | {str(int(l0.annee_du_bac.iloc[0])): int(l0.voeux.sum())},
-        "lycees": lyc,
+        "lycees": lyc, "annee_ival": an_ival,
     }
 
 
