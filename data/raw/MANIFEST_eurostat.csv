@@ -1,0 +1,6 @@
+fichier;requete;sha256;maj_eurostat;telecharge_le
+eurostat_mobilite_francais_etranger.json;educ_uoe_mobs02?partner=FR&isced11=ED5-8&isced11=ED5&isced11=ED6&isced11=ED7&isced11=ED8&sex=T&unit=NR&sinceTimePeriod=2013;3aa92c1c0903717278351b0ceb73b8be926e42bef73b205fcbe28458f0b4e099;2026-10-06T23:00:00+0200;2026-10-10
+eurostat_mobilite_etrangers_france.json;educ_uoe_mobs02?geo=FR&isced11=ED5-8&sex=T&unit=NR&sinceTimePeriod=2013;1dd3c3e6c6d2cef5a40c42a539ae3b7ca94562b234d285fa45facdd0314e0a4f;2026-10-06T23:00:00+0200;2026-10-10
+eurostat_diplomes_sup_25_34.json;edat_lfse_04?age=Y25-34&isced11=ED5-8&sex=T&unit=PC&sinceTimePeriod=2015;a670f3c221a3f500b2da17aa7efb28ecf254fd319d562c8021c7fe8ab6a6f7b0;2026-09-10T23:00:00+0200;2026-10-10
+eurostat_sorties_precoces_18_24.json;edat_lfse_16?sex=T&unit=PC&sinceTimePeriod=2015;e8caff6518fdffcffa7335544b8ca08326ed816d14839485f328a833a7ca40c2;2026-09-10T23:00:00+0200;2026-10-10
+eurostat_neet_15_29.json;edat_lfse_22?age=Y15-29&sex=T&unit=PC&sinceTimePeriod=2015;0043f358603a7ac2c36ab7ed1ea7c4986d7bfa5184b2527776c13793f880637f;2026-09-10T23:00:00+0200;2026-10-10

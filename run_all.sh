@@ -12,6 +12,7 @@ mkdir -p data/processed reports/profiling
 
 python3 scripts/download_data.py
 python3 scripts/download_data.py --check
+python3 scripts/download_eurostat.py
 python3 scripts/profile_data.py
 python3 scripts/build_parcoursup_panel.py
 python3 scripts/analyse_tension.py
@@ -27,6 +28,7 @@ python3 scripts/build_simulateur_parcoursup.py
 python3 scripts/build_mutualisation.py
 python3 scripts/build_mon_academie.py
 python3 scripts/build_mes_specialites.py
+python3 scripts/build_voisins.py
 python3 scripts/build_site.py
 python3 -m pytest tests/ -q -p no:cacheprovider
 echo "Pipeline terminé."

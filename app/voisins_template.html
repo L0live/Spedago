@@ -1,0 +1,225 @@
+<title>France et voisins</title>
+__COMMUN__
+<style>
+/* Deux parties : petits multiples (un pays par vignette, deux courbes) puis graphiques en points (une ligne par région).
+   Couleurs de données : bleu = Français partis / régions voisines ; orange = venus en France / votre région (validées : CVD ΔE ≥ 31). */
+.wrap { max-width: 1080px; margin: 0 auto }
+header { padding-block: 40px 8px }
+.lede { color: var(--muted); max-width: 70ch; margin: 0 }
+h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0 0 8px }
+.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-top: 24px; box-shadow: var(--shadow-sm) }
+@media (max-width: 640px) { .bloc { padding: 16px } }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--orange-ink); margin-bottom: 4px }
+.bloc > p { max-width: 75ch; margin: 0 0 12px }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-block: 8px 16px }
+@media (max-width: 760px) { .stats { grid-template-columns: 1fr } }
+.stat { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px }
+.stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1 }
+.stat span { font-size: 13px; color: var(--muted) }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 8px }
+.legend i { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 6px; border-radius: 1px }
+.legend i.dot { width: 9px; height: 9px; border-radius: 50% }
+.legend i.ring { width: 9px; height: 9px; border-radius: 50%; background: none !important; border: 2px solid var(--ink) }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px }
+.panel { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px; position: relative; min-width: 0 }
+.panel h3 { font-size: 15px; font-weight: 600; margin: 0 }
+.panel .last { font-size: 12px; color: var(--muted); margin: 2px 0 6px; font-variant-numeric: tabular-nums }
+.panel svg { width: 100%; height: auto; display: block; overflow: visible }
+.grid line { stroke: var(--line); stroke-width: 1 }
+.axis text { font-size: 10px; fill: var(--muted); font-variant-numeric: tabular-nums }
+.l-out { stroke: #2563eb } .l-in { stroke: #ea580c }
+.flag { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5 }
+.cross { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 2 }
+.tip { position: absolute; z-index: 5; pointer-events: none; background: var(--ink); color: #fff; font-size: 12px; line-height: 1.4; border-radius: 6px; padding: 6px 8px; max-width: calc(100% - 8px); box-shadow: var(--shadow-md) }
+.tip b { font-variant-numeric: tabular-nums }
+.pick { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; margin-block: 8px 16px }
+.pick label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
+.pick select { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 240px }
+.dots { display: grid; gap: 28px }
+.dots h3 { font-size: 16px; font-weight: 600; margin: 0 0 2px }
+.dots .sens { font-size: 12px; color: var(--muted); margin: 0 0 8px }
+.drow { display: grid; grid-template-columns: minmax(120px, 230px) minmax(0, 1fr) 56px; gap: 8px; align-items: center; padding-block: 3px; font-size: 13px }
+.drow .nom { overflow-wrap: anywhere } .drow.moi .nom { font-weight: 700; color: var(--orange-ink) } .drow.ref .nom { color: var(--muted) }
+.drow .val { text-align: right; font-variant-numeric: tabular-nums } .drow.moi .val { font-weight: 700 }
+.track { position: relative; height: 16px }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: var(--track); border-radius: 1px }
+.track span { position: absolute; top: 2px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; box-shadow: 0 0 0 2px var(--surface) }
+.drow.moi .track span { background: #ea580c } .drow.voisine .track span { background: #2563eb }
+.drow.ref .track span { background: var(--surface); border: 2px solid var(--ink); box-shadow: none; width: 10px; height: 10px; margin-left: -5px; top: 3px }
+.u { font-size: 11px; color: var(--muted) }
+details { margin-top: 16px } summary { cursor: pointer; font-weight: 600; color: var(--accent) }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; min-width: 640px; margin-top: 8px }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line) }
+td { padding: 6px 8px; border-bottom: 1px solid var(--line) } td.r, th.r { text-align: right }
+.note { font-size: 13px; color: var(--muted) }
+section.explain { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
+@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } .drow { grid-template-columns: minmax(0, 1fr) 52px } .drow .track { grid-column: 1 / -1; grid-row: 2 } }
+section.explain h2 { font-size: 19px } section.explain ul { padding-left: 18px; margin: 0 }
+footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
+</style>
+
+<div class="wrap">
+  __NAV__
+  <main id="contenu" tabindex="-1">
+  <header>
+    <span class="badge">Données Eurostat · __AN0__-__AN1__</span>
+    <h1>France et voisins</h1>
+    <p class="lede">Combien de jeunes Français partent faire tout un cursus dans un pays voisin, et combien viennent en sens inverse ; puis, académie par académie, où en sont les régions de part et d'autre de la frontière sur les diplômes, le décrochage et l'insertion des jeunes.</p>
+  </header>
+
+  <section class="bloc" aria-labelledby="h-mob">
+    <div class="kicker">Mobilité diplômante · supérieur (licence à doctorat)</div>
+    <h2 id="h-mob">Partir étudier à l'étranger</h2>
+    <div class="stats" id="mob-stats"></div>
+    <div class="legend" aria-hidden="true"><span><i style="background:#2563eb"></i>Français inscrits dans ce pays</span><span><i style="background:#ea580c"></i>Étudiants de ce pays inscrits en France</span><span><i class="ring"></i>Année signalée par Eurostat (voir le tableau)</span></div>
+    <p class="note">Chaque vignette a sa propre échelle (les effectifs vont de quelques centaines à près de 20 000). Survolez une vignette pour lire les valeurs.</p>
+    <div class="multiples" id="multiples"></div>
+    <details><summary>Tableau des valeurs et des signalements</summary><div class="tablewrap" tabindex="0" role="region" aria-label="Tableau de la mobilité (défilant)"><table id="t-mob"></table></div></details>
+    <p class="note" id="mob-note"></p>
+  </section>
+
+  <section class="bloc" aria-labelledby="h-reg">
+    <div class="kicker">Régions frontalières · enquête Forces de travail</div>
+    <h2 id="h-reg">De part et d'autre de la frontière</h2>
+    <form class="pick" id="pick" autocomplete="off"><label for="acad">Académie <select id="acad"></select></label><span class="note" id="reg-note"></span></form>
+    <div class="legend" aria-hidden="true"><span><i class="dot" style="background:#ea580c"></i>Région de l'académie</span><span><i class="dot" style="background:#2563eb"></i>Régions voisines</span><span><i class="ring"></i>Moyennes nationales et UE</span></div>
+    <div class="dots" id="dots"></div>
+    <details><summary>Tableau des valeurs</summary><div class="tablewrap" tabindex="0" role="region" aria-label="Tableau des régions (défilant)"><table id="t-reg"></table></div></details>
+    <div class="toolbar"><span class="note">Moyenne des trois dernières années disponibles ; « peu fiable » : petit échantillon signalé par Eurostat.</span><button type="button" class="btn-ghost" id="export">Exporter (CSV)</button></div>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h2>Lire ces chiffres</h2>
+      <ul>
+        <li>Mobilité diplômante : étudiants inscrits pour obtenir un diplôme dans le pays (Erasmus et échanges courts exclus), comptés par le pays d'accueil.</li>
+        <li>Une région NUTS 2 ne coïncide pas toujours avec une académie : Lyon et Grenoble partagent Rhône-Alpes, Aix-Marseille et Nice partagent Provence-Alpes-Côte d'Azur, la Normandie a deux régions.</li>
+        <li>Sorties précoces et jeunes « NEET » : plus c'est bas, mieux c'est ; diplômés du supérieur : plus c'est haut, plus la population jeune est diplômée (et mobile).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la page ne dit pas</h2>
+      <ul>
+        <li>Pourquoi ces étudiants partent : Eurostat ne croise pas le pays d'origine et le domaine d'études (médecine, kinésithérapie, art vétérinaire en Belgique par exemple).</li>
+        <li>Les quotas belges pour non-résidents et les notes d'admission espagnoles ne sont pas publiés en données ouvertes.</li>
+        <li>La baisse en Belgique en 2024 n'est pas signalée comme rupture de série par Eurostat ; elle reste à confirmer auprès de la source.</li>
+      </ul>
+    </div>
+  </section>
+  </main>
+
+  <footer>Source : Eurostat (educ_uoe_mobs02, edat_lfse_04, edat_lfse_16, edat_lfse_22), réutilisation libre avec mention de la source ; traitement Spédago.</footer>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script id="calc">
+// Fonctions de calcul pures (aucun accès au DOM) : exécutées par la page ET par les tests (Node.js).
+const VoisinsCalc = (() => {
+  // Lignes du graphique en points pour un indicateur : région(s) de l'académie, voisines, puis références nationales.
+  function lignes(D, ai, key) {
+    const [, , mes, vois] = D.academies[ai];
+    const pays = [...new Set(["FR", ...vois.map((c) => c.slice(0, 2)), "EU27_2020"])];
+    // un pays qui n'a qu'une région (Luxembourg : LU00) apparaît déjà comme voisine : pas de doublon en référence
+    const refs = D.refs.filter((c) => pays.includes(c) && !vois.includes(c + "00"));
+    const row = (c, role) => { const r = D.regions[c], v = r.v[key]; return v ? { code: c, nom: r.nom, role, v: v[0], dernier: v[1], de: v[2], a: v[3], u: v[4] === "u" } : null; };
+    return [...mes.map((c) => row(c, "moi")), ...vois.map((c) => row(c, "voisine")), ...refs.map((c) => row(c, "ref"))].filter(Boolean);
+  }
+  // Série d'un pays : [{annee, sortants, flagS, entrants, flagE}]
+  function serie(D, c) {
+    const M = D.mobilite;
+    return M.annees.map((a, i) => ({ annee: a, sortants: M.sortants[c][i][0], flagS: M.sortants[c][i][1], entrants: M.entrants[c][i][0], flagE: M.entrants[c][i][1] }));
+  }
+  return { lignes, serie };
+})();
+if (typeof module !== "undefined") module.exports = VoisinsCalc;
+</script>
+<script>
+(() => {
+  const C = VoisinsCalc, D = JSON.parse(document.getElementById("data").textContent), M = D.mobilite;
+  const $ = (id) => document.getElementById(id);
+  const fmtInt = (x) => (x == null ? "–" : Math.round(x).toLocaleString("fr-FR"));
+  const fmt1 = (x) => (x == null ? "–" : x.toFixed(1).replace(".", ","));
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const NS = "http://www.w3.org/2000/svg", flagTxt = (f) => (f ? f.split("").filter((x) => D.drapeaux[x]).map((x) => D.drapeaux[x]).join(", ") : "");
+
+  // ---- chiffres clés
+  const last = M.annees.length - 1, an = M.annees[last];
+  const tot = M.pays.reduce((s, [c]) => s + (M.sortants[c][last][0] || 0), 0);
+  const ue = (M.ue.find((x) => x[0] === an) || [])[1];
+  const top = [...M.pays].sort((a, b) => (M.sortants[b[0]][last][0] || 0) - (M.sortants[a[0]][last][0] || 0))[0];
+  $("mob-stats").innerHTML = [[fmtInt(ue), `étudiants français en mobilité diplômante dans l'UE en ${an}`],
+    [fmtInt(tot), `dans les ${M.pays.length} pays ci-dessous en ${an}, dont ${fmtInt(M.sortants.CH[last][0])} en Suisse (hors UE, d'où un total supérieur)`],
+    [esc(top[1]), `premier pays d'accueil en ${an} (${fmtInt(M.sortants[top[0]][last][0])})`]]
+    .map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join("");
+
+  // ---- petits multiples
+  const W = 240, H = 120, P = { l: 34, r: 6, t: 8, b: 18 };
+  M.pays.forEach(([c, nom]) => {
+    const s = C.serie(D, c), vmax = Math.max(1, ...s.flatMap((r) => [r.sortants || 0, r.entrants || 0]));
+    const step = Math.pow(10, Math.floor(Math.log10(vmax))), top = Math.ceil(vmax / step) * step;
+    const x = (i) => P.l + i * (W - P.l - P.r) / (s.length - 1), y = (v) => H - P.b - v / top * (H - P.t - P.b);
+    const path = (k) => { let d = "", on = false; s.forEach((r, i) => { const v = r[k]; if (v == null) { on = false; return; } d += (on ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); on = true; }); return d; };
+    const flags = (k, fk) => s.map((r, i) => (r[fk] && r[k] != null ? `<circle class="flag" cx="${x(i).toFixed(1)}" cy="${y(r[k]).toFixed(1)}" r="4"/>` : "")).join("");
+    const lastS = [...s].reverse().find((r) => r.sortants != null), lastE = [...s].reverse().find((r) => r.entrants != null);
+    const el = document.createElement("div"); el.className = "panel";
+    el.innerHTML = `<h3>${esc(nom)}</h3><p class="last">${lastS ? `${fmtInt(lastS.sortants)} Français (${lastS.annee})` : "–"} · ${lastE ? `${fmtInt(lastE.entrants)} venus en France` : "–"}</p>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(nom)} : Français inscrits de ${fmtInt(s.find((r) => r.sortants != null)?.sortants)} à ${fmtInt(lastS?.sortants)} entre ${s[0].annee} et ${lastS?.annee}">
+        <g class="grid">${[0, top / 2, top].map((v) => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/>`).join("")}</g>
+        <g class="axis">${[0, top / 2, top].map((v) => `<text x="${P.l - 4}" y="${y(v) + 3}" text-anchor="end">${v >= 1000 ? fmt1(v / 1000).replace(",0", "") + " k" : v}</text>`).join("")}
+          <text x="${P.l}" y="${H - 4}">${s[0].annee}</text><text x="${W - P.r}" y="${H - 4}" text-anchor="end">${s[s.length - 1].annee}</text></g>
+        <path d="${path("entrants")}" class="l-in" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${path("sortants")}" class="l-out" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${flags("sortants", "flagS")}${flags("entrants", "flagE")}
+        <line class="cross" y1="${P.t}" y2="${H - P.b}" x1="-10" x2="-10"/>
+        <rect x="${P.l}" y="0" width="${W - P.l - P.r}" height="${H}" fill="transparent"/>
+      </svg><div class="tip" hidden></div>`;
+    const svg = el.querySelector("svg"), cross = el.querySelector(".cross"), tip = el.querySelector(".tip");
+    svg.addEventListener("pointermove", (e) => {
+      const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(s.length - 1, Math.round((px - P.l) / ((W - P.l - P.r) / (s.length - 1))))), d = s[i];
+      cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i));
+      tip.innerHTML = `<b>${d.annee}</b><br>Français dans ce pays : <b>${fmtInt(d.sortants)}</b>${d.flagS ? ` (${esc(flagTxt(d.flagS))})` : ""}<br>Venus en France : <b>${fmtInt(d.entrants)}</b>${d.flagE ? ` (${esc(flagTxt(d.flagE))})` : ""}`;
+      tip.hidden = false; tip.style.left = Math.max(4, Math.min(el.clientWidth - tip.offsetWidth - 4, x(i) / W * r.width + 12)) + "px"; tip.style.top = "40px";
+    });
+    svg.addEventListener("pointerleave", () => { tip.hidden = true; cross.setAttribute("x1", -10); cross.setAttribute("x2", -10); });
+    $("multiples").appendChild(el);
+  });
+  // tableau (alternative accessible et détail des drapeaux)
+  $("t-mob").innerHTML = `<caption class="sr-only">Étudiants en mobilité diplômante par année</caption><thead><tr><th>Pays</th><th>Sens</th>${M.annees.map((a) => `<th class="r">${a}</th>`).join("")}</tr></thead><tbody>${
+    M.pays.map(([c, nom]) => ["sortants", "entrants"].map((k) => `<tr><td>${esc(nom)}</td><td>${k === "sortants" ? "Français dans ce pays" : "Venus en France"}</td>${
+      M[k][c].map(([v, f]) => `<td class="r">${fmtInt(v)}${f ? `<sup title="${esc(flagTxt(f))}"> ${esc(f)}</sup>` : ""}</td>`).join("")}</tr>`).join("")).join("")}</tbody>`;
+  $("mob-note").textContent = `Signalements Eurostat : ${Object.entries(D.drapeaux).map(([k, v]) => `${k} = ${v}`).join(" ; ")}. Répartition ${an} des Français par niveau (licence / master / doctorat) : ` +
+    M.pays.map(([c, nom]) => { const n = M.niveaux[c]; return n[1] == null ? null : `${nom} ${fmtInt(n[1])} / ${fmtInt(n[2])} / ${fmtInt(n[3])}`; }).filter(Boolean).join(" ; ") + ".";
+
+  // ---- régions
+  D.academies.forEach(([nom], i) => { const o = document.createElement("option"); o.value = i; o.textContent = nom; $("acad").appendChild(o); });
+  if (!Spedago.pick($("acad"))) $("acad").value = Math.max(0, D.academies.findIndex((a) => a[1] === "strasbourg"));
+  function renderReg() {
+    const ai = +$("acad").value, a = D.academies[ai];
+    $("reg-note").textContent = a[3].length ? `${a[3].length} région${a[3].length > 1 ? "s" : ""} voisine${a[3].length > 1 ? "s" : ""}` : "Pas de frontière terrestre avec un pays couvert : comparaison avec la France et l'Union européenne.";
+    $("dots").innerHTML = D.indicateurs.map(([key, lib, sens]) => {
+      const rows = C.lignes(D, ai, key), vmax = Math.max(...rows.map((r) => r.v)) * 1.1;
+      return `<div><h3>${esc(lib)}</h3><p class="sens">${sens === "haut" ? "Plus c'est haut, plus les jeunes adultes sont diplômés du supérieur." : "Plus c'est bas, mieux c'est."} Échelle de 0 à ${fmt1(vmax)} %.</p>
+        ${rows.map((r) => `<div class="drow ${r.role}"><span class="nom">${esc(r.nom)}${r.role === "ref" ? "" : ` <small class="u">${esc(D.noms_pays[r.code.slice(0, 2)] || "")}</small>`}${r.u ? ' <small class="u">(peu fiable)</small>' : ""}</span>
+          <span class="track" title="${esc(r.nom)} : ${fmt1(r.v)} % (moyenne ${r.de}-${r.a}, ${fmt1(r.dernier)} % en ${r.a})"><span style="left:${(r.v / vmax * 100).toFixed(1)}%"></span></span>
+          <span class="val">${fmt1(r.v)} %</span></div>`).join("")}</div>`;
+    }).join("");
+    const all = D.indicateurs.map(([k]) => C.lignes(D, ai, k));
+    const codes = all[0].map((r) => r.code);
+    $("t-reg").innerHTML = `<caption class="sr-only">Indicateurs des régions</caption><thead><tr><th>Région ou pays</th><th>Rôle</th>${D.indicateurs.map(([, lib]) => `<th class="r">${esc(lib)}</th>`).join("")}</tr></thead><tbody>${
+      codes.map((c, j) => `<tr><td>${esc(D.regions[c].nom)} <small class="u">${c}</small></td><td>${{ moi: "Région de l'académie", voisine: "Voisine", ref: "Référence" }[all[0][j].role]}</td>${
+        all.map((rows) => { const r = rows.find((x) => x.code === c); return `<td class="r">${r ? fmt1(r.v) + " %" + (r.u ? " *" : "") : "–"}</td>`; }).join("")}</tr>`).join("")}</tbody>`;
+    Spedago.announce(`Académie de ${a[0]} : ${a[3].length} régions voisines`);
+  }
+  $("acad").addEventListener("change", () => { Spedago.setHash(D.academies[+$("acad").value][0]); renderReg(); });
+  $("pick").addEventListener("submit", (e) => e.preventDefault());
+  window.addEventListener("hashchange", () => { if (Spedago.pick($("acad"))) renderReg(); });
+  document.addEventListener("spedago:profil", () => { if (!Spedago.hashSlug() && Spedago.pick($("acad"))) renderReg(); });
+  $("export").addEventListener("click", () => {
+    const ai = +$("acad").value, out = [["Académie", "Code", "Région ou pays", "Rôle", "Indicateur", "Moyenne 3 ans (%)", "Dernière valeur (%)", "Années", "Peu fiable"]];
+    D.indicateurs.forEach(([k, lib]) => C.lignes(D, ai, k).forEach((r) => out.push([D.academies[ai][0], r.code, r.nom, r.role, lib, r.v, r.dernier, `${r.de}-${r.a}`, r.u ? "oui" : ""])));
+    Spedago.download(`spedago-voisins-${D.academies[ai][1]}.csv`, Spedago.csv(out));
+  });
+  renderReg();
+})();
+</script>

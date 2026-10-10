@@ -19,6 +19,7 @@ PAGES = [
     ("mon-academie.html", "Mon académie", "Décideurs"),
     ("simulateur-parcoursup.html", "Simulateur des places", "Décideurs"),
     ("mutualisation.html", "Carte des spécialités", "Décideurs"),
+    ("france-et-voisins.html", "France et voisins", "Décideurs"),
 ]
 COMMUN = Path(__file__).resolve().parent.parent / "app" / "_commun.html"
 
