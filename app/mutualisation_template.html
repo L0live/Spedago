@@ -3,7 +3,7 @@ __COMMUN__
 <style>
 /* Mise en page : carte (points des lycées, projection simple) à gauche, fiche et groupes à droite ; empilé sur mobile */
 :root {
-  --offre: #2f7d4f; --voisin: #c68a12; --commun: #2c64c6; --isole: #c0413c; --incertain: #aab4bd; --land: #e9edf1;
+  --offre: #2f7d4f; --voisin: #b45309; --commun: #2c64c6; --isole: #c0413c; --incertain: #64748b; --land: #e9edf1;
 }
 .wrap { max-width: 1180px; margin: 0 auto }
 header { padding-block: 32px 12px }
@@ -35,7 +35,7 @@ svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
 .spes { display: grid; gap: 4px; margin-top: 10px; font-size: 14px }
 .spes div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding-block: 3px }
 .spes small { color: var(--muted); text-align: right }
-.pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--surface); background: var(--c); border-radius: 4px; padding: 0 6px; white-space: nowrap }
+.pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); background: color-mix(in srgb, var(--c) 14%, white); border: 1px solid var(--c); border-radius: 4px; padding: 0 5px }
 .groups { display: grid; gap: 8px; max-height: 520px; overflow-y: auto }
 .group { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; cursor: pointer; background: transparent; text-align: left; font: inherit; color: inherit; width: 100% }
 .group:hover { background: var(--accent-soft) }
@@ -51,6 +51,7 @@ footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px
 
 <div class="wrap">
   __NAV__
+  <main id="contenu" tabindex="-1">
   <header>
     <span class="badge">Projet indépendant · données publiques, 1re générale __RENTREE__</span>
     <h1>Carte des spécialités partagées</h1>
@@ -68,7 +69,7 @@ footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px
 
   <div class="layout">
     <div class="mapbox">
-      <svg id="map" viewBox="0 0 600 620" role="img" aria-label="Carte des lycées de métropole"></svg>
+      <svg id="map" viewBox="0 0 600 620" role="img" aria-label="Carte des lycées de métropole ; les mêmes informations sont données par les compteurs, la fiche du lycée (champ « Lycée ») et la liste des ouvertures communes"></svg>
       <div class="legend" id="legend"></div>
     </div>
     <div class="side">
@@ -97,6 +98,8 @@ footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px
       </ul>
     </div>
   </section>
+
+  </main>
 
   <footer>
     Sources : ministère de l'Éducation nationale (DEPP), effectifs par spécialité en 1re générale, et annuaire de l'éducation (Licence Ouverte 2.0) ; traitement Spédago.
@@ -155,7 +158,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
   Spedago.pick($("acad"));  // #poitiers dans l'adresse -> académie présélectionnée
   L.forEach((l) => { const o = document.createElement("option"); o.value = `${l[I.nom]} — ${l[I.com]}`; $("lycees").appendChild(o); });
   const byLabel = new Map(L.map((l, i) => [`${l[I.nom]} — ${l[I.com]}`, i]));
-  $("legend").innerHTML = [0, 3, 4, 5, 2].map((c) => `<span><i style="--c:var(${CAT[c][1]})"></i>${CAT[c][0]}</span>`).join("");
+  $("legend").innerHTML = [0, 3, 4, 5, 2].map((c) => `<span><i style="--c:var(${CAT[c][1]})${c === 2 ? ";background:none;border:1.5px solid var(--incertain)" : ""}"></i>${CAT[c][0]}</span>`).join("");
 
   // ---- carte
   const svg = $("map"), gLines = document.createElementNS(NS, "g"), gDots = document.createElementNS(NS, "g");
@@ -176,8 +179,12 @@ if (typeof module !== "undefined") module.exports = MutCalc;
       const code = l[I.st][sp], vis = visible(l), d = dots[i];
       if (!d) return;
       d.hidden = !vis;
-      d.setAttribute("r", code === 0 ? 2.2 : code === 2 ? 1.6 : 3);
-      d.style.fill = `var(${CAT[code][1]})`; d.style.opacity = code === 0 || code === 2 ? 0.55 : 0.9;
+      // Hiérarchie : « sans solution » et « ouverture commune » ressortent ; « incertain » = anneau vide (forme, pas seulement couleur)
+      d.setAttribute("r", { 0: 2, 2: 1.8, 3: 2.4, 4: 3.6, 5: 3.8 }[code]);
+      d.style.fill = code === 2 ? "none" : `var(${CAT[code][1]})`;
+      d.style.stroke = code === 2 ? "var(--incertain)" : code >= 4 ? "#fff" : "none";
+      d.style.strokeWidth = code === 2 ? 1 : code >= 4 ? 0.8 : 0;
+      d.style.opacity = { 0: 0.45, 2: 0.9, 3: 0.65, 4: 1, 5: 1 }[code];
       d.firstChild.textContent = `${l[I.nom]} (${l[I.com]}) — ${CAT[code][0]}`;
       d.classList.toggle("sel", selected === i);
     });
@@ -187,6 +194,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
     $("counts").innerHTML = [[0, n[0], "lycées la proposent"], [3, n[3], `sans elle · voisin à moins de ${D.rayon_km} km`],
       [4, n[4], "sans elle · ouverture commune possible"], [5, n[5], `sans elle · rien à moins de ${D.rayon_km} km (${fmtInt(el[5])} élèves de 1re)`]]
       .map(([c, v, t]) => `<div class="count" style="--c:var(${CAT[c][1]})"><b>${fmtInt(v)}</b><span>${t}</span></div>`).join("");
+    Spedago.announce($("counts").innerText);
     // groupes
     gLines.innerHTML = "";
     const grs = MutCalc.groups(D, sp, $("statut").value, $("acad").value);

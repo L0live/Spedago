@@ -97,6 +97,18 @@ def test_navigation_commune_sur_toutes_les_pages():
         assert "--bg:" not in s and "fonts.googleapis" not in s, f"styles de base dupliqués dans {t.name}"
 
 
+def test_accessibilite_structure():
+    """Socle WCAG vérifiable sans navigateur (le scan axe complet : scripts/check_a11y.mjs)."""
+    for f, _, _ in PAGES:
+        html = NOMS[f].read_text(encoding="utf-8")
+        assert html.count('<main id="contenu"') == 1 and '<a class="skip" href="#contenu">' in html, f
+        assert 'role="status" aria-live="polite" id="sr-status"' in html, f
+        assert html.count("<h1") == 1, f
+        for tab in re.findall(r'<[^>]*role="tab"[^>]*>', html):
+            assert "aria-controls=" in tab and "aria-selected=" in tab, (f, tab)
+        assert "Spedago.announce(" in html or f == "index.html", f"pas d'annonce des mises à jour dans {f}"
+
+
 def test_documents_complets_du_site():
     for f, _, _ in PAGES:
         s = (SITE / f).read_text(encoding="utf-8")

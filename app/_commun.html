@@ -46,6 +46,14 @@ a { color: var(--accent) }
 /* Surfaces : une seule élévation pour toutes les cartes du site */
 .stat, .panel, .row, .mapbox, .count, .controls, section.bloc, .door-card { box-shadow: var(--shadow-sm) }
 footer { color: var(--muted) }
+/* Accessibilité commune */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0 }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--ink); color: #fff; font-weight: 600; padding: 8px 14px; border-radius: var(--radius-sm); text-decoration: none }
+.skip:focus { top: 12px }
+main[tabindex="-1"]:focus { outline: none }
+/* Champs : bordure contrastée 4,8:1 (WCAG 1.4.11) ; le sélecteur :not(#_) passe devant les styles de page */
+select:not(#_), input:not([type=range]):not([type=radio]):not([type=checkbox]):not(#_) { border-color: #64748b }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important } }
 </style>
 <script id="commun">
 // Spédago — fonctions communes : identifiant d'académie dans l'adresse (#poitiers), liens de navigation qui le gardent.
@@ -79,7 +87,14 @@ const Spedago = (() => {
     document.addEventListener("DOMContentLoaded", syncNav);
     window.addEventListener("hashchange", syncNav);
   }
-  return { slug, hashSlug, syncNav, setHash, pick };
+  // Annonce polie pour les lecteurs d'écran (WCAG 4.1.3), regroupée : un curseur qui glisse n'annonce qu'une fois.
+  let tAnn = null;
+  function announce(text) {
+    if (typeof document === "undefined") return;
+    const z = document.getElementById("sr-status"); if (!z) return;
+    clearTimeout(tAnn); tAnn = setTimeout(() => { z.textContent = ""; setTimeout(() => { z.textContent = String(text).replace(/\s+/g, " ").trim(); }, 50); }, 700);
+  }
+  return { slug, hashSlug, syncNav, setHash, pick, announce };
 })();
 if (typeof module !== "undefined") module.exports = Spedago;
 </script>

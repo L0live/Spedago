@@ -64,7 +64,8 @@ table.rank th { text-align: left; font-size: 12px; text-transform: uppercase; le
 table.rank td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
 table.rank .r { text-align: right }
 table.rank tbody tr { cursor: pointer } table.rank tbody tr:hover { background: var(--accent-soft) }
-table.rank .mention { font-weight: 600 } table.rank small { color: var(--muted); display: block }
+table.rank .mention { font-weight: 600 }
+.linklike { font: inherit; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px } table.rank small { color: var(--muted); display: block }
 .mini { display: grid; gap: 3px; min-width: 150px } .mini .bar { height: 7px }
 footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
 @media (prefers-reduced-motion: no-preference) { .bar .pt { transition: left .2s } }
@@ -72,16 +73,17 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 
 <div class="wrap">
   __NAV__
+  <main id="contenu" tabindex="-1">
   <header>
     <span class="badge">Projet indépendant · données publiques 2024-2025</span>
     <h1>Boussole des masters</h1>
     <p class="lede">Pour chaque master de la plateforme nationale de candidature (universités et établissements privés habilités), la part des candidats de votre profil qui ont reçu une proposition d'admission en 2024 et 2025. Des taux passés, pas une prédiction : votre dossier compte plus que votre profil.</p>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Vue">
-    <button type="button" role="tab" id="tab-mention" aria-selected="true">Par mention</button>
-    <button type="button" role="tab" id="tab-inverse" aria-selected="false">Où candidater avec mon profil</button>
-  </nav>
+  <div class="tabs" role="tablist" aria-label="Vue">
+    <button type="button" role="tab" id="tab-mention" aria-selected="true" aria-controls="vue-mention" tabindex="0">Par mention</button>
+    <button type="button" role="tab" id="tab-inverse" aria-selected="false" aria-controls="vue-inverse" tabindex="-1">Où candidater avec mon profil</button>
+  </div>
 
   <form class="filters" id="filters" autocomplete="off">
     <label for="mention" id="lab-mention">Mention
@@ -102,7 +104,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
     </label>
   </form>
 
-  <div id="vue-mention">
+  <div id="vue-mention" role="tabpanel" aria-labelledby="tab-mention">
+  <h2 class="sr-only">Formations de la mention</h2>
   <div class="summary" id="summary"></div>
   <p class="note" id="insider"></p>
 
@@ -121,10 +124,11 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
   <button class="more" id="more" type="button" hidden>Afficher plus de formations</button>
   </div>
 
-  <div id="vue-inverse" hidden>
+  <div id="vue-inverse" role="tabpanel" aria-labelledby="tab-inverse" hidden>
+    <h2 class="sr-only">Mentions classées pour votre profil</h2>
     <p class="note">Mentions classées selon l'estimation prudente (bas de l'intervalle) de la part des candidats de votre profil ayant reçu une proposition, toutes formations de la mention réunies. Seules les mentions avec au moins 30 candidats de votre profil sont classées. Cliquez une mention pour voir ses formations.</p>
     <div class="tools"><span id="count-inv"></span></div>
-    <div class="tablewrap"><table class="rank" id="rank">
+    <div class="tablewrap"><table class="rank" id="rank"><caption class="sr-only">Mentions classées selon les chances pour votre profil</caption>
       <thead><tr><th scope="col">Mention</th><th scope="col" class="r">Formations</th><th scope="col" class="r">Places</th><th scope="col">Chances pour votre profil</th><th scope="col">Formation la plus accessible</th></tr></thead>
       <tbody></tbody>
     </table></div>
@@ -149,6 +153,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       </ul>
     </div>
   </section>
+
+  </main>
 
   <footer>
     Source : ministère de l'Enseignement supérieur, jeu de données ouvert « Mon Master » (sessions 2024 et 2025, Licence Ouverte 2.0), traitement Spédago.
@@ -283,6 +289,7 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
       : tri === "nom" ? D.etablissements[a.f[1]].localeCompare(D.etablissements[b.f[1]], "fr")
       : key(b) - key(a)));
     $("count").textContent = `${fmtInt(rows.length)} formation${rows.length > 1 ? "s" : ""} · profil : ${D.libelles_profils[profil]}`;
+    Spedago.announce($("count").textContent);
 
     const frag = document.createDocumentFragment();
     rows.slice(0, shown).forEach((r) => {
@@ -312,12 +319,13 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
     const profil = $("profil").value;
     const rows = C.rankMentions(D, profil, { academie: $("academie").value, modalite: $("modalite").value, secteur: $("secteur").value });
     $("count-inv").textContent = `${fmtInt(rows.length)} mention${rows.length > 1 ? "s" : ""} classée${rows.length > 1 ? "s" : ""} · profil : ${D.libelles_profils[profil]}`;
+    Spedago.announce($("count-inv").textContent);
     const tb = $("rank").tBodies[0];
     tb.innerHTML = rows.length ? "" : '<tr><td colspan="5" class="empty">Aucune mention avec assez de candidats de votre profil pour cette sélection.</td></tr>';
     rows.slice(0, shownInv).forEach((g) => {
       const tr = document.createElement("tr"); tr.dataset.mention = D.mentions[g.mention];
       const best = g.best ? `${esc(D.etablissements[g.best.etab])}<small>${esc(g.best.parcours || "Parcours non précisé")} · ${fmtPct(g.best.p)}</small>` : "–";
-      tr.innerHTML = `<td class="mention">${esc(D.mentions[g.mention])}<small>${fmtInt(g.n)} candidats de votre profil</small></td>
+      tr.innerHTML = `<td class="mention"><button type="button" class="linklike">${esc(D.mentions[g.mention])}</button><small>${fmtInt(g.n)} candidats de votre profil</small></td>
         <td class="r">${fmtInt(g.formations)}</td><td class="r">${fmtInt(g.places)}</td>
         <td><div class="mini"><span><b>${fmtPct(g.p)}</b> <small style="display:inline">(${fmtPct(g.lo)} – ${fmtPct(g.hi)})</small></span>
           <div class="bar"><span class="ci ${level(g.p)}" style="left:${g.lo * 100}%;width:${(g.hi - g.lo) * 100}%"></span><span class="pt ${level(g.p)}" style="left:calc(${g.p * 100}% - 1px)"></span></div></div></td>
@@ -331,6 +339,7 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
     vue = v;
     $("tab-mention").setAttribute("aria-selected", v === "mention");
     $("tab-inverse").setAttribute("aria-selected", v === "inverse");
+    $("tab-mention").tabIndex = v === "mention" ? 0 : -1; $("tab-inverse").tabIndex = v === "inverse" ? 0 : -1;
     $("vue-mention").hidden = v !== "mention"; $("vue-inverse").hidden = v !== "inverse";
     $("lab-mention").hidden = v !== "mention"; $("lab-secteur").hidden = v !== "inverse";
     render();
@@ -346,6 +355,13 @@ if (typeof module !== "undefined") module.exports = BoussoleCalc;
   $("more-inv").addEventListener("click", () => { shownInv += 40; render(); });
   $("tab-mention").addEventListener("click", () => setVue("mention"));
   $("tab-inverse").addEventListener("click", () => setVue("inverse"));
+  // Onglets au clavier : flèches gauche/droite, Début/Fin (motif ARIA « tabs »)
+  document.querySelector(".tabs").addEventListener("keydown", (e) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    e.preventDefault();
+    const next = e.key === "Home" ? "mention" : e.key === "End" ? "inverse" : (vue === "mention" ? "inverse" : "mention");
+    setVue(next); $(next === "mention" ? "tab-mention" : "tab-inverse").focus();
+  });
   $("rank").addEventListener("click", (e) => {
     const tr = e.target.closest("tr[data-mention]"); if (!tr) return;
     $("mention").value = tr.dataset.mention; shown = 30; setVue("mention"); window.scrollTo({ top: 0 });

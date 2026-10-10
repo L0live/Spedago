@@ -40,3 +40,21 @@ Non fait : test avec un vrai lecteur d'écran (NVDA, VoiceOver), à prévoir ava
 3. Tier 3 : 7, 11, 14, 15, 16, 17 ; puis test réel NVDA + VoiceOver.
 
 Ajouter axe-core aux tests automatiques (Playwright) pour bloquer toute régression.
+
+## Suivi des corrections (10 octobre 2026)
+
+Constats 1 à 16 corrigés :
+- zone d'annonce `role="status"` commune, alimentée par chaque outil ;
+- classement de la Boussole en boutons ;
+- onglets au clavier (flèches, Début, Fin) ;
+- pastilles et points de la carte recolorés (≥ 3:1), « incertain » dessiné en anneau ;
+- bordures des champs à 4,8:1 ;
+- `<main>` et lien d'évitement ;
+- titres, légendes de tableaux, légende de l'orange ;
+- étiquette visible sur l'accueil ;
+- mouvement réduit respecté partout.
+
+Contrôle : `tools/check_a11y.mjs` (axe-core 4.10) sur les 5 pages, ordinateur et téléphone : **0 violation, quel que soit le niveau**.
+Restent :
+- le n° 17 : `lang` de la page principale publiée, à vérifier en ligne ;
+- un test réel au lecteur d'écran (NVDA, VoiceOver).

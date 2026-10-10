@@ -30,7 +30,9 @@ def nav(current: str) -> str:
             portes.setdefault(porte, []).append(f'<a href="{f}" data-page="{f}"{cur}>{lib}</a>')
     blocs = [f'<div class="door"><span>{p}</span>{"".join(liens)}</div>' for p, liens in portes.items()]
     cur = ' aria-current="page"' if current == "index.html" else ""
-    return (f'<nav class="site-nav" aria-label="Spédago"><a class="brand" href="index.html" data-page="index.html"{cur}>Spédago</a>'
+    return ('<a class="skip" href="#contenu">Aller au contenu</a>'
+            '<div class="sr-only" role="status" aria-live="polite" id="sr-status"></div>'
+            f'<nav class="site-nav" aria-label="Spédago"><a class="brand" href="index.html" data-page="index.html"{cur}>Spédago</a>'
             + '<span class="sep"></span>'.join(blocs) + "</nav>")
 
 

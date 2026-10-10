@@ -25,9 +25,10 @@ header h1 { font-size: clamp(40px, 7vw, 60px) }
 .tool:hover { background: var(--door-soft); border-radius: var(--radius-sm) }
 .tool strong { color: var(--ink); font-size: 16px; font-weight: 600 }
 .tool span { grid-column: 1; color: var(--muted); font-size: 14px }
-.tool::after { content: "→"; grid-column: 2; grid-row: 1 / span 2; color: var(--door); font-size: 18px; transition: transform .15s ease-out }
+.tool::after { content: "→" / ""; grid-column: 2; grid-row: 1 / span 2; color: var(--door); font-size: 18px; transition: transform .15s ease-out }
 .tool:hover::after { transform: translateX(3px) }
 .go { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 12px }
+.go-label { flex-basis: 100%; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted) }
 .go select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 0; flex: 1 1 180px }
 .go button { font: inherit; font-weight: 600; color: #fff; background: var(--orange-ink); border: 0; border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;
              box-shadow: var(--shadow-sm); transition: background-color .15s ease-out }
@@ -40,6 +41,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 
 <div class="wrap">
   __NAV__
+  <main id="contenu" tabindex="-1">
   <header>
     <span class="badge">Projet indépendant · données publiques</span>
     <h1>Spédago</h1>
@@ -60,7 +62,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <a class="tool" href="mon-academie.html" data-page="mon-academie.html"><strong>Mon académie</strong>
         <span>Une fiche par académie : tension Parcoursup, lycées sans spécialité à proximité, chances d'admission en master.</span></a>
       <form class="go" id="go" autocomplete="off">
-        <select id="acad" aria-label="Académie"></select><button type="submit">Ouvrir la fiche</button>
+        <label for="acad" class="go-label">Votre académie</label>
+        <select id="acad"></select><button type="submit">Ouvrir la fiche</button>
       </form>
       <a class="tool" href="simulateur-parcoursup.html" data-page="simulateur-parcoursup.html"><strong>Simulateur des places en tension</strong>
         <span>Que donnerait une règle « les places suivent la pression de l'année précédente » ? Combien de places, où, et quelle part prise sur des places restées vides.</span></a>
@@ -77,6 +80,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <li>Les conclusions corrigées après vérification sont consignées dans un journal des corrections.</li>
     </ul>
   </section>
+
+  </main>
 
   <footer>Spédago (« simulation pédagogique ») · projet indépendant, sans lien avec les plateformes ni les ministères cités.</footer>
 </div>

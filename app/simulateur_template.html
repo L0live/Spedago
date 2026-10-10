@@ -53,6 +53,7 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
 
 <div class="wrap">
   __NAV__
+  <main id="contenu" tabindex="-1">
   <header>
     <span class="badge">Projet indépendant · données publiques Parcoursup 2025</span>
     <h1>Simulateur des places en tension</h1>
@@ -92,16 +93,16 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <button type="button" class="reset" id="reset">Revenir aux réglages de départ</button>
     </form>
 
-    <main>
+    <section class="results" aria-label="Résultats">
       <div class="summary" id="summary"></div>
       <p class="note" id="lecture"></p>
       <p class="note" id="demande"></p>
       <div class="cols">
-        <div class="panel"><h2>Par académie</h2><div class="tablewrap"><table id="t-acad"><thead><tr><th>Académie</th><th class="r">Places 2025</th><th class="r">Ajoutées</th><th>Part ajoutée</th></tr></thead><tbody></tbody></table></div></div>
-        <div class="panel"><h2>Par filière</h2><div class="tablewrap"><table id="t-fil"><thead><tr><th>Filière</th><th class="r">Formations visées</th><th class="r">Ajoutées</th><th class="r">Candidatures classées non appelées</th><th class="r">Récupérables</th></tr></thead><tbody></tbody></table></div>
-          <h2 style="margin-top:16px">Spécialités les plus concernées</h2><div class="tablewrap"><table id="t-spe"><thead><tr><th>Spécialité</th><th class="r">Ajoutées</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="panel"><h2>Par académie</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par académie"><table id="t-acad"><caption class="sr-only">Places ajoutées par académie</caption><thead><tr><th>Académie</th><th class="r">Places 2025</th><th class="r">Ajoutées</th><th>Part ajoutée</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="panel"><h2>Par filière</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par filière"><table id="t-fil"><caption class="sr-only">Places ajoutées par filière</caption><thead><tr><th>Filière</th><th class="r">Formations visées</th><th class="r">Ajoutées</th><th class="r">Candidatures classées non appelées</th><th class="r">Récupérables</th></tr></thead><tbody></tbody></table></div>
+          <h2 style="margin-top:16px">Spécialités les plus concernées</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Spécialités les plus concernées"><table id="t-spe"><caption class="sr-only">Spécialités les plus concernées</caption><thead><tr><th>Spécialité</th><th class="r">Ajoutées</th></tr></thead><tbody></tbody></table></div></div>
       </div>
-    </main>
+    </section>
   </div>
 
   <section class="explain">
@@ -127,6 +128,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       </ul>
     </div>
   </section>
+
+  </main>
 
   <footer>
     Source : ministère de l'Enseignement supérieur, données ouvertes Parcoursup (session 2025, Licence Ouverte 2.0), traitement Spédago.
@@ -257,6 +260,7 @@ if (typeof module !== "undefined") module.exports = SimCalc;
       [tot ? fmtPct(idf / tot, 0) : "–", "en Île-de-France"],
       [tot ? fmtPct(couv / tot, 0) : "–", "récupérables sur des places vides"],
     ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+    Spedago.announce($("summary").innerText);
     $("lecture").innerHTML = tot
       ? `${fmtInt(visees)} formations recevraient des places. Sur ces <strong>${fmtInt(tot)}</strong> places, au plus <strong>${fmtInt(couv)}</strong> pourraient venir de places restées vides dans une formation de même spécialité de la même académie ; le reste (${fmtInt(tot - couv)}) demanderait des moyens nouveaux.`
       : "Aucune formation ne remplit les conditions avec ces réglages.";
