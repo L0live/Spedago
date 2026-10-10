@@ -43,6 +43,23 @@ jobs:
         run: |
           echo "### Spédago" >> "$GITHUB_STEP_SUMMARY"
           git log -1 --format='Commit : %h %s' >> "$GITHUB_STEP_SUMMARY"
+          # Données sources changées depuis le dernier commit ? Le MANIFEST est réécrit au téléchargement :
+          # on compare les empreintes (pas les dates) à la version versionnée.
+          python3 - <<'PY'
+          import csv, io, os, subprocess
+          diff = []
+          for f, sep in (("data/raw/MANIFEST.csv", ","), ("data/raw/MANIFEST_eurostat.csv", ";")):
+              lire = lambda t: {r["fichier"]: r["sha256"] for r in csv.DictReader(io.StringIO(t), delimiter=sep)}
+              avant = lire(subprocess.run(["git", "show", f"HEAD:{f}"], capture_output=True, text=True).stdout)
+              apres = lire(open(f, encoding="utf-8").read())
+              diff += [k for k in sorted(set(avant) | set(apres)) if avant.get(k) != apres.get(k)]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as out:
+              if diff:
+                  out.write("**Données sources modifiées par les producteurs depuis le MANIFEST versionné :** " + ", ".join(diff) + "\n")
+                  print("::warning::Données sources modifiées (" + ", ".join(diff) + ") : relire puis versionner le MANIFEST.")
+              else:
+                  out.write("Données sources identiques au MANIFEST versionné.\n")
+          PY
           ls -la web/dist/data >> "$GITHUB_STEP_SUMMARY" || true
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
