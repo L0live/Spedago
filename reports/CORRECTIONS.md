@@ -42,11 +42,22 @@ Inchangé : inversion de `list_com` 2024-2025, CNED exclu, persistance de la ten
 | Lycées avec 1re générale absents de l'annuaire | 9 lycées (sans coordonnées) disparaissaient du référentiel | Gardés dans le référentiel ; toujours hors carte (pas de position) |
 | « Mon académie » | Nombres recalculés en Python | Identiques au Simulateur, à la Carte, à la Boussole et à la table de tension (tests) |
 
+## Nouvelles données (10 octobre 2026)
+
+| Point | Contrôle | Choix |
+|---|---|---|
+| Doublettes Parcoursup : noms de spécialités contenant des virgules | export « A,B » ambigu | Découpage sur la liste des 13 spécialités, arrêt du script si une doublette est inconnue |
+| InserSup : plusieurs promotions par formation, cumuls quand l'effectif est petit | — | Promotion la plus récente publiée ; à égalité, promotion seule plutôt que cumul ; taux de la mention dans l'établissement (pas du parcours) |
+| Poursuite d'études : colonnes « _flux » et « _stable » | leur somme redonne le taux publié (≈ 78 %) | Seule la somme est affichée ; le partage, non documenté, n'est pas interprété |
+| Eurostat, Belgique 2024 : −27 % de Français inscrits | aucun drapeau de rupture | Affiché tel quel, avec un avertissement « à confirmer » |
+| Indicateurs régionaux (petits échantillons) | drapeaux « peu fiable » fréquents | Moyenne des 3 dernières années, drapeau repris |
+
 ## Reproductibilité
 
 - `scripts/download_data.py` + `data/raw/MANIFEST.csv` (empreintes SHA-256) ; `requirements.txt` ; `run_all.sh`.
 - Pipeline relancé de zéro : sorties identiques à l'archive (hors effet attendu du correctif IFSI : 56 cellules 2024).
-- 98 tests (`python3 -m pytest tests/`), dont parité JavaScript/Python des 4 outils et concordance entre pages.
+- 116 tests (`python3 -m pytest tests/`) : parité JavaScript/Python des outils, concordance entre pages, syntaxe de tous les scripts, structure d'accessibilité ; scan axe-core (`tools/check_a11y.mjs`) : 0 violation.
+- Pipeline complet relancé le 10 octobre 2026 (20 étapes) : 51 sorties identiques au bit près.
 - Externe : places en apprentissage 2025 = 264 386 (CESPM : 264 800), part ≈ 25,6 % (CESPM : « 26 % »).
 
 ## Limites qui restent (non vérifiables avec l'open data)

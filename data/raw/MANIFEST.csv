@@ -8,6 +8,7 @@ parcoursup_2023.csv,fr-esr-parcoursup_2023,data.enseignementsup-recherche.gouv.f
 parcoursup_2024.csv,fr-esr-parcoursup_2024,data.enseignementsup-recherche.gouv.fr,14079,c6b0760822671c71bbec3007c99a58b0f2f129c9def5ad3d843cdfc1a1b64e89,2026-10-09
 parcoursup_2025.csv,fr-esr-parcoursup,data.enseignementsup-recherche.gouv.fr,14252,f54f0a5704c72bdfa2c2600e68a4d71469c04b0f637cb3a892fd7a2e71a301d9,2026-10-09
 parcoursup_apprentissage.csv,fr-esr-parcoursup-apprentissage,data.enseignementsup-recherche.gouv.fr,39032,ee3f6f5fd1c2849ee66a4ba7eba361a83c45f7c6699fc29af8c426cdfdea2540,2026-10-09
+parcoursup_specialites_v2.csv,fr-esr-parcoursup-enseignements-de-specialite-bacheliers-generaux-2,data.enseignementsup-recherche.gouv.fr,17420,3631d8a4a7420c846465b873d5b969e025978c3bbeda57542f68a48da2aab01e,2026-10-10
 parcoursup_specialites_v3.csv,fr-esr-parcoursup-enseignements-de-specialite-bacheliers-generaux-3,data.enseignementsup-recherche.gouv.fr,17211,55c6b5619cb4d5155f8a1a2e0a87a3de4f6c920503caf9525bc39e95739311f8,2026-10-09
 monmaster_2023.csv,fr-esr-mon_master_2023,data.enseignementsup-recherche.gouv.fr,7694,aef1bc45005d9fcfebca20e20b1ac2f6515c1ff203ad45d1f0bf29092ea1ae76,2026-10-09
 monmaster_2024_2025.csv,fr-esr-mon_master,data.enseignementsup-recherche.gouv.fr,16257,a61e82e74544ed59c2abffa464e9be93fdb0c87236e6156cb2ea41f819df96c3,2026-10-09
@@ -17,4 +18,7 @@ ips_lycees_2016_2022.csv,fr-en-ips_lycees,data.education.gouv.fr,21777,c504a37ce
 ips_lycees_ap2023.csv,fr-en-ips-lycees-ap2023,data.education.gouv.fr,10905,31b2aafd8fb4597608c55f8f78f7144444a350df795111a651fb5222ee9c8aa7,2026-10-09
 eloignement_lycees.csv,fr-en-indice_eloignement_lycee_ap2020,data.education.gouv.fr,24883,cdb1af274e6623a8ef518851049b48427cdb701771b81b97a0ceb70e9351f358,2026-10-09
 remplacement_2nd_degre.csv,fr-en-remplacement-second-degre,data.education.gouv.fr,30,161d5dd128403521cfbd1ac588e5a28b88576933a9b6e59a6847a8abe20e2054,2026-10-09
+insersup_master.csv,fr-esr-insersup,data.enseignementsup-recherche.gouv.fr,22020,09a3ae2a5978d0ad848f1b66d771eac7252fe5ae06ce8305eb5b859a1855f049,2026-10-10
+poursuite_academie.csv,fr-esr-taux-poursuite-enseignement-superieur-par-academie,data.enseignementsup-recherche.gouv.fr,2874,fd518a4da8f5aa19270e2cb02e70b0a4b7b058d47fe016a8857eb3c52c36b7a6,2026-10-10
+ival_lycees_gt.csv,fr-en-indicateurs-de-resultat-des-lycees-gt_v2,data.education.gouv.fr,32485,6ab77b391e3405f5157bb942d4548d5f1cfbacd94e76dd52b93db9b370de8658,2026-10-10
 annuaire_lycees.csv,fr-en-annuaire-education,data.education.gouv.fr,5644,4077908bba2df68846e0beecf6d0a08e3f9f1fa8f674fe9c3a2b57601423014e,2026-10-09

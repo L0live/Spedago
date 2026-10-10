@@ -2,10 +2,14 @@
 
 | Fichier | Lignes | Colonnes | Colonnes UAI | Années |
 |---|---|---|---|---|
-| MANIFEST.csv | 18 | 6 | — | — |
+| MANIFEST.csv | 23 | 6 | — | — |
+| MANIFEST_eurostat.csv | 5 | 5 | — | — |
+| annuaire_lycees.csv | 5,644 | 14 | identifiant_de_l_etablissement | — |
 | eloignement_lycees.csv | 24,883 | 11 | uai | rentree_scolaire: 2020…2025 |
+| insersup_master.csv | 22,020 | 21 | uai_fresq | — |
 | ips_lycees_2016_2022.csv | 21,777 | 15 | uai | rentree_scolaire: 2016-2017…2021-2022 |
 | ips_lycees_ap2023.csv | 10,905 | 48 | uai | rentree_scolaire: 2023-2024…2025-2026 |
+| ival_lycees_gt.csv | 32,485 | 88 | uai | annee: 2012…2025 |
 | monmaster_2023.csv | 7,694 | 97 | eta_uai, inm | session: 2023…2023 |
 | monmaster_2024_2025.csv | 16,257 | 144 | eta_uai, inm | session: 2024…2025 |
 | parcoursup_2018.csv | 10,697 | 85 | cod_uai | session: 2018…2018 |
@@ -17,7 +21,9 @@
 | parcoursup_2024.csv | 14,079 | 118 | cod_uai | session: 2024…2024 |
 | parcoursup_2025.csv | 14,252 | 118 | cod_uai | session: 2025…2025 |
 | parcoursup_apprentissage.csv | 39,032 | 44 | cod_uai | session: 2022…2025 |
+| parcoursup_specialites_v2.csv | 17,420 | 6 | — | annee_du_bac: 2021…2024 |
 | parcoursup_specialites_v3.csv | 17,211 | 10 | — | annee_du_bac: 2025…2025 |
+| poursuite_academie.csv | 2,874 | 30 | — | rentree_session: 2010…2025 |
 | remplacement_2nd_degre.csv | 30 | 3 | — | — |
 | specialites_doublettes_tle.csv | 13,548 | 89 | numero_etablissement | rentree_scolaire: 2020…2025 |
 | specialites_triplettes_1ere.csv | 11,337 | 95 | numero_etablissement | rentree_scolaire: 2021…2025 |
@@ -26,8 +32,30 @@
 
 | A | B | UAI communs | % de A | % de B |
 |---|---|---|---|---|
+| annuaire_lycees.csv | eloignement_lycees.csv | 4036 | 72% | 91% |
+| annuaire_lycees.csv | insersup_master.csv | 0 | 0% | 0% |
+| annuaire_lycees.csv | ips_lycees_2016_2022.csv | 3587 | 64% | 97% |
+| annuaire_lycees.csv | ips_lycees_ap2023.csv | 3653 | 65% | 99% |
+| annuaire_lycees.csv | ival_lycees_gt.csv | 2468 | 44% | 97% |
+| annuaire_lycees.csv | monmaster_2023.csv | 0 | 0% | 0% |
+| annuaire_lycees.csv | monmaster_2023.csv | 0 | 0% | 0% |
+| annuaire_lycees.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
+| annuaire_lycees.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
+| annuaire_lycees.csv | parcoursup_2018.csv | 2225 | 40% | 75% |
+| annuaire_lycees.csv | parcoursup_2019.csv | 2314 | 41% | 66% |
+| annuaire_lycees.csv | parcoursup_2020.csv | 2375 | 42% | 63% |
+| annuaire_lycees.csv | parcoursup_2021.csv | 2404 | 43% | 62% |
+| annuaire_lycees.csv | parcoursup_2022.csv | 2406 | 43% | 61% |
+| annuaire_lycees.csv | parcoursup_2023.csv | 2419 | 43% | 61% |
+| annuaire_lycees.csv | parcoursup_2024.csv | 2413 | 43% | 60% |
+| annuaire_lycees.csv | parcoursup_2025.csv | 2417 | 43% | 60% |
+| annuaire_lycees.csv | parcoursup_apprentissage.csv | 1785 | 32% | 39% |
+| annuaire_lycees.csv | specialites_doublettes_tle.csv | 2281 | 41% | 99% |
+| annuaire_lycees.csv | specialites_triplettes_1ere.csv | 2280 | 41% | 99% |
+| eloignement_lycees.csv | insersup_master.csv | 0 | 0% | 0% |
 | eloignement_lycees.csv | ips_lycees_2016_2022.csv | 3609 | 81% | 98% |
 | eloignement_lycees.csv | ips_lycees_ap2023.csv | 3605 | 81% | 98% |
+| eloignement_lycees.csv | ival_lycees_gt.csv | 2464 | 55% | 97% |
 | eloignement_lycees.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | eloignement_lycees.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | eloignement_lycees.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
@@ -43,7 +71,26 @@
 | eloignement_lycees.csv | parcoursup_apprentissage.csv | 1805 | 41% | 40% |
 | eloignement_lycees.csv | specialites_doublettes_tle.csv | 2258 | 51% | 98% |
 | eloignement_lycees.csv | specialites_triplettes_1ere.csv | 2260 | 51% | 98% |
+| insersup_master.csv | ips_lycees_2016_2022.csv | 0 | 0% | 0% |
+| insersup_master.csv | ips_lycees_ap2023.csv | 0 | 0% | 0% |
+| insersup_master.csv | ival_lycees_gt.csv | 0 | 0% | 0% |
+| insersup_master.csv | monmaster_2023.csv | 95 | 69% | 83% |
+| insersup_master.csv | monmaster_2023.csv | 0 | 0% | 0% |
+| insersup_master.csv | monmaster_2024_2025.csv | 101 | 73% | 84% |
+| insersup_master.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
+| insersup_master.csv | parcoursup_2018.csv | 69 | 50% | 2% |
+| insersup_master.csv | parcoursup_2019.csv | 69 | 50% | 2% |
+| insersup_master.csv | parcoursup_2020.csv | 73 | 53% | 2% |
+| insersup_master.csv | parcoursup_2021.csv | 79 | 57% | 2% |
+| insersup_master.csv | parcoursup_2022.csv | 81 | 59% | 2% |
+| insersup_master.csv | parcoursup_2023.csv | 88 | 64% | 2% |
+| insersup_master.csv | parcoursup_2024.csv | 92 | 67% | 2% |
+| insersup_master.csv | parcoursup_2025.csv | 95 | 69% | 2% |
+| insersup_master.csv | parcoursup_apprentissage.csv | 11 | 8% | 0% |
+| insersup_master.csv | specialites_doublettes_tle.csv | 0 | 0% | 0% |
+| insersup_master.csv | specialites_triplettes_1ere.csv | 0 | 0% | 0% |
 | ips_lycees_2016_2022.csv | ips_lycees_ap2023.csv | 3576 | 97% | 97% |
+| ips_lycees_2016_2022.csv | ival_lycees_gt.csv | 2472 | 67% | 97% |
 | ips_lycees_2016_2022.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | ips_lycees_2016_2022.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | ips_lycees_2016_2022.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
@@ -59,6 +106,7 @@
 | ips_lycees_2016_2022.csv | parcoursup_apprentissage.csv | 1548 | 42% | 34% |
 | ips_lycees_2016_2022.csv | specialites_doublettes_tle.csv | 2239 | 61% | 97% |
 | ips_lycees_2016_2022.csv | specialites_triplettes_1ere.csv | 2238 | 61% | 97% |
+| ips_lycees_ap2023.csv | ival_lycees_gt.csv | 2465 | 67% | 97% |
 | ips_lycees_ap2023.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | ips_lycees_ap2023.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | ips_lycees_ap2023.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
@@ -74,6 +122,21 @@
 | ips_lycees_ap2023.csv | parcoursup_apprentissage.csv | 1574 | 43% | 35% |
 | ips_lycees_ap2023.csv | specialites_doublettes_tle.csv | 2274 | 62% | 99% |
 | ips_lycees_ap2023.csv | specialites_triplettes_1ere.csv | 2278 | 62% | 99% |
+| ival_lycees_gt.csv | monmaster_2023.csv | 0 | 0% | 0% |
+| ival_lycees_gt.csv | monmaster_2023.csv | 0 | 0% | 0% |
+| ival_lycees_gt.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
+| ival_lycees_gt.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
+| ival_lycees_gt.csv | parcoursup_2018.csv | 1699 | 67% | 57% |
+| ival_lycees_gt.csv | parcoursup_2019.csv | 1706 | 67% | 49% |
+| ival_lycees_gt.csv | parcoursup_2020.csv | 1716 | 67% | 46% |
+| ival_lycees_gt.csv | parcoursup_2021.csv | 1720 | 68% | 44% |
+| ival_lycees_gt.csv | parcoursup_2022.csv | 1722 | 68% | 44% |
+| ival_lycees_gt.csv | parcoursup_2023.csv | 1722 | 68% | 43% |
+| ival_lycees_gt.csv | parcoursup_2024.csv | 1711 | 67% | 43% |
+| ival_lycees_gt.csv | parcoursup_2025.csv | 1722 | 68% | 42% |
+| ival_lycees_gt.csv | parcoursup_apprentissage.csv | 1088 | 43% | 24% |
+| ival_lycees_gt.csv | specialites_doublettes_tle.csv | 2250 | 88% | 98% |
+| ival_lycees_gt.csv | specialites_triplettes_1ere.csv | 2246 | 88% | 98% |
 | monmaster_2023.csv | monmaster_2023.csv | 0 | 0% | 0% |
 | monmaster_2023.csv | monmaster_2024_2025.csv | 110 | 96% | 92% |
 | monmaster_2023.csv | monmaster_2024_2025.csv | 0 | 0% | 0% |
