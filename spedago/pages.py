@@ -14,6 +14,7 @@ def embed_json(data) -> str:
 # Le site : une page d'accueil, deux portes d'entrée (élèves, décideurs). Nom de fichier, libellé, porte.
 PAGES = [
     ("index.html", "Accueil", ""),
+    ("mes-specialites.html", "Mes spécialités", "Élèves"),
     ("boussole-des-masters.html", "Boussole des masters", "Élèves"),
     ("mon-academie.html", "Mon académie", "Décideurs"),
     ("simulateur-parcoursup.html", "Simulateur des places", "Décideurs"),
@@ -24,16 +25,11 @@ COMMUN = Path(__file__).resolve().parent.parent / "app" / "_commun.html"
 
 def _profil_panel() -> str:
     """Panneau « Mon profil » : réglages gardés dans le navigateur, lus par toutes les pages."""
-    from .libelles import PROFILS_MASTER
+    from .libelles import EDS, PROFILS_MASTER
     from .referentiel import ACADEMIES, cle, slug
     acads = sorted({v for v in ACADEMIES.values() if v != "Étranger"}, key=cle)
     opt = lambda v, t: f'<option value="{escape(v)}">{escape(t)}</option>'  # noqa: E731
-    spes = ["Mathématiques", "Physique-chimie", "Sciences de la vie et de la Terre", "Sciences économiques et sociales",
-            "Histoire-géographie, géopolitique et sciences politiques", "Humanités, littérature et philosophie",
-            "Langues, littératures et cultures étrangères et régionales", "Numérique et sciences informatiques",
-            "Sciences de l'ingénieur", "Éducation physique, pratiques et culture sportives", "Arts",
-            "Littérature et langues et cultures de l'Antiquité", "Biologie-écologie"]
-    spe_opts = opt("", "—") + "".join(opt(x, x) for x in spes)
+    spe_opts = opt("", "—") + "".join(opt(i, lib) for i, lib, _, _ in EDS)
     return ('<div class="site-tools"><button type="button" id="copy-link">Copier le lien</button>'
             '<button type="button" id="profil-btn" aria-expanded="false" aria-controls="profil-panel"><span>Mon profil</span></button>'
             '<div id="profil-panel" hidden><form autocomplete="off">'

@@ -36,7 +36,8 @@ DATASETS = {
     **{f"parcoursup_{y}": (ESR, f"fr-esr-parcoursup_{y}") for y in range(2020, 2025)},
     "parcoursup_2025": (ESR, "fr-esr-parcoursup"),
     "parcoursup_apprentissage": (ESR, "fr-esr-parcoursup-apprentissage"),
-    "parcoursup_specialites_v3": (ESR, "fr-esr-parcoursup-enseignements-de-specialite-bacheliers-generaux-3"),
+    "parcoursup_specialites_v2": (ESR, "fr-esr-parcoursup-enseignements-de-specialite-bacheliers-generaux-2"),  # 2021-2024
+    "parcoursup_specialites_v3": (ESR, "fr-esr-parcoursup-enseignements-de-specialite-bacheliers-generaux-3"),  # 2025
     "monmaster_2023": (ESR, "fr-esr-mon_master_2023"),
     "monmaster_2024_2025": (ESR, "fr-esr-mon_master"),
     "specialites_triplettes_1ere": (EDU, "fr-en-effectifs-specialites-triplettes-1ere-generale"),

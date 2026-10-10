@@ -25,6 +25,7 @@ python3 scripts/build_page_boussole.py
 python3 scripts/build_simulateur_parcoursup.py
 python3 scripts/build_mutualisation.py
 python3 scripts/build_mon_academie.py
+python3 scripts/build_mes_specialites.py
 python3 scripts/build_site.py
 python3 -m pytest tests/ -q -p no:cacheprovider
 echo "Pipeline terminé."

@@ -27,3 +27,25 @@ SPECIALITES = {
 # Profils Mon Master proposés à l'étudiant
 PROFILS_MASTER = {"lg3": "En L3 générale", "lp3": "En licence pro", "but3": "En BUT 3e année", "master": "Déjà en master",
                   "autre": "Autre inscription", "noninscri": "Reprise d'études"}
+
+# Enseignements de spécialité de terminale générale :
+# (identifiant, libellé, nom dans les données Parcoursup, clés de la carte des spécialités de 1re)
+EDS = [
+    ("maths", "Mathématiques", "Mathématiques Spécialité", ["mathematiques"]),
+    ("pc", "Physique-chimie", "Physique-Chimie Spécialité", ["physique_chimie"]),
+    ("svt", "Sciences de la vie et de la Terre", "Sciences de la vie et de la Terre Spécialité", ["sciences_de_la_vie_et_de_la_terre"]),
+    ("ses", "Sciences économiques et sociales", "Sciences Economiques et Sociales Spécialité", ["sciences_economiques_et_sociales"]),
+    ("hggsp", "Histoire-géographie, géopolitique et sciences politiques", "Histoire-Géographie, Géopolitique et Sciences politiques",
+     ["hist_geo_geopolitique_sc_politiques"]),
+    ("hlp", "Humanités, littérature et philosophie", "Humanités, Littérature et Philosophie", ["humanites_litterature_et_philosophie"]),
+    ("llcer", "Langues, littératures et cultures étrangères et régionales", "Langues, littératures et cultures étrangères et régionales",
+     ["langues_litterature_et_cultures_etrangeres_et_regionales"]),
+    ("nsi", "Numérique et sciences informatiques", "Numérique et Sciences Informatiques", ["numerique_et_sciences_informatiques"]),
+    ("si", "Sciences de l'ingénieur", "Sciences de l'ingénieur et sciences physiques", ["sciences_de_l_ingenieur"]),
+    ("eppcs", "Éducation physique, pratiques et culture sportives", "Éducation physique, pratiques et culture sportives",
+     ["educ_physique_pratique_cult_sportive"]),
+    ("arts", "Arts (musique, arts plastiques, théâtre, cinéma, histoire des arts)", "Art",
+     ["musique", "arts_plastiques", "histoire_des_arts", "theatre", "cinema_audiovisuel"]),
+    ("llca", "Littérature et langues et cultures de l'Antiquité", "Littérature et langues et cultures de l'Antiquité", []),
+    ("bio", "Biologie-écologie (lycées agricoles)", "Biologie/Ecologie", []),
+]
