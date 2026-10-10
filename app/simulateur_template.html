@@ -23,6 +23,7 @@ legend, .ctl label { font-size: 12px; font-weight: 600; letter-spacing: .03em; t
 input[type=range] { width: 100%; accent-color: var(--accent) }
 select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; width: 100% }
 input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.panel .toolbar h2 { margin: 0 }
 .reset { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 8px; padding: 6px 10px; cursor: pointer; justify-self: start }
 .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px }
 @media (max-width: 640px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
@@ -87,6 +88,11 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
         <small>Une formation publique ou privée sous contrat remplie en dessous de ce taux peut céder ses places vides à une formation de même spécialité dans la même académie.</small>
       </div>
       <div class="ctl">
+        <label for="acad">Académie détaillée</label>
+        <select id="acad"><option value="">Toutes (France)</option></select>
+        <small>Filtre les tableaux par filière et par spécialité ; l'académie reste surlignée dans le classement.</small>
+      </div>
+      <div class="ctl">
         <label for="filiere">Filière affichée</label>
         <select id="filiere"><option value="">Toutes</option></select>
       </div>
@@ -98,8 +104,8 @@ footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px
       <p class="note" id="lecture"></p>
       <p class="note" id="demande"></p>
       <div class="cols">
-        <div class="panel"><h2>Par académie</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par académie"><table id="t-acad"><caption class="sr-only">Places ajoutées par académie</caption><thead><tr><th>Académie</th><th class="r">Places 2025</th><th class="r">Ajoutées</th><th>Part ajoutée</th></tr></thead><tbody></tbody></table></div></div>
-        <div class="panel"><h2>Par filière</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par filière"><table id="t-fil"><caption class="sr-only">Places ajoutées par filière</caption><thead><tr><th>Filière</th><th class="r">Formations visées</th><th class="r">Ajoutées</th><th class="r">Candidatures classées non appelées</th><th class="r">Récupérables</th></tr></thead><tbody></tbody></table></div>
+        <div class="panel"><div class="toolbar"><h2>Par académie</h2><button type="button" class="btn-ghost" id="export-acad">Exporter (CSV)</button></div><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par académie"><table id="t-acad"><caption class="sr-only">Places ajoutées par académie</caption><thead><tr><th>Académie</th><th class="r">Places 2025</th><th class="r">Ajoutées</th><th>Part ajoutée</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="panel"><h2 id="h-fil">Par filière</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Places ajoutées par filière"><table id="t-fil"><caption class="sr-only">Places ajoutées par filière</caption><thead><tr><th>Filière</th><th class="r">Formations visées</th><th class="r">Ajoutées</th><th class="r">Candidatures classées non appelées</th><th class="r">Récupérables</th></tr></thead><tbody></tbody></table></div>
           <h2 style="margin-top:16px">Spécialités les plus concernées</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Spécialités les plus concernées"><table id="t-spe"><caption class="sr-only">Spécialités les plus concernées</caption><thead><tr><th>Spécialité</th><th class="r">Ajoutées</th></tr></thead><tbody></tbody></table></div></div>
       </div>
     </section>
@@ -176,14 +182,15 @@ const SimCalc = (() => {
       c.besoin += add[i];
       if (f[MOB] === 1 && f[ACC] / f[CAP] < sous) c.gisement += Math.max(0, f[CAP] - f[ACC]);
     });
-    let couvert = 0; const couvertFil = new Map(), couvertA = new Map();
+    let couvert = 0; const couvertFil = new Map(), couvertA = new Map(), couvertAF = new Map();
     cells.forEach((c) => {
       const x = Math.min(c.besoin, c.gisement); couvert += x;
       couvertFil.set(c.fil, (couvertFil.get(c.fil) || 0) + x); couvertA.set(c.a, (couvertA.get(c.a) || 0) + x);
+      couvertAF.set(c.a + "|" + c.fil, (couvertAF.get(c.a + "|" + c.fil) || 0) + x);
     });
     let total = 0, places = 0, idf = 0, nElig = 0;
     F.forEach((f, i) => { total += add[i]; places += f[CAP]; if (f[IDF]) idf += add[i]; if (elig[i]) nElig += 1; });
-    return { add, elig, total, places, idf, nElig, couvert, couvertFil, couvertA, ...demande(D, add) };
+    return { add, elig, total, places, idf, nElig, couvert, couvertFil, couvertA, couvertAF, ...demande(D, add) };
   }
 
   // Demande non servie dans les formations qui reçoivent des places : candidats classés jamais appelés
@@ -204,10 +211,10 @@ const SimCalc = (() => {
     return { nonServis, ajoutRang, sansRang, ajoutSansRang, formationsRang: m, couvertes, medianeRatio };
   }
 
-  function groupBy(D, res, col, filtre = "") {
+  function groupBy(D, res, col, filtre = "", acad = "") {
     const g = new Map();
     D.formations.forEach((f, i) => {
-      if (filtre !== "" && f[FIL] !== +filtre) return;
+      if ((filtre !== "" && f[FIL] !== +filtre) || (acad !== "" && f[A] !== +acad)) return;
       let r = g.get(f[col]); if (!r) { r = { key: f[col], places: 0, ajout: 0, visees: 0, nonServis: 0, idf: f[IDF] }; g.set(f[col], r); }
       r.places += f[CAP]; r.ajout += res.add[i]; r.visees += res.add[i] > 0 ? 1 : 0;
       if (res.add[i] > 0 && f[NA] >= 0 && f[LC] !== 1) r.nonServis += f[NA];
@@ -226,7 +233,8 @@ if (typeof module !== "undefined") module.exports = SimCalc;
   const fmtPct = (x, d = 1) => (x * 100).toFixed(d).replace(".", ",") + " %";
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const DEF = { pct: 10, q: 75, sat: 95, sous: 80, regle: "s1", filiere: "" };
-  D.filieres.forEach((f, i) => { const o = document.createElement("option"); o.value = i; o.textContent = f; $("filiere").appendChild(o); });
+  const FIL = (i) => (D.libelles_filieres || {})[D.filieres[i]] || D.filieres[i];
+  D.filieres.forEach((f, i) => { const o = document.createElement("option"); o.value = i; o.textContent = FIL(i); $("filiere").appendChild(o); });
 
   function params() {
     return { regle: $("regle-s2").checked ? "s2" : "s1", pct: +$("pct").value / 100, q: +$("q").value / 100,
@@ -235,12 +243,13 @@ if (typeof module !== "undefined") module.exports = SimCalc;
 
   function table(id, rows, cells) {
     const tb = $(id).tBodies[0]; tb.innerHTML = "";
-    const moi = Spedago.hashSlug();  // #poitiers dans l'adresse -> ligne de l'académie surlignée
+    const moi = $("acad").value;  // académie choisie (adresse, profil ou menu) -> ligne surlignée
     rows.forEach((r) => {
       const tr = document.createElement("tr");
-      if (id === "t-acad") { if (r.idf) tr.classList.add("idf"); if (moi && Spedago.slug(D.academies[r.key]) === moi) tr.classList.add("moi"); }
+      if (id === "t-acad") { if (r.idf) tr.classList.add("idf"); if (moi !== "" && r.key === +moi) tr.classList.add("moi"); }
       tr.innerHTML = cells(r); tb.appendChild(tr);
     });
+    Spedago.sortable($(id));
   }
 
   function render() {
@@ -269,23 +278,34 @@ if (typeof module !== "undefined") module.exports = SimCalc;
       ? `<strong>Ces places trouveraient-elles preneur ?</strong> Dans <strong>${fmtPct(dm.couvertes / dm.formationsRang, 0)}</strong> des ${fmtInt(dm.formationsRang)} formations visées à liste d'appel propre, il restait au moins autant de candidats classés jamais appelés que de places ajoutées (médiane : ${fmtInt(dm.medianeRatio)} classés non appelés par place ajoutée). Ces chiffres comptent des candidatures, pas des personnes : un même candidat est classé dans plusieurs formations, et beaucoup ont été admis ailleurs. Ils disent que les places seraient remplies, pas combien d'élèves sans proposition en profiteraient.${dm.sansRang ? ` Pour ${fmtInt(dm.sansRang)} formations à liste commune (${fmtInt(dm.ajoutSansRang)} places), ce n'est pas mesurable.` : ""}`
       : "";
     const maxA = Math.max(...acad.map((r) => r.ajout / (r.places || 1)), 1e-9);
-    table("t-acad", acad.filter((r) => r.places > 0), (r) => `<td>${esc(D.academies[r.key])}</td><td class="r">${fmtInt(r.places)}</td><td class="r">${fmtInt(r.ajout)}</td>
-      <td class="barcell"><div class="hbar" title="${fmtPct(r.ajout / r.places)}"><span style="width:${(r.ajout / r.places) / maxA * 100}%"></span></div></td>`);
-    const fils = C.groupBy(D, res, C.COL.FIL, fil).sort((a, b) => b.ajout - a.ajout);
-    table("t-fil", fils, (r) => `<td>${esc(D.filieres[r.key])}</td><td class="r">${fmtInt(r.visees)}</td><td class="r">${fmtInt(r.ajout)}</td><td class="r">${fmtInt(r.nonServis)}</td><td class="r">${fmtInt(res.couvertFil.get(r.key) || 0)}</td>`);
-    const spe = C.groupBy(D, res, C.COL.SPE, fil).filter((r) => r.ajout > 0).sort((a, b) => b.ajout - a.ajout).slice(0, 15);
-    table("t-spe", spe, (r) => `<td>${esc(D.specialites[r.key])}</td><td class="r">${fmtInt(r.ajout)}</td>`);
+    table("t-acad", acad.filter((r) => r.places > 0), (r) => `<td data-v="${esc(D.academies[r.key])}">${esc(D.academies[r.key])}</td><td class="r" data-v="${r.places}">${fmtInt(r.places)}</td><td class="r" data-v="${r.ajout}">${fmtInt(r.ajout)}</td>
+      <td class="barcell" data-v="${r.ajout / r.places}"><span class="sr-only">${fmtPct(r.ajout / r.places)}</span><div class="hbar" title="${fmtPct(r.ajout / r.places)}" aria-hidden="true"><span style="width:${(r.ajout / r.places) / maxA * 100}%"></span></div></td>`);
+    const ac = $("acad").value, nomA = ac === "" ? "" : D.academies[+ac];
+    $("h-fil").textContent = nomA ? `Par filière · ${nomA}` : "Par filière";
+    const fils = C.groupBy(D, res, C.COL.FIL, fil, ac).filter((r) => r.places > 0).sort((a, b) => b.ajout - a.ajout);
+    const cv = (k) => (ac === "" ? res.couvertFil.get(k) : res.couvertAF.get(ac + "|" + k)) || 0;
+    table("t-fil", fils, (r) => `<td data-v="${esc(FIL(r.key))}">${esc(FIL(r.key))}</td><td class="r" data-v="${r.visees}">${fmtInt(r.visees)}</td><td class="r" data-v="${r.ajout}">${fmtInt(r.ajout)}</td><td class="r" data-v="${r.nonServis}">${fmtInt(r.nonServis)}</td><td class="r" data-v="${cv(r.key)}">${fmtInt(cv(r.key))}</td>`);
+    const spe = C.groupBy(D, res, C.COL.SPE, fil, ac).filter((r) => r.ajout > 0).sort((a, b) => b.ajout - a.ajout).slice(0, 15);
+    table("t-spe", spe, (r) => `<td data-v="${esc(D.specialites[r.key])}">${esc(D.specialites[r.key])}</td><td class="r" data-v="${r.ajout}">${fmtInt(r.ajout)}</td>`);
   }
 
   function reset() {
     $("pct").value = DEF.pct; $("q").value = DEF.q; $("sat").value = DEF.sat; $("sous").value = DEF.sous;
-    $("regle-s1").checked = true; $("filiere").value = DEF.filiere; render();
+    $("regle-s1").checked = true; $("filiere").value = DEF.filiere; saveState(); render();
   }
+  // export du classement par académie (ordre affiché)
+  $("export-acad").addEventListener("click", () => Spedago.download("spedago-simulation-academies.csv", Spedago.csv(Spedago.tableRows($("t-acad")))));
   $("controls").addEventListener("input", render);
   $("controls").addEventListener("change", render);
   $("controls").addEventListener("submit", (e) => e.preventDefault());
   $("reset").addEventListener("click", reset);
-  window.addEventListener("hashchange", render);
+  // Académie : adresse, sinon profil ; tous les réglages vont dans l'adresse (lien partageable)
+  D.academies.forEach((a, i) => { if (a) { const o = document.createElement("option"); o.value = i; o.textContent = a; $("acad").appendChild(o); } });
+  Spedago.pick($("acad"));
+  $("acad").addEventListener("change", () => Spedago.setHash($("acad").value === "" ? "" : $("acad").selectedOptions[0].textContent));
+  const saveState = Spedago.bind({ regle: $("regle-s1"), pct: $("pct"), q: $("q"), sat: $("sat"), sous: $("sous"), filiere: $("filiere") });
+  window.addEventListener("hashchange", () => { if (!Spedago.pick($("acad"))) $("acad").value = ""; render(); });
+  document.addEventListener("spedago:profil", () => { if (!Spedago.hashSlug() && Spedago.pick($("acad"))) render(); });
   render();
 })();
 </script>

@@ -26,6 +26,7 @@ import simulate_ppl_art2 as sim  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.pages import build_page  # noqa: E402
 from spedago.paths import APP, PROCESSED  # noqa: E402
+from spedago.libelles import FILIERES, SPECIALITES  # noqa: E402
 from spedago.referentiel import IDF, OUTRE_MER, academie_canonique, cle, slug  # noqa: E402
 
 SESSION = 2025
@@ -148,6 +149,7 @@ def build() -> dict:
     acads = [{"nom": a, "slug": slug(a), "zone": zone(a), "ref": ref.get(a), "ps": ps.get(a), "spe": sp.get(a), "mm": mm.get(a)}
              for a in noms]
     return {"session": SESSION, "rentree": M["rentree"], "alpha": ALPHA, "filieres": filieres, "specialites": M["specialites"],
+            "libelles_filieres": FILIERES, "libelles_specialites": SPECIALITES,
             "france": {"nom": "France entière", "ref": ref_fr, "ps": ps_fr, "spe": sp_fr, "mm": mm_fr},
             "academies": acads}
 

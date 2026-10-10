@@ -27,6 +27,7 @@ import simulate_ppl_art2 as sim  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.pages import build_page  # noqa: E402
+from spedago.libelles import FILIERES  # noqa: E402
 from spedago.referentiel import academie_canonique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -53,7 +54,7 @@ def export(df: pd.DataFrame, session: int = SESSION) -> dict:
         d.fil_lib_voe_acc.fillna("").astype(str).map(dicts["fil_lib_voe_acc"][1]),
         d.idf.astype(int), mob.astype(int), d.capa_fin.round().astype(int), d.acc_tot.round().astype(int),
         d.nb_voe_pp.round().astype(int), na, lc]).tolist()
-    return {"session": session, "academies": dicts["academie"][0], "filieres": dicts["fili_harmo"][0],
+    return {"session": session, "academies": dicts["academie"][0], "filieres": dicts["fili_harmo"][0], "libelles_filieres": FILIERES,
             "specialites": dicts["fil_lib_voe_acc"][0], "perimetre_mobilisable": sorted(sim.PERIMETRE_GISEMENT),
             "colonnes": ["academie", "filiere", "specialite", "idf", "mobilisable", "places", "admis", "candidats_pp",
                          "non_appeles", "liste_commune"], "formations": rows}

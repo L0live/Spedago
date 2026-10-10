@@ -218,3 +218,42 @@ def test_calculs_de_la_page(js):
             t = a["mm"]["total"]
             assert m["tauxL3"] is None and t[4] == 0 or abs(m["tauxL3"] - t[5] / t[4]) < 1e-12
     assert D["academies"][out["idx"]]["nom"] == "Poitiers"
+
+
+# ---------- personnalisation : adresse, CSV, filtres par académie ----------
+
+def test_adresse_csv_et_filtre_academie(js, tmp_path):
+    _, _, cfg = js
+    code = r"""
+const S = require(process.argv[2]), Sim = require(process.argv[3]);
+const DS = JSON.parse(require('fs').readFileSync(process.argv[4], 'utf8'));
+const cases = ["", "#poitiers", "#poitiers&spe=8&statut=Priv%C3%A9", "#cmp=lille", "#orleans-tours&mention=DROIT%20DES%20AFFAIRES&vue=inverse"];
+const hashes = cases.map((h) => { const p = S.parseHash(h); return [p, S.buildHash(p)]; });
+const r = Sim.simulate(DS, {}), nat = Sim.groupBy(DS, r, Sim.COL.FIL);
+const parAcad = DS.academies.map((_, a) => Sim.groupBy(DS, r, Sim.COL.FIL, "", String(a)));
+const somme = {}; parAcad.flat().forEach((x) => { somme[x.key] = (somme[x.key] || 0) + x.ajout; });
+const cvA = {}; r.couvertAF.forEach((v, k) => { const f = k.split("|")[1]; cvA[f] = (cvA[f] || 0) + v; });
+process.stdout.write(JSON.stringify({ hashes, csv: S.csv([["a;b", 'il dit "oui"', 3], ["x", null, 0.5]]),
+  nat: Object.fromEntries(nat.map((x) => [x.key, x.ajout])), somme, cvFil: Object.fromEntries(r.couvertFil), cvA }));
+"""
+    (tmp_path / "t.js").write_text(code, encoding="utf-8")
+    out = json.loads(subprocess.run(["node", str(tmp_path / "t.js"), cfg["commun"], cfg["sim"], cfg["simData"]],
+                                    capture_output=True, text=True, check=True).stdout)
+    h = out["hashes"]
+    assert h[0][0] == {"acad": "", "params": {}} and h[0][1] == ""
+    assert h[1][0]["acad"] == "poitiers" and h[1][1] == "#poitiers"
+    assert h[2][0]["params"] == {"spe": "8", "statut": "Privé"} and h[2][1] == "#poitiers&spe=8&statut=Priv%C3%A9"
+    assert h[3][0] == {"acad": "", "params": {"cmp": "lille"}}
+    assert h[4][0]["params"]["mention"] == "DROIT DES AFFAIRES"
+    assert out["csv"] == '﻿"a;b";"il dit ""oui""";3\r\nx;;0.5'
+    # le filtre par académie partitionne exactement le total national
+    assert {k: v for k, v in out["somme"].items() if v} == {k: v for k, v in out["nat"].items() if v}
+    assert all(out["cvA"].get(k, 0) == v for k, v in out["cvFil"].items()) and sum(out["cvA"].values()) == sum(out["cvFil"].values())
+
+
+def test_libelles_complets():
+    from spedago.libelles import FILIERES, SPECIALITES
+    sim = json.loads((PROC / "simulateur_parcoursup.json").read_text(encoding="utf-8"))
+    mut = json.loads((PROC / "mutualisation.json").read_text(encoding="utf-8"))
+    assert set(sim["filieres"]) <= set(FILIERES) and set(mut["specialites"]) <= set(SPECIALITES)
+    assert sim["libelles_filieres"] == FILIERES and mut["libelles_specialites"] == SPECIALITES

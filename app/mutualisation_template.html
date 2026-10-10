@@ -24,6 +24,7 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
 .mapbox { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; min-width: 0 }
 svg#map { width: 100%; height: auto; display: block; touch-action: manipulation }
 svg#map circle { cursor: pointer }
+svg#map circle, svg#map line { vector-effect: non-scaling-stroke }
 svg#map .grp { stroke: var(--commun); stroke-width: 1.4; opacity: .7 }
 svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); padding: 6px 4px 2px }
@@ -35,6 +36,17 @@ svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
 .spes { display: grid; gap: 4px; margin-top: 10px; font-size: 14px }
 .spes div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding-block: 3px }
 .spes small { color: var(--muted); text-align: right }
+.liste { margin-top: 24px; min-width: 0 }
+.liste h2 { margin: 0 }
+.liste-ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.liste-ctl label { font-size: 13px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center }
+.liste-ctl select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 5px 8px }
+#t-lyc { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 640px }
+#t-lyc th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line) }
+#t-lyc td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+#t-lyc .r { text-align: right } #t-lyc small { display: block; color: var(--muted); font-size: 12px }
+#t-lyc button.linklike { font: inherit; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px }
+#more-lyc { margin-top: 8px }
 .pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); background: color-mix(in srgb, var(--c) 14%, white); border: 1px solid var(--c); border-radius: 4px; padding: 0 5px }
 .groups { display: grid; gap: 8px; max-height: 520px; overflow-y: auto }
 .group { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; cursor: pointer; background: transparent; text-align: left; font: inherit; color: inherit; width: 100% }
@@ -77,6 +89,16 @@ footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px
       <div class="panel"><h2 id="g-title">Ouvertures communes possibles</h2><div class="groups" id="groups"></div></div>
     </div>
   </div>
+
+  <section class="panel liste" aria-labelledby="h-liste">
+    <div class="toolbar"><h2 id="h-liste">Lycées de la sélection</h2>
+      <span class="liste-ctl"><label for="montrer">Afficher <select id="montrer"><option value="sans">sans la spécialité</option><option value="isole">sans solution proche</option><option value="tous">tous les lycées</option></select></label>
+      <button type="button" class="btn-ghost" id="export-lyc">Exporter (CSV)</button></span></div>
+    <p class="note" id="liste-note"></p>
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Tableau des lycées (défilant)"><table id="t-lyc"><caption class="sr-only">Lycées de la sélection et leur situation pour la spécialité</caption>
+      <thead><tr><th scope="col">Lycée</th><th scope="col">Académie</th><th scope="col">Statut</th><th scope="col" class="r">Élèves de 1re</th><th scope="col">Situation</th><th scope="col" class="r">Offre la plus proche</th></tr></thead><tbody></tbody></table></div>
+    <button type="button" class="btn-ghost" id="more-lyc" hidden>Afficher plus de lycées</button>
+  </section>
 
   <section class="explain">
     <div>
@@ -139,7 +161,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
   const NS = "http://www.w3.org/2000/svg";
   const fmtInt = (x) => Math.round(x).toLocaleString("fr-FR");
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-  const LIB = (s) => s.replace(/_/g, " ").replace(/\bsc\b/g, "sciences").replace(/^./, (c) => c.toUpperCase());
+  const LIB = (s) => (D.libelles_specialites || {})[s] || s.replace(/_/g, " ").replace(/\bsc\b/g, "sciences").replace(/^./, (c) => c.toUpperCase());
   // codes : 0 proposée, 2 incertaine, 3 accès voisin, 4 ouverture commune, 5 isolé
   const CAT = { 0: ["Proposée", "--offre"], 3: ["Accès voisin", "--voisin"], 4: ["Ouverture commune", "--commun"], 5: ["Sans solution proche", "--isole"], 2: ["Incertain", "--incertain"] };
   const L = D.lycees, I = { uai: 0, nom: 1, com: 2, stat: 3, acad: 4, bassin: 5, lat: 6, lon: 7, eff: 8, st: 9, near: 10 };
@@ -180,7 +202,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
       if (!d) return;
       d.hidden = !vis;
       // Hiérarchie : « sans solution » et « ouverture commune » ressortent ; « incertain » = anneau vide (forme, pas seulement couleur)
-      d.setAttribute("r", { 0: 2, 2: 1.8, 3: 2.4, 4: 3.6, 5: 3.8 }[code]);
+      d.setAttribute("r", ({ 0: 2, 2: 1.8, 3: 2.4, 4: 3.6, 5: 3.8 }[code] * zf).toFixed(2));
       d.style.fill = code === 2 ? "none" : `var(${CAT[code][1]})`;
       d.style.stroke = code === 2 ? "var(--incertain)" : code >= 4 ? "#fff" : "none";
       d.style.strokeWidth = code === 2 ? 1 : code >= 4 ? 0.8 : 0;
@@ -195,6 +217,7 @@ if (typeof module !== "undefined") module.exports = MutCalc;
       [4, n[4], "sans elle · ouverture commune possible"], [5, n[5], `sans elle · rien à moins de ${D.rayon_km} km (${fmtInt(el[5])} élèves de 1re)`]]
       .map(([c, v, t]) => `<div class="count" style="--c:var(${CAT[c][1]})"><b>${fmtInt(v)}</b><span>${t}</span></div>`).join("");
     Spedago.announce($("counts").innerText);
+    renderListe();
     // groupes
     gLines.innerHTML = "";
     const grs = MutCalc.groups(D, sp, $("statut").value, $("acad").value);
@@ -228,17 +251,65 @@ if (typeof module !== "undefined") module.exports = MutCalc;
       <div class="spes">${rows}</div>`;
   }
 
+  // ---- zoom sur l'académie choisie (cadre des lycées de métropole visibles)
+  let zf = 1;
+  function zoom() {
+    const ac = $("acad").value, pts = ac ? L.filter((l) => l[I.acad] === ac && inMetro(l)) : [];
+    if (!pts.length) { svg.setAttribute("viewBox", `0 0 ${W} ${H}`); zf = 1; return; }
+    const xs = pts.map((l) => px(l[I.lon])), ys = pts.map((l) => py(l[I.lat]));
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const w = Math.max(x1 - x0, 40) * 1.4 + 12, h = Math.max(y1 - y0, 40) * 1.4 + 12, side = Math.max(w, h * W / H);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    svg.setAttribute("viewBox", `${(cx - side / 2).toFixed(1)} ${(cy - side * H / W / 2).toFixed(1)} ${side.toFixed(1)} ${(side * H / W).toFixed(1)}`);
+    zf = Math.max(0.25, Math.pow(side / W, 0.75));
+  }
+  // ---- liste des lycées de la sélection
+  let shownLyc = 100;
+  const SIT = { 0: "La propose", 2: "Incertain (effectif masqué)", 3: "Voisin à moins de " + D.rayon_km + " km", 4: "Ouverture commune possible", 5: "Sans solution proche" };
+  function lycRows() {
+    const sp = +$("spe").value, m = $("montrer").value;
+    return L.map((l, i) => [l, i]).filter(([l]) => visible(l) && (m === "tous" || (m === "isole" ? l[I.st][sp] === 5 : [3, 4, 5].includes(l[I.st][sp]))))
+      .sort((a, b) => b[0][I.st][sp] - a[0][I.st][sp] || b[0][I.eff] - a[0][I.eff]);
+  }
+  function renderListe() {
+    const sp = +$("spe").value, rows = lycRows(), tb = $("t-lyc").tBodies[0]; tb.innerHTML = "";
+    rows.slice(0, shownLyc).forEach(([l, i]) => {
+      const c = l[I.st][sp], nr = l[I.near][sp], near = nr ? L[idx.get(nr[1])] : null, tr = document.createElement("tr");
+      tr.innerHTML = `<td data-v="${esc(l[I.nom])}"><button type="button" class="linklike" data-lyc="${i}">${esc(l[I.nom])}</button><small>${esc(l[I.com])}</small></td>
+        <td data-v="${esc(l[I.acad])}">${esc(l[I.acad])}</td><td data-v="${esc(l[I.stat])}">${esc(l[I.stat])}</td>
+        <td class="r" data-v="${l[I.eff]}">${fmtInt(l[I.eff])}</td>
+        <td data-v="${c}"><span class="pill" style="--c:var(${CAT[c][1]})">${SIT[c]}</span></td>
+        <td class="r" data-v="${nr ? nr[0] : ""}">${nr ? `${String(nr[0]).replace(".", ",")} km` : "–"}${near ? `<small>${esc(near[I.nom])}</small>` : ""}</td>`;
+      tb.appendChild(tr);
+    });
+    Spedago.sortable($("t-lyc"));
+    $("more-lyc").hidden = rows.length <= shownLyc;
+    $("liste-note").textContent = `${fmtInt(rows.length)} lycée${rows.length > 1 ? "s" : ""}${rows.length > shownLyc ? `, ${fmtInt(shownLyc)} affichés (l'export les contient tous)` : ""} · ${LIB(D.specialites[sp])}`;
+  }
+  $("t-lyc").addEventListener("click", (e) => { const b = e.target.closest("[data-lyc]"); if (b) { select(+b.dataset.lyc); $("fiche").scrollIntoView({ block: "nearest" }); } });
+  $("more-lyc").addEventListener("click", () => { shownLyc += 200; renderListe(); });
+  $("montrer").addEventListener("change", () => { shownLyc = 100; renderListe(); });
+  $("export-lyc").addEventListener("click", () => {
+    const sp = +$("spe").value, out = [["UAI", "Lycée", "Commune", "Académie", "Statut", "Élèves de 1re", "Spécialité", "Situation", "Offre la plus proche (km)", "Lycée le plus proche"]];
+    lycRows().forEach(([l]) => { const nr = l[I.near][sp], near = nr ? L[idx.get(nr[1])] : null;
+      out.push([l[I.uai], l[I.nom], l[I.com], l[I.acad], l[I.stat], l[I.eff], LIB(D.specialites[sp]), SIT[l[I.st][sp]], nr ? nr[0] : "", near ? near[I.nom] : ""]); });
+    Spedago.download(`spedago-lycees-${D.specialites[sp]}.csv`, Spedago.csv(out));
+  });
+
   function select(i) { selected = i; render(); }
   gDots.addEventListener("click", (e) => { const c = e.target.closest("circle"); if (c) select(+c.dataset.i); });
   $("filters").addEventListener("change", render);
   $("filters").addEventListener("submit", (e) => e.preventDefault());
-  $("acad").addEventListener("change", () => Spedago.setHash($("acad").value));
-  window.addEventListener("hashchange", () => { if (!Spedago.pick($("acad"))) $("acad").value = ""; render(); });
+  $("acad").addEventListener("change", () => { Spedago.setHash($("acad").value); zoom(); shownLyc = 100; render(); });
+  window.addEventListener("hashchange", () => { if (!Spedago.pick($("acad"))) $("acad").value = ""; zoom(); render(); });
+  document.addEventListener("spedago:profil", () => { if (!Spedago.hashSlug() && Spedago.pick($("acad"))) { zoom(); render(); } });
   $("cherche").addEventListener("input", () => { const i = byLabel.get($("cherche").value); if (i !== undefined) select(i); });
 
   // État initial : spécialité NSI, premier groupe sélectionné (exemple réel)
   const nsi = D.specialites.indexOf("numerique_et_sciences_informatiques");
   $("spe").value = nsi >= 0 ? nsi : 0;
+  Spedago.bind({ spe: $("spe"), statut: $("statut"), montrer: $("montrer") });
+  zoom();
   const g0 = MutCalc.groups(D, +$("spe").value, "", $("acad").value)[0];  // premier groupe (de l'académie choisie, s'il y en a une)
   selected = g0 ? g0[1][0] : null;
   render();

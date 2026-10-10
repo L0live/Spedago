@@ -30,6 +30,7 @@ import build_indice_specialites as b  # noqa: E402  (appariement des colonnes fi
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.geo import EARTH_KM, haversine_matrix  # noqa: E402,F401
 from spedago.pages import build_page  # noqa: E402
+from spedago.libelles import SPECIALITES  # noqa: E402
 from spedago.referentiel import academie_canonique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -193,7 +194,7 @@ def main() -> None:
     near = {}
     for _, r in pairs[pairs.lycee_offre_le_plus_proche.notna()].iterrows():
         near.setdefault(r.uai, {})[keep.index(r.specialite)] = [round(r.km_offre_la_plus_proche, 1), r.lycee_offre_le_plus_proche]
-    data = {"rentree": an, "rayon_km": R_KM, "seuil": SEUIL, "specialites": keep, "taux": [round(float(x), 4) for x in rates],
+    data = {"rentree": an, "rayon_km": R_KM, "seuil": SEUIL, "specialites": keep, "libelles_specialites": SPECIALITES, "taux": [round(float(x), 4) for x in rates],
             "taux_haut": [round(float(x), 4) for x in rates_hi],
             "lycees": [[r.uai, r.nom, r.commune, r.statut, r.academie, r.bassin, round(r.lat, 5), round(r.lon, 5), int(r.effectif),
                         st[i].tolist(), near.get(r.uai, {})] for i, r in lyc.iterrows()],

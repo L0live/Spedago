@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from html import escape
 from pathlib import Path
 
 
@@ -21,6 +22,33 @@ PAGES = [
 COMMUN = Path(__file__).resolve().parent.parent / "app" / "_commun.html"
 
 
+def _profil_panel() -> str:
+    """Panneau « Mon profil » : réglages gardés dans le navigateur, lus par toutes les pages."""
+    from .libelles import PROFILS_MASTER
+    from .referentiel import ACADEMIES, cle, slug
+    acads = sorted({v for v in ACADEMIES.values() if v != "Étranger"}, key=cle)
+    opt = lambda v, t: f'<option value="{escape(v)}">{escape(t)}</option>'  # noqa: E731
+    spes = ["Mathématiques", "Physique-chimie", "Sciences de la vie et de la Terre", "Sciences économiques et sociales",
+            "Histoire-géographie, géopolitique et sciences politiques", "Humanités, littérature et philosophie",
+            "Langues, littératures et cultures étrangères et régionales", "Numérique et sciences informatiques",
+            "Sciences de l'ingénieur", "Éducation physique, pratiques et culture sportives", "Arts",
+            "Littérature et langues et cultures de l'Antiquité", "Biologie-écologie"]
+    spe_opts = opt("", "—") + "".join(opt(x, x) for x in spes)
+    return ('<div class="site-tools"><button type="button" id="copy-link">Copier le lien</button>'
+            '<button type="button" id="profil-btn" aria-expanded="false" aria-controls="profil-panel"><span>Mon profil</span></button>'
+            '<div id="profil-panel" hidden><form autocomplete="off">'
+            '<label>Je suis<select name="role">' + opt("", "—") + opt("lyceen", "Lycéen·ne") + opt("etudiant", "Étudiant·e")
+            + opt("decideur", "Décideur, élu, journaliste…") + '</select></label>'
+            '<label>Mon académie<select name="academie">' + opt("", "—") + "".join(opt(slug(a), a) for a in acads) + '</select></label>'
+            '<label>Mes études (masters)<select name="profilMaster">' + opt("", "—")
+            + "".join(opt(k, v) for k, v in PROFILS_MASTER.items()) + '</select></label>'
+            '<div class="row2"><label>Spécialité 1<select name="spe1">' + spe_opts + '</select></label>'
+            '<label>Spécialité 2<select name="spe2">' + spe_opts + '</select></label></div>'
+            '<p>Gardé dans ce navigateur seulement ; rien n\'est envoyé. Chaque page s\'ouvre sur ces réglages.</p>'
+            '<div class="acts"><button type="button" data-reset>Effacer</button><button type="submit">Enregistrer</button></div>'
+            '</form></div></div>')
+
+
 def nav(current: str) -> str:
     """Barre de navigation commune ; la page courante porte aria-current. Les liens gardent le #académie (JS)."""
     portes: dict[str, list[str]] = {}
@@ -33,7 +61,7 @@ def nav(current: str) -> str:
     return ('<a class="skip" href="#contenu">Aller au contenu</a>'
             '<div class="sr-only" role="status" aria-live="polite" id="sr-status"></div>'
             f'<nav class="site-nav" aria-label="Spédago"><a class="brand" href="index.html" data-page="index.html"{cur}>Spédago</a>'
-            + '<span class="sep"></span>'.join(blocs) + "</nav>")
+            + '<span class="sep"></span>'.join(blocs) + _profil_panel() + "</nav>")
 
 
 def document(fragment: str, title_fallback: str = "Spédago") -> str:
