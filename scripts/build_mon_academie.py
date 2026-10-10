@@ -2,7 +2,7 @@
 
 Usage : python3 scripts/build_mon_academie.py
 Entrées : panel Parcoursup, data/processed/mutualisation.json, monmaster_formations.csv, referentiel_uai.csv
-Sorties : data/processed/mon_academie.json, app/mon-academie.html
+Sorties : data/processed/mon_academie.json, web/public/data/mon_academie.json
 
 Une fiche par académie qui réunit les trois pistes, avec les mêmes règles que les autres outils :
   - Parcoursup 2025 : tension par filière (définitions de analyse_tension.py) et règle de départ du simulateur
@@ -24,8 +24,8 @@ import analyse_tension as at  # noqa: E402
 import simulate_ppl_art2 as sim  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
-from spedago.pages import build_page  # noqa: E402
-from spedago.paths import APP, PROCESSED, RAW  # noqa: E402
+from spedago.pages import export_web  # noqa: E402
+from spedago.paths import PROCESSED, RAW  # noqa: E402
 from spedago.libelles import FILIERES, SPECIALITES  # noqa: E402
 from spedago.referentiel import IDF, OUTRE_MER, academie_canonique, cle, slug  # noqa: E402
 
@@ -34,8 +34,6 @@ ALPHA = 0.10  # règle de départ du simulateur
 PROFILS_PARTITION = ["lg3", "lp3", "but3", "master", "autre", "noninscri"]  # somme = tous les candidats
 N_MENTIONS = 6
 OUT_JSON = PROCESSED / "mon_academie.json"
-TPL = APP / "mon_academie_template.html"
-OUT_PAGE = APP / "mon-academie.html"
 PS_COLS = ["formations", "places", "admis", "voeux_pp", "places_saturees", "vacantes"]
 
 
@@ -176,8 +174,8 @@ def build() -> dict:
 def main() -> None:
     D = build()
     OUT_JSON.write_text(json.dumps(D, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    build_page(TPL, OUT_PAGE, D, {"__RENTREE_PO__": str(D["rentree_poursuite"])})
-    print(f"{len(D['academies'])} académies -> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e3:.0f} ko)")
+    export_web("mon_academie", D)
+    print(f"{len(D['academies'])} académies -> web/public/data/mon_academie.json")
 
 
 if __name__ == "__main__":

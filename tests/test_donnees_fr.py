@@ -39,8 +39,9 @@ def test_insertion_regle_de_selection():
 
 
 def test_insertion_dans_la_boussole():
-    html = (ROOT / "app" / "boussole-des-masters.html").read_text(encoding="utf-8")
-    assert '"insertion":{"mois":18' in html and "Insertion à 18 mois" in html
+    data = (ROOT / "web" / "public" / "data" / "boussole.json").read_text(encoding="utf-8")
+    page = (ROOT / "web" / "boussole-des-masters.html").read_text(encoding="utf-8")
+    assert '"insertion":{"mois":18' in data and "Insertion à 18 mois" in page
 
 
 def test_poursuite_academies_egale_france():

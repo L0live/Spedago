@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Mon académie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<script type="module" src="/src/pages/mon-academie.ts"></script>
+</head>
+<body>
+<div class="wrap">
+  <!--NAV-->
+  <main id="contenu" tabindex="-1">
+  <header>
+    <span class="badge">Projet indépendant · données publiques 2025</span>
+    <h1>Mon académie</h1>
+    <p class="lede">Les trois outils Spédago vus depuis une académie : la tension à l'entrée du supérieur, l'accès aux spécialités au lycée, l'admission en master. Chaque bloc renvoie à l'outil détaillé, où l'académie est déjà choisie.</p>
+  </header>
+
+  <form class="pick" id="pick" autocomplete="off">
+    <label for="acad">Académie <select id="acad"></select></label>
+    <label for="cmp">Comparer avec <select id="cmp"><option value="fr">France entière</option></select></label>
+    <span class="zone" id="zone"></span>
+  </form>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="bloc" id="b-ps" aria-labelledby="h-ps">
+    <div class="kicker">Entrée dans le supérieur · Parcoursup 2025</div>
+    <h2 id="h-ps">Où la demande dépasse l'offre</h2>
+    <div id="ps"></div>
+  </section>
+
+  <section class="bloc" id="b-po" aria-labelledby="h-po">
+    <div class="kicker">Après le bac · rentrée <span data-meta="rentree_po"></span></div>
+    <h2 id="h-po">Où poursuivent les bacheliers de l'académie</h2>
+    <div id="po"></div>
+  </section>
+
+  <section class="bloc" id="b-spe" aria-labelledby="h-spe">
+    <div class="kicker">Lycée · spécialités de 1re générale</div>
+    <h2 id="h-spe">Qui n'a pas accès à quelle spécialité</h2>
+    <div id="spe"></div>
+  </section>
+
+  <section class="bloc" id="b-mm" aria-labelledby="h-mm">
+    <div class="kicker">Après la licence · Mon Master 2025</div>
+    <h2 id="h-mm">Les chances d'admission en master</h2>
+    <div id="mm"></div>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h2>Lire ces chiffres</h2>
+      <ul>
+        <li>Les vœux et les candidatures ne sont pas des personnes : un candidat compte dans chaque formation demandée.</li>
+        <li>Comparer la pression d'une filière à celle d'une autre n'a pas de sens (IFSI et PASS fonctionnent en listes communes) ; la colonne « France » sert de repère pour la même filière.</li>
+        <li>L'académie est celle du lieu de la formation ou du lycée, pas celle du domicile des candidats.</li>
+        <li>« Sans solution proche » : aucun lycée qui propose la spécialité à moins de 20 km, et trop peu d'élèves pour une ouverture commune (seuil 12, estimation basse).</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la page ne dit pas</h2>
+      <ul>
+        <li>Combien de candidats seraient admis en plus : il faudrait les vœux individuels, réservés aux chercheurs.</li>
+        <li>Le coût des places ou des ouvertures (enseignants, locaux, transports).</li>
+        <li>Les emplois du temps : deux lycées voisins ne peuvent partager un cours que si leurs horaires s'accordent.</li>
+        <li>Apprentissage et CNED exclus de Parcoursup ; masters hors plateforme nationale absents.</li>
+      </ul>
+    </div>
+  </section>
+
+  </main>
+
+  <footer>
+    Sources : ministère de l'Enseignement supérieur (Parcoursup 2025, Mon Master 2025) et ministère de l'Éducation nationale (DEPP, spécialités en 1re générale ; annuaire de l'éducation), Licence Ouverte 2.0 ; traitement Spédago.
+    Outil indépendant. Mêmes règles et mêmes nombres que les autres pages du site, vérifiés par des tests automatiques.
+  <!--PIED--></footer>
+</div>
+</body>
+</html>

@@ -1,13 +1,13 @@
-"""Tests du site (niveau 3) : navigation commune, ancres d'académie, page « Mon académie ».
+"""Tests de l'application web : navigation commune, ancres d'académie, accessibilité, « Mon académie ».
 
 « Mon académie » recalcule ses nombres en Python ; on vérifie qu'ils sont IDENTIQUES à ceux que les autres pages
-calculent dans le navigateur (SimCalc, MutCalc) ou embarquent (Boussole), et aux tables d'analyse publiées.
+calculent dans le navigateur (SimCalc, MutCalc) ou chargent (Boussole), et aux tables d'analyse publiées.
+Les pages construites (web/dist) sont vérifiées après `npm run build`.
 """
 from __future__ import annotations
 
 import json
 import re
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -19,15 +19,15 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
-from jsharness import extract_page  # noqa: E402
-from spedago.pages import PAGES, nav  # noqa: E402
+from jsharness import DATA, DIST, WEB, built_html, compile_calc, data_text, disponible, extract_page  # noqa: E402
+from spedago.pages import PAGES, nav, pied  # noqa: E402
 from spedago.referentiel import ACADEMIES, academie_canonique, slug  # noqa: E402
 from spedago.stats import wilson  # noqa: E402
 
-APP, SITE, PROC = ROOT / "app", ROOT / "site", ROOT / "data" / "processed"
-NOMS = {f: APP / f for f, _, _ in PAGES}
-pytestmark = pytest.mark.skipif(shutil.which("node") is None or not all(p.exists() for p in NOMS.values()),
-                                reason="node ou pages construites absents")
+PROC = ROOT / "data" / "processed"
+NOMS = [f for f, _, _ in PAGES]
+SRC = {f: (WEB / "src" / "pages" / f.replace(".html", ".ts")).read_text(encoding="utf-8") for f in NOMS}
+pytestmark = pytest.mark.skipif(not disponible(), reason="node, esbuild (npm install dans web/) ou données absents")
 
 RUNNER = r"""
 const fs = require('fs'), cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
@@ -53,11 +53,10 @@ DROLES = ["Saint-Étienne", "L’Haÿ-les-Roses", "  ST DENIS ", "Aix--Marseille
 @pytest.fixture(scope="module")
 def js(tmp_path_factory):
     d = tmp_path_factory.mktemp("site")
-    commun = re.search(r'<script id="commun">(.*?)</script>', (APP / "_commun.html").read_text(encoding="utf-8"), re.S).group(1)
-    (d / "commun.js").write_text(commun, encoding="utf-8")
+    (d / "commun.js").write_text(compile_calc("commun"), encoding="utf-8")
     datas = {}
-    for key, page in (("sim", "simulateur-parcoursup.html"), ("mut", "mutualisation.html"), ("acad", "mon-academie.html")):
-        calc, data = extract_page(NOMS[page].read_text(encoding="utf-8"))
+    for key, page in (("sim", "simulateur-parcoursup"), ("mut", "mutualisation"), ("acad", "mon-academie")):
+        calc, data = extract_page(page)
         (d / f"{key}.js").write_text(calc, encoding="utf-8")
         (d / f"{key}.json").write_text(data, encoding="utf-8")
         datas[key] = json.loads(data)
@@ -71,66 +70,65 @@ def js(tmp_path_factory):
     return json.loads(out.stdout), datas, cfg
 
 
-# ---------- ancres d'académie et navigation ----------
+# ---------- ancres d'académie, navigation, construction ----------
 
 def test_slug_js_identique_au_python(js):
     out, _, cfg = js
     assert out["slugs"] == [slug(n) for n in cfg["noms"]]
 
 
+def test_typescript_sans_erreur():
+    """Les calculs et le code commun sont vérifiés par le compilateur (mode strict)."""
+    r = subprocess.run(["node", str(WEB / "node_modules" / "typescript" / "bin" / "tsc"), "--noEmit"], cwd=WEB, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout[-2000:]
+    for f in ("src/lib/commun.ts", "src/lib/data.ts", *(f"src/calc/{x}" for x in ("boussole.ts", "simulateur.ts", "mutualisation.ts",
+              "mon-academie.ts", "mes-specialites.ts", "voisins.ts"))):
+        assert "@ts-nocheck" not in (WEB / f).read_text(encoding="utf-8"), f"{f} doit rester vérifié par TypeScript"
+
+
+def test_construction_a_jour():
+    """web/dist correspond aux données publiées (sinon : `npm run build`)."""
+    for f in DATA.glob("*.json"):
+        built = DIST / "data" / f.name
+        assert built.exists() and built.read_bytes() == f.read_bytes(), f"{built} périmé : relancer `npm run build`"
+
+
 def test_navigation_commune_sur_toutes_les_pages():
-    commun = (APP / "_commun.html").read_text(encoding="utf-8")
-    for f, _, _ in PAGES:
-        html = NOMS[f].read_text(encoding="utf-8")
-        assert "__" not in re.sub(r'<script type="application/json" id="data">.*?</script>', "", html, flags=re.S) \
-            .replace("__proto__", ""), f"jeton non remplacé dans {f}"
-        assert html.count('<nav class="site-nav"') == 1 and nav(f) in html, f
-        assert html.count(f'data-page="{f}" aria-current="page"') == 1, f
-        assert html.count('<script id="commun">') == 1 and commun.strip() in html, f
+    commun = (WEB / "src" / "styles" / "commun.css").read_text(encoding="utf-8")
+    assert "color-scheme: light" in commun and "--orange:" in commun
+    for f in NOMS:
+        html = built_html(f.replace(".html", ""))
+        assert html.startswith("<!doctype html>") and '<html lang="fr">' in html
+        assert "<!--NAV-->" not in html and html.count('<nav class="site-nav"') == 1 and nav(f) in html, f
+        dans_nav = f == "index.html" or any(p == f and porte for p, _, porte in PAGES)
+        assert html.count(f'data-page="{f}" aria-current="page"') == (1 if dans_nav else 0), f
+        assert "<!--PIED-->" not in html and html.count(pied()) == 1, f"pied de page commun absent de {f}"
         assert "prefers-color-scheme: dark" not in html and 'data-theme="dark"' not in html, f"thème sombre restant dans {f}"
         hrefs = re.findall(r'href="([^"#]+)', nav(f))
-        assert sorted(set(hrefs)) == sorted(NOMS), (f, hrefs)
-    assert "color-scheme: light" in commun and "--orange:" in commun
-    for t in APP.glob("*_template.html"):
-        s = t.read_text(encoding="utf-8")
-        assert "__COMMUN__" in s and "__NAV__" in s, t.name
-        assert "--bg:" not in s and "fonts.googleapis" not in s, f"styles de base dupliqués dans {t.name}"
+        assert sorted(set(hrefs)) == sorted(p for p, _, porte in PAGES if porte or p == "index.html"), (f, hrefs)
+        src = (WEB / f).read_text(encoding="utf-8")
+        assert "<!--NAV-->" in src and "<!--PIED-->" in src and "fonts.googleapis" in src and "__" not in src.replace("<!--NAV-->", "").replace("<!--PIED-->", ""), f
+    for css in (WEB / "src" / "styles").glob("*.css"):
+        if css.name != "commun.css":
+            assert "--bg:" not in css.read_text(encoding="utf-8"), f"styles de base dupliqués dans {css.name}"
 
 
 def test_accessibilite_structure():
-    """Socle WCAG vérifiable sans navigateur (le scan axe complet : scripts/check_a11y.mjs)."""
-    for f, _, _ in PAGES:
-        html = NOMS[f].read_text(encoding="utf-8")
+    """Socle WCAG vérifiable sans navigateur (le scan axe complet : tools/check_a11y.mjs)."""
+    for f in NOMS:
+        html = built_html(f.replace(".html", ""))
         assert html.count('<main id="contenu"') == 1 and '<a class="skip" href="#contenu">' in html, f
         assert 'role="status" aria-live="polite" id="sr-status"' in html, f
         assert html.count("<h1") == 1, f
         for tab in re.findall(r'<[^>]*role="tab"[^>]*>', html):
             assert "aria-controls=" in tab and "aria-selected=" in tab, (f, tab)
-        assert "Spedago.announce(" in html or f == "index.html", f"pas d'annonce des mises à jour dans {f}"
-
-
-def test_tous_les_scripts_sont_valides(tmp_path):
-    """Chaque bloc <script> de chaque page passe `node --check` (une erreur de syntaxe casse toute la page)."""
-    for f in NOMS:
-        html = NOMS[f].read_text(encoding="utf-8")
-        for i, js in enumerate(re.findall(r"<script(?: id=\"[a-z]+\")?>(.*?)</script>", html, re.S)):
-            p = tmp_path / f"{f}.{i}.js"
-            p.write_text(js, encoding="utf-8")
-            r = subprocess.run(["node", "--check", str(p)], capture_output=True, text=True)
-            assert r.returncode == 0, (f, i, r.stderr[:400])
-
-
-def test_documents_complets_du_site():
-    for f, _, _ in PAGES:
-        s = (SITE / f).read_text(encoding="utf-8")
-        assert s.startswith("<!doctype html>") and '<meta charset="utf-8">' in s and s.rstrip().endswith("</html>")
-        assert NOMS[f].read_text(encoding="utf-8") in s, f"site/{f} périmé : relancer scripts/build_site.py"
+        assert "Spedago.announce(" in SRC[f] or f in ("index.html", "methodes.html"), f"pas d'annonce des mises à jour dans {f}"
 
 
 def test_les_outils_lisent_l_ancre():
     for f, sel in (("boussole-des-masters.html", 'Spedago.pick($("academie"))'), ("mutualisation.html", 'Spedago.pick($("acad"))'),
-                   ("mon-academie.html", 'Spedago.pick($("acad"))'), ("simulateur-parcoursup.html", "Spedago.hashSlug()")):
-        assert sel in NOMS[f].read_text(encoding="utf-8"), f
+                   ("mon-academie.html", 'Spedago.pick($("acad"))'), ("simulateur-parcoursup.html", 'Spedago.pick($("acad"))')):
+        assert sel in SRC[f], f
 
 
 # ---------- « Mon académie » : mêmes nombres que les autres pages ----------
@@ -191,7 +189,7 @@ def test_specialites_egales_la_carte(js):
 def test_masters_egaux_a_la_boussole(js):
     _, datas, _ = js
     D = datas["acad"]
-    B = json.loads(extract_page(NOMS["boussole-des-masters.html"].read_text(encoding="utf-8"))[1])
+    B = json.loads(data_text("boussole-des-masters"))
     s = B["sessions"].index(D["session"]); ns = len(B["sessions"])
     P = B["profils"]
     part = [P.index(p) for p in ("lg3", "lp3", "but3", "master", "autre", "noninscri")]

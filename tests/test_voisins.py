@@ -12,17 +12,17 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts")); sys.path.insert(0, str(ROOT / "tests"))
 import build_voisins as bv  # noqa: E402
-from jsharness import extract_page  # noqa: E402
+from jsharness import disponible, extract_page  # noqa: E402
 from spedago.jsonstat import lire  # noqa: E402
 from spedago.referentiel import academie_canonique  # noqa: E402
 
-PAGE = ROOT / "app" / "france-et-voisins.html"
-pytestmark = pytest.mark.skipif(not PAGE.exists() or shutil.which("node") is None, reason="page ou node absents")
+PAGE = "france-et-voisins"
+pytestmark = pytest.mark.skipif(not disponible(), reason="node, esbuild (npm install dans web/) ou données absents")
 
 
 @pytest.fixture(scope="module")
 def js(tmp_path_factory):
-    calc, data = extract_page(PAGE.read_text(encoding="utf-8"))
+    calc, data = extract_page(PAGE)
     D = json.loads(data)
     d = tmp_path_factory.mktemp("v")
     (d / "c.js").write_text(calc, encoding="utf-8"); (d / "d.json").write_text(data, encoding="utf-8")

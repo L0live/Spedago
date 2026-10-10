@@ -22,10 +22,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import build_monmaster as mm  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "tests"))
-from jsharness import extract_page  # noqa: E402
+from jsharness import disponible, extract_page  # noqa: E402
 
-PAGE = ROOT / "app" / "boussole-des-masters.html"
-pytestmark = pytest.mark.skipif(not PAGE.exists() or shutil.which("node") is None, reason="page construite ou node absents")
+PAGE = "boussole-des-masters"
+pytestmark = pytest.mark.skipif(not disponible(), reason="node, esbuild (npm install dans web/) ou données absents")
 
 PROFILS = ["lg3", "but3", "lp3", "master", "autre", "noninscri", "etab", "hors_etab"]
 RUNNER = """
@@ -41,8 +41,7 @@ process.stdout.write(JSON.stringify({ est, ranks }, (k, v) => (typeof v === 'num
 
 @pytest.fixture(scope="module")
 def page_parts(tmp_path_factory):
-    html = PAGE.read_text(encoding="utf-8")
-    calc, data = extract_page(html)
+    calc, data = extract_page(PAGE)
     d = tmp_path_factory.mktemp("js")
     (d / "calc.js").write_text(calc, encoding="utf-8")
     (d / "data.json").write_text(data, encoding="utf-8")
@@ -147,7 +146,7 @@ def test_cas_limites_js(page_parts):
 # ---------- Simulateur des places en tension (piste A) ----------
 import simulate_ppl_art2 as sim  # noqa: E402
 
-PAGE_SIM = ROOT / "app" / "simulateur-parcoursup.html"
+PAGE_SIM = "simulateur-parcoursup"
 SIM_RUNNER = """
 const C = require(process.argv[2]);
 const D = JSON.parse(require('fs').readFileSync(process.argv[3], 'utf8'));
@@ -162,10 +161,7 @@ GRID = [{"regle": r, "pct": pct, "q": q, "sat": sat, "sous": 0.8}
 
 @pytest.fixture(scope="module")
 def sim_js(tmp_path_factory):
-    if not PAGE_SIM.exists():
-        pytest.skip("page simulateur absente")
-    html = PAGE_SIM.read_text(encoding="utf-8")
-    calc, data = extract_page(html)
+    calc, data = extract_page(PAGE_SIM)
     d = tmp_path_factory.mktemp("sim")
     (d / "calc.js").write_text(calc, encoding="utf-8")
     (d / "data.json").write_text(data, encoding="utf-8")
@@ -231,7 +227,7 @@ def test_quantile_et_plafond_js(sim_js):
 # ---------- Carte des spécialités partagées (piste B) ----------
 import build_mutualisation as mu  # noqa: E402
 
-PAGE_MUT = ROOT / "app" / "mutualisation.html"
+PAGE_MUT = "mutualisation"
 MUT_RUNNER = """
 const C = require(process.argv[2]);
 const D = JSON.parse(require('fs').readFileSync(process.argv[3], 'utf8'));
@@ -242,10 +238,7 @@ process.stdout.write(JSON.stringify(cfg.map(([sp, st, ac]) => ({ s: C.summary(D,
 
 @pytest.fixture(scope="module")
 def mut_js(tmp_path_factory):
-    if not PAGE_MUT.exists():
-        pytest.skip("page carte absente")
-    html = PAGE_MUT.read_text(encoding="utf-8")
-    calc, data = extract_page(html)
+    calc, data = extract_page(PAGE_MUT)
     D = json.loads(data)
     acads = ["", "Poitiers", "Créteil", "Strasbourg"]
     assert set(acads[1:]) <= {l[4] for l in D["lycees"]}

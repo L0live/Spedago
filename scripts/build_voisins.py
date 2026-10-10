@@ -2,7 +2,7 @@
 
 Usage : python3 scripts/download_eurostat.py && python3 scripts/build_voisins.py
 Entrées : data/raw/eurostat_*.json (JSON-stat, API Eurostat)
-Sorties : data/processed/voisins.json, app/france-et-voisins.html, reports/voisins.md
+Sorties : data/processed/voisins.json, web/public/data/voisins.json, reports/voisins.md
 
 Choix :
 - Mobilité : étudiants en mobilité DIPLÔMANTE (inscrits pour un diplôme entier, pas Erasmus), CITE 5 à 8, comptés par le
@@ -21,13 +21,11 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.jsonstat import DRAPEAUX, lire  # noqa: E402
-from spedago.pages import build_page  # noqa: E402
-from spedago.paths import APP, PROCESSED, RAW, REPORTS  # noqa: E402
+from spedago.pages import export_web  # noqa: E402
+from spedago.paths import PROCESSED, RAW, REPORTS  # noqa: E402
 from spedago.referentiel import ACADEMIES, cle, slug  # noqa: E402
 
 OUT_JSON = PROCESSED / "voisins.json"
-TPL = APP / "voisins_template.html"
-OUT_PAGE = APP / "france-et-voisins.html"
 OUT_MD = REPORTS / "voisins.md"
 
 PAYS = ["BE", "CH", "ES", "DE", "IT", "PT", "LU"]  # Pays-Bas : pas de valeur publiée
@@ -108,9 +106,7 @@ def main() -> None:
     D = build()
     OUT_JSON.write_text(json.dumps(D, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     OUT_MD.write_text(report(D), encoding="utf-8")
-    if TPL.exists():
-        m = D["mobilite"]["annees"]
-        build_page(TPL, OUT_PAGE, D, {"__AN0__": m[0], "__AN1__": m[-1]})
+    export_web("voisins", D)
     print(f"{len(D['regions'])} régions, {len(D['mobilite']['pays'])} pays -> {OUT_JSON}")
 
 

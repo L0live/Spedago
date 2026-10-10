@@ -14,12 +14,12 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts")); sys.path.insert(0, str(ROOT / "tests"))
 import build_mes_specialites as ms  # noqa: E402
-from jsharness import extract_page  # noqa: E402
+from jsharness import disponible, extract_page  # noqa: E402
 from spedago.libelles import EDS  # noqa: E402
 from spedago.stats import wilson  # noqa: E402
 
-PAGE = ROOT / "app" / "mes-specialites.html"
-pytestmark = pytest.mark.skipif(not PAGE.exists() or shutil.which("node") is None, reason="page ou node absents")
+PAGE = "mes-specialites"
+pytestmark = pytest.mark.skipif(not disponible(), reason="node, esbuild (npm install dans web/) ou données absents")
 RUNNER = r"""
 const C = require(process.argv[2]); const D = JSON.parse(require('fs').readFileSync(process.argv[3], 'utf8'));
 const out = { g: D.doublettes.map((_, d) => C.groupes(D, d)), r: D.doublettes.map((_, d) => C.resume(D, d)),
@@ -31,7 +31,7 @@ process.stdout.write(JSON.stringify(out, (k, v) => (typeof v === 'number' && !is
 
 @pytest.fixture(scope="module")
 def js(tmp_path_factory):
-    calc, data = extract_page(PAGE.read_text(encoding="utf-8"))
+    calc, data = extract_page(PAGE)
     d = tmp_path_factory.mktemp("ms")
     (d / "c.js").write_text(calc, encoding="utf-8"); (d / "d.json").write_text(data, encoding="utf-8"); (d / "r.js").write_text(RUNNER, encoding="utf-8")
     out = subprocess.run(["node", str(d / "r.js"), str(d / "c.js"), str(d / "d.json")], capture_output=True, text=True, check=True, timeout=300)

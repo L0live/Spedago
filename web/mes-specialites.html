@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Mes spécialités</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<script type="module" src="/src/pages/mes-specialites.ts"></script>
+</head>
+<body>
+<div class="wrap">
+  <!--NAV-->
+  <main id="contenu" tabindex="-1">
+  <header>
+    <span class="badge">Pour les lycéens · Parcoursup <span data-meta="annee"></span></span>
+    <h1>Mes spécialités, mes formations</h1>
+    <p class="lede">Choisissez vos deux spécialités de terminale. La page montre ce qu'ont demandé, sur Parcoursup, les bacheliers qui avaient les mêmes, et quelle part a reçu une proposition, comparée aux autres bacheliers généraux. Ce sont des résultats passés, au niveau national : votre dossier compte plus que vos spécialités.</p>
+  </header>
+
+  <form class="filters" id="filters" autocomplete="off">
+    <label for="s1">Spécialité 1 <select id="s1"></select></label>
+    <label for="s2">Spécialité 2 <select id="s2"></select></label>
+    <label for="fam">Type de formation <select id="fam"><option value="">Tous</option></select></label>
+    <label for="tri">Trier par <select id="tri">
+      <option value="demande">Les plus demandées par les élèves comme moi</option>
+      <option value="chances">Part ayant reçu une proposition</option>
+      <option value="ecart">Avantage sur les autres bacheliers (prudent)</option>
+      <option value="nom">Ordre alphabétique</option></select></label>
+    <label for="q" class="wide">Chercher une formation <input id="q" type="search" placeholder="ex. Informatique, STAPS, CPGE"></label>
+    <label for="lyc" class="wide">Mon lycée (facultatif) <input id="lyc" list="lycees" placeholder="Nom du lycée ou commune"><datalist id="lycees"></datalist></label>
+  </form>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="bloc lycee" id="b-lycee" aria-labelledby="h-lycee" hidden>
+    <div class="kicker">Mon lycée · offre de spécialités en 1re, rentrée <span data-meta="rentree"></span></div>
+    <h2 id="h-lycee">Mon lycée</h2>
+    <div id="lycee"></div>
+  </section>
+
+  <section class="bloc" aria-labelledby="h-res">
+    <div class="toolbar"><h2 id="h-res" style="margin:0">Ce qu'ont demandé les élèves comme vous</h2>
+      <button type="button" class="btn-ghost" id="export">Exporter (CSV)</button></div>
+    <p class="note" id="count"></p>
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Tableau des formations (défilant)"><table id="t-g">
+      <caption class="sr-only">Formations demandées par les bacheliers ayant la même doublette, et part ayant reçu une proposition</caption>
+      <thead><tr><th>Formation</th><th class="r">Élèves comme vous qui l'ont demandée</th><th class="r">Ont reçu une proposition</th><th class="r">Autres bacheliers généraux</th><th class="r">Écart</th></tr></thead>
+      <tbody></tbody></table></div>
+    <button type="button" class="btn-ghost" id="more" hidden>Afficher toutes les formations</button>
+  </section>
+
+  <section class="bloc" id="b-detail" aria-labelledby="h-detail" hidden>
+    <div class="kicker">Détail</div>
+    <h2 id="h-detail"></h2>
+    <div id="detail"></div>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h2>Lire ces chiffres</h2>
+      <ul>
+        <li>« Demandée » : candidats qui ont confirmé au moins un vœu dans cette formation ; ce sont des personnes.</li>
+        <li>« Ont reçu une proposition » : part de ces candidats qui ont reçu au moins une proposition dans cette formation (intervalle à 95 % en petit).</li>
+        <li>« Autres bacheliers généraux » : la même part pour tous les autres candidats de terminale générale. L'écart mêle l'effet des spécialités et celui des dossiers : ce n'est pas une règle d'admission.</li>
+        <li>Mon lycée : l'offre vient des effectifs de 1re (trois spécialités) ; en terminale, l'élève en garde deux.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la page ne dit pas</h2>
+      <ul>
+        <li>Vos chances personnelles : notes, appréciations, projet et établissement d'origine ne sont pas dans les données ouvertes.</li>
+        <li>Les chances dans une formation d'un établissement précis : les données par spécialités sont nationales.</li>
+        <li>Les candidats de terminale technologique ou professionnelle, ni les étudiants en réorientation.</li>
+      </ul>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    Source : ministère de l'Enseignement supérieur, « Parcoursup : enseignements de spécialité des bacheliers généraux » (<span data-meta="annee"></span>, et 2021-2024 pour l'évolution) ; ministère de l'Éducation nationale (DEPP), effectifs par spécialité en 1re générale. Licence Ouverte 2.0 ; traitement Spédago.
+  <!--PIED--></footer>
+</div>
+</body>
+</html>

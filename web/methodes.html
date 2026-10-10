@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Méthodes et sources · Spédago</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<script type="module" src="/src/pages/methodes.ts"></script>
+</head>
+<body data-ancres="locales">
+<div class="wrap">
+  <!--NAV-->
+  <main id="contenu" tabindex="-1">
+  <header>
+    <span class="badge">Méthodes · <span data-meta="n"></span> indicateurs</span>
+    <h1>Méthodes et sources</h1>
+    <p class="lede">Une fiche par nombre publié : ce qu'il mesure, sur quel champ, avec quelles sources et quels seuils, et ce qu'il ne dit pas. Les seuils affichés ici sont vérifiés par des tests automatiques contre ceux qu'utilisent réellement les calculs.</p>
+  </header>
+
+  <nav class="sommaire" aria-label="Indicateurs" id="sommaire"></nav>
+  <div id="fiches"></div>
+
+  <section class="bloc-sources" aria-labelledby="titre-sources">
+    <h2 id="titre-sources">Fichiers sources</h2>
+    <p>Chaque fichier est téléchargé depuis le portail de son producteur et identifié par son empreinte SHA-256 : on peut vérifier qu'un nombre a été calculé sur exactement ces données.</p>
+    <div class="tablewrap"><table id="sources"><caption class="sr-only">Fichiers sources, producteur, date de téléchargement et empreinte</caption>
+      <thead><tr><th scope="col">Fichier</th><th scope="col">Jeu de données</th><th scope="col">Producteur</th><th scope="col">Téléchargé le</th><th scope="col">Empreinte (début)</th></tr></thead>
+      <tbody></tbody></table></div>
+  </section>
+
+  <section class="bloc-sources" aria-labelledby="titre-regles">
+    <h2 id="titre-regles">Règles communes</h2>
+    <ul>
+      <li>Un taux calculé sur un groupe (bacheliers d'une doublette, candidats d'un profil) décrit ce qui s'est passé pour ce groupe ; ce n'est jamais une probabilité individuelle.</li>
+      <li>Les cases masquées par le secret statistique ne sont jamais remplacées par zéro.</li>
+      <li>Les calculs faits dans le navigateur sont testés pour donner exactement les mêmes nombres que les scripts d'analyse.</li>
+      <li>Une conclusion corrigée après vérification est consignée dans le journal des corrections (dossier <code>reports/</code> du code source).</li>
+    </ul>
+  </section>
+  </main>
+
+  <footer>Spédago · fiches générées depuis le registre des indicateurs (<code>spedago/indicateurs.py</code>).<!--PIED--></footer>
+</div>
+</body>
+</html>

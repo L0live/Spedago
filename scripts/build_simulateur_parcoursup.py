@@ -1,8 +1,8 @@
 """Spédago — piste A : données et page du « Simulateur de places Parcoursup ».
 
 Usage : python3 scripts/build_simulateur_parcoursup.py
-Entrées : data/processed/parcoursup_panel_2020_2025.csv.gz, app/simulateur_template.html
-Sorties : data/processed/simulateur_parcoursup.json, app/simulateur-parcoursup.html
+Entrées : data/processed/parcoursup_panel_2020_2025.csv.gz
+Sorties : data/processed/simulateur_parcoursup.json, web/public/data/simulateur.json
 
 La page applique, dans le navigateur, les mêmes règles que scripts/simulate_ppl_art2.py à la dernière session
 (2025) pour montrer ce qu'elles donneraient l'année suivante. La parité JS/Python est testée
@@ -26,14 +26,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import simulate_ppl_art2 as sim  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
-from spedago.pages import build_page  # noqa: E402
+from spedago.pages import export_web  # noqa: E402
 from spedago.libelles import FILIERES  # noqa: E402
 from spedago.referentiel import academie_canonique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_JSON = ROOT / "data" / "processed" / "simulateur_parcoursup.json"
-TPL = ROOT / "app" / "simulateur_template.html"
-OUT_PAGE = ROOT / "app" / "simulateur-parcoursup.html"
 SESSION = 2025
 
 
@@ -65,9 +63,7 @@ def main() -> None:
     df = sim.prepare(raw)
     data = export(df)
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    if TPL.exists():
-        build_page(TPL, OUT_PAGE, data)
-        print(f"-> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e6:.1f} Mo)")
+    print(f"-> {export_web('simulateur', data)}")
     print(f"{len(data['formations']):,} formations -> {OUT_JSON}")
 
 

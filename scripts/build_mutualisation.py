@@ -3,7 +3,7 @@
 Usage : python3 scripts/build_mutualisation.py
 Entrées : data/raw/specialites_triplettes_1ere.csv (rentrée la plus récente), data/raw/annuaire_lycees.csv
 Sorties : data/processed/mutualisation.json, data/processed/mutualisation_lycees.csv,
-          reports/piste_B_mutualisation.md, app/mutualisation.html (si le gabarit existe)
+          reports/piste_B_mutualisation.md, web/public/data/mutualisation.json
 
 Pour chaque spécialité et chaque lycée de 1re générale qui NE la propose PAS (effectifs explicitement à 0) :
   - « accès voisin »       : un lycée du même statut (public / privé) la propose (ou a des effectifs masqués,
@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_indice_specialites as b  # noqa: E402  (appariement des colonnes filles / garçons)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.geo import EARTH_KM, haversine_matrix  # noqa: E402,F401
-from spedago.pages import build_page  # noqa: E402
+from spedago.pages import export_web  # noqa: E402
 from spedago.libelles import SPECIALITES  # noqa: E402
 from spedago.referentiel import academie_canonique  # noqa: E402
 
@@ -38,8 +38,6 @@ RAW = ROOT / "data" / "raw"
 OUT_JSON = ROOT / "data" / "processed" / "mutualisation.json"
 OUT_CSV = ROOT / "data" / "processed" / "mutualisation_lycees.csv"
 OUT_MD = ROOT / "reports" / "piste_B_mutualisation.md"
-TPL = ROOT / "app" / "mutualisation_template.html"
-OUT_PAGE = ROOT / "app" / "mutualisation.html"
 
 R_KM = 20.0
 SEUIL = 12            # élèves : taille minimale d'un groupe de spécialité pour envisager une ouverture commune
@@ -200,9 +198,7 @@ def main() -> None:
                         st[i].tolist(), near.get(r.uai, {})] for i, r in lyc.iterrows()],
             "groupes": [[keep.index(g["specialite"]), g["membres"], round(g["demande"], 1), round(g["rayon_km"], 1)] for g in groups]}
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    if TPL.exists():
-        build_page(TPL, OUT_PAGE, data, {"__RENTREE__": str(an), "__RAYON__": f"{R_KM:.0f}", "__SEUIL__": str(SEUIL)})
-        print(f"-> {OUT_PAGE} ({OUT_PAGE.stat().st_size / 1e6:.1f} Mo)")
+    print(f"-> {export_web('mutualisation', data)}")
     print(f"{len(lyc):,} lycées, {len(pairs):,} couples absents, {len(groups)} groupes -> {OUT_MD}")
 
 

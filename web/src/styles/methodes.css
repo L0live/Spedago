@@ -1,0 +1,25 @@
+/* Méthodes : sommaire par thème, une fiche par indicateur, table des sources. */
+.wrap { max-width: 900px; margin: 0 auto }
+header { padding-block: 40px 8px }
+.lede { color: var(--muted); max-width: 68ch; margin: 0; font-size: 16px }
+.sommaire { margin-top: 24px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: 14px }
+.sommaire h2 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px }
+.sommaire ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
+.fiche { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; margin-top: 16px; box-shadow: var(--shadow-sm); scroll-margin-top: 16px }
+.fiche:target, .fiche.visee { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft) }
+.fiche h3 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 0 4px }
+.fiche .theme { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--orange-ink) }
+.fiche dl { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 8px 16px; margin: 12px 0 0; font-size: 14px }
+.fiche dt { font-weight: 600; color: var(--muted) }
+.fiche dd { margin: 0 }
+.fiche ul { margin: 0; padding-left: 18px }
+.fiche code { font-size: 13px; background: var(--track); padding: 1px 4px; border-radius: 4px }
+@media (max-width: 560px) { .fiche dl { grid-template-columns: 1fr } .fiche dd { margin-bottom: 4px } }
+.bloc-sources { margin-top: 40px; font-size: 14px }
+.bloc-sources h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 0 8px }
+.tablewrap { overflow-x: auto; position: relative }
+table { border-collapse: collapse; width: 100%; font-size: 13px; background: var(--surface) }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-weight: 600; color: var(--muted) }
+td code { font-size: 12px }
+footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }

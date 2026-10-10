@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Carte des spécialités partagées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<script type="module" src="/src/pages/mutualisation.ts"></script>
+</head>
+<body>
+<div class="wrap">
+  <!--NAV-->
+  <main id="contenu" tabindex="-1">
+  <header>
+    <span class="badge">Projet indépendant · données publiques, 1re générale <span data-meta="rentree"></span></span>
+    <h1>Carte des spécialités partagées</h1>
+    <p class="lede">Les petits lycées proposent moins de spécialités. Pour chaque spécialité, la carte montre les lycées qui ne la proposent pas et ce qui serait possible : la suivre dans un lycée voisin, l'ouvrir en commun avec d'autres lycées proches qui ne l'ont pas, ou rien de tout cela à moins de <span data-meta="rayon"></span> km.</p>
+  </header>
+
+  <form class="filters" id="filters" autocomplete="off">
+    <label for="spe">Spécialité <select id="spe"></select></label>
+    <label for="statut">Statut <select id="statut"><option value="">Tous</option><option value="Public">Public</option><option value="Privé">Privé</option></select></label>
+    <label for="acad">Académie <select id="acad"><option value="">Toutes</option></select></label>
+    <label for="cherche">Lycée <input id="cherche" list="lycees" placeholder="Nom ou commune"><datalist id="lycees"></datalist></label>
+  </form>
+
+  <div class="counts" id="counts"></div>
+
+  <div class="layout">
+    <div class="mapbox">
+      <svg id="map" viewBox="0 0 600 620" role="img" aria-label="Carte des lycées de métropole ; les mêmes informations sont données par les compteurs, la fiche du lycée (champ « Lycée ») et la liste des ouvertures communes"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="side">
+      <div class="panel fiche" id="fiche"><h2>Fiche lycée</h2><p class="empty">Cliquez un point sur la carte ou cherchez un lycée.</p></div>
+      <div class="panel"><h2 id="g-title">Ouvertures communes possibles</h2><div class="groups" id="groups"></div></div>
+    </div>
+  </div>
+
+  <section class="panel liste" aria-labelledby="h-liste">
+    <div class="toolbar"><h2 id="h-liste">Lycées de la sélection</h2>
+      <span class="liste-ctl"><label for="montrer">Afficher <select id="montrer"><option value="sans">sans la spécialité</option><option value="isole">sans solution proche</option><option value="tous">tous les lycées</option></select></label>
+      <button type="button" class="btn-ghost" id="export-lyc">Exporter (CSV)</button></span></div>
+    <p class="note" id="liste-note"></p>
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Tableau des lycées (défilant)"><table id="t-lyc"><caption class="sr-only">Lycées de la sélection et leur situation pour la spécialité</caption>
+      <thead><tr><th scope="col">Lycée</th><th scope="col">Académie</th><th scope="col">Statut</th><th scope="col" class="r">Élèves de 1re</th><th scope="col">Situation</th><th scope="col" class="r">Offre la plus proche</th></tr></thead><tbody></tbody></table></div>
+    <button type="button" class="btn-ghost" id="more-lyc" hidden>Afficher plus de lycées</button>
+  </section>
+
+  <section class="explain">
+    <div>
+      <h2>Comment c'est calculé</h2>
+      <ul>
+        <li>Un lycée « ne propose pas » une spécialité quand ses effectifs publiés sont à zéro. Quand ils sont masqués (secret statistique), le lycée est gris : on ne sait pas.</li>
+        <li>Accès voisin : un lycée du même statut la propose à moins de <span data-meta="rayon"></span> km à vol d'oiseau.</li>
+        <li>Ouverture commune : sinon, 2 à 4 lycées proches qui ne l'ont pas atteignent ensemble <span data-meta="seuil"></span> élèves estimés.</li>
+        <li>Élèves estimés = effectif de 1re × part des élèves qui suivent la spécialité dans tous les lycées (estimation basse). Avec la part observée là où elle est proposée, les ouvertures possibles seraient plus nombreuses.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Ce que la carte ne sait pas</h2>
+      <ul>
+        <li>Les temps de transport réels, les horaires, la disponibilité d'un enseignant.</li>
+        <li>Les goûts des élèves d'un lycée donné : la demande est une moyenne nationale.</li>
+        <li>Les enseignements déjà partagés par convention entre établissements, ou suivis au CNED.</li>
+        <li>Outre-mer : lycées comptés et listés, mais pas dessinés sur la carte.</li>
+      </ul>
+    </div>
+  </section>
+
+  </main>
+
+  <footer>
+    Sources : ministère de l'Éducation nationale (DEPP), effectifs par spécialité en 1re générale, et annuaire de l'éducation (Licence Ouverte 2.0) ; traitement Spédago.
+    Outil indépendant. Les catégories sont calculées par un script testé ; la page ne fait que les afficher.
+  <!--PIED--></footer>
+</div>
+</body>
+</html>

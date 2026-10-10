@@ -1,14 +1,9 @@
-"""Spédago — assemblage des pages autonomes (gabarit + données JSON intégrées)."""
+"""Spédago — liaison avec l'application web (web/) : navigation commune, export des données des pages."""
 from __future__ import annotations
 
 import json
 from html import escape
 from pathlib import Path
-
-
-def embed_json(data) -> str:
-    """JSON compact sûr dans une balise <script> (pas de « </ » littéral)."""
-    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 
 # Le site : une page d'accueil, deux portes d'entrée (élèves, décideurs). Nom de fichier, libellé, porte.
@@ -20,8 +15,11 @@ PAGES = [
     ("simulateur-parcoursup.html", "Simulateur des places", "Décideurs"),
     ("mutualisation.html", "Carte des spécialités", "Décideurs"),
     ("france-et-voisins.html", "France et voisins", "Décideurs"),
+    ("methodes.html", "Méthodes et sources", ""),  # lien en pied de page, hors barre de navigation
 ]
-COMMUN = Path(__file__).resolve().parent.parent / "app" / "_commun.html"
+ROOT = Path(__file__).resolve().parent.parent
+WEB = ROOT / "web"
+WEB_DATA = WEB / "public" / "data"
 
 
 def _profil_panel() -> str:
@@ -61,19 +59,26 @@ def nav(current: str) -> str:
             + '<span class="sep"></span>'.join(blocs) + _profil_panel() + "</nav>")
 
 
-def document(fragment: str, title_fallback: str = "Spédago") -> str:
-    """Document HTML complet autour d'un fragment de page (pour les pages annexes et l'usage local)."""
-    return ('<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n'
-            '<meta name="viewport" content="width=device-width, initial-scale=1">\n</head>\n<body>\n'
-            + fragment + "\n</body>\n</html>\n")
+def export_web(name: str, data) -> Path:
+    """Écrit les données d'une page de l'application web : web/public/data/<name>.json (compact, déterministe)."""
+    WEB_DATA.mkdir(parents=True, exist_ok=True)
+    out = WEB_DATA / f"{name}.json"
+    out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return out
 
 
-def build_page(template: Path, out: Path, data, replacements: dict[str, str] | None = None) -> Path:
-    """Remplace __DATA__, __COMMUN__ (styles et script communs), __NAV__ (barre du site) et les jetons
-    __X__ fournis dans le gabarit, écrit la page (fragment, format de publication), la renvoie."""
-    page = template.read_text(encoding="utf-8")
-    page = page.replace("__COMMUN__", COMMUN.read_text(encoding="utf-8").strip()).replace("__NAV__", nav(out.name))
-    for k, v in (replacements or {}).items():
-        page = page.replace(k, v)
-    out.write_text(page.replace("__DATA__", embed_json(data)), encoding="utf-8")
+def pied() -> str:
+    """Mentions communes du pied de page : méthodes, licences (code AGPL-3.0, données Licence Ouverte 2.0)."""
+    return ('<p class="pied-commun"><a href="methodes.html">Méthodes et sources</a> · '
+            'Code sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.html" hreflang="en">GNU AGPL-3.0</a> · '
+            'Données et textes sous <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence/">Licence Ouverte 2.0</a>, '
+            'mention « Spédago, d\'après [producteur], [date] » · Aucun compte, aucun traceur.</p>')
+
+
+def export_nav() -> Path:
+    """Barre de navigation de chaque page et pied de page commun (insérés au build par vite.config.ts)."""
+    out = WEB / "generated" / "nav.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({f: nav(f) for f, _, _ in PAGES}, ensure_ascii=False, indent=1), encoding="utf-8")
+    (out.parent / "pied.html").write_text(pied(), encoding="utf-8")
     return out

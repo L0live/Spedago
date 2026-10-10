@@ -3,7 +3,7 @@
 Usage : python3 scripts/build_mes_specialites.py
 Entrées : data/raw/parcoursup_specialites_v3.csv (2025, formations fines), parcoursup_specialites_v2.csv (2021-2024),
           data/processed/mutualisation.json (offre de spécialités par lycée, voisins)
-Sorties : data/processed/mes_specialites.json, app/mes-specialites.html, reports/mes_specialites.md
+Sorties : data/processed/mes_specialites.json, web/public/data/mes_specialites.json, reports/mes_specialites.md
 
 Pour une doublette de spécialités de terminale : quelles formations demandent les bacheliers qui l'ont suivie,
 et quelle part de ceux qui ont demandé une formation y ont reçu une proposition, comparée à l'ensemble des
@@ -20,12 +20,10 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.libelles import EDS  # noqa: E402
-from spedago.pages import build_page  # noqa: E402
-from spedago.paths import APP, PROCESSED, RAW, REPORTS  # noqa: E402
+from spedago.pages import export_web  # noqa: E402
+from spedago.paths import PROCESSED, RAW, REPORTS  # noqa: E402
 
 OUT_JSON = PROCESSED / "mes_specialites.json"
-TPL = APP / "mes_specialites_template.html"
-OUT_PAGE = APP / "mes-specialites.html"
 OUT_MD = REPORTS / "mes_specialites.md"
 NOMS_PS = {ps: i for i, (_, _, ps, _) in enumerate(EDS)}
 V2_VERS_V3 = {"Licence Sciences de l éducation": "Licence Sciences de l'éducation"}
@@ -155,8 +153,7 @@ def main() -> None:
     D = build()
     OUT_JSON.write_text(json.dumps(D, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     OUT_MD.write_text(report(D), encoding="utf-8")
-    if TPL.exists():
-        build_page(TPL, OUT_PAGE, D, {"__ANNEE__": str(D["annee"]), "__RENTREE__": str(D["rentree_carte"])})
+    export_web("mes_specialites", D)
     print(f"{len(D['doublettes'])} doublettes, {len(D['groupes'])} regroupements -> {OUT_JSON} ({OUT_JSON.stat().st_size / 1e6:.2f} Mo)")
 
 

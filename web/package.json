@@ -1,0 +1,21 @@
+{
+  "name": "spedago",
+  "private": true,
+  "version": "0.4.0",
+  "description": "Spédago — observatoire ouvert et vérifiable de l'orientation (lycée, supérieur, emploi)",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test:calc": "node tests/build_calc.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3",
+    "vite": "8.3.0"
+  }
+}

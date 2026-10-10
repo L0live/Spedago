@@ -34,9 +34,8 @@ def test_csv_gz_deterministe(tmp_path):
     assert pd.read_csv(tmp_path / "1.csv.gz").equals(df)
 
 
-def test_page_sans_fermeture_de_script_dans_les_donnees(tmp_path):
-    tpl = tmp_path / "t.html"
-    tpl.write_text('<p>__X__</p><script type="application/json" id="data">__DATA__</script>', encoding="utf-8")
-    out = pages.build_page(tpl, tmp_path / "o.html", {"txt": "</script><b>"}, {"__X__": "ok"})
-    html = out.read_text(encoding="utf-8")
-    assert html.count("</script>") == 1 and "<p>ok</p>" in html and "<\\/script>" in html
+def test_export_web_deterministe(tmp_path, monkeypatch):
+    monkeypatch.setattr(pages, "WEB_DATA", tmp_path)
+    a = pages.export_web("t", {"txt": "</script><b>", "x": [1, 2.5, None]}).read_bytes()
+    b = pages.export_web("t", {"txt": "</script><b>", "x": [1, 2.5, None]}).read_bytes()
+    assert a == b and a == '{"txt":"</script><b>","x":[1,2.5,null]}'.encode()

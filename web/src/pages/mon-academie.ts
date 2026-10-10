@@ -1,176 +1,14 @@
-<title>Mon académie</title>
-__COMMUN__
-<style>
-/* Mise en page : une colonne de lecture ; sélecteur d'académie, quatre chiffres clés, puis trois sections (Parcoursup, spécialités, masters) */
-.wrap { max-width: 1000px; margin: 0 auto }
-header { padding-block: 40px 8px }
-.lede { color: var(--muted); max-width: 70ch; margin: 0 }
-h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0 0 12px }
-.pick { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: end; margin-block: 24px 8px }
-.pick label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
-.pick select { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 260px; box-shadow: var(--shadow-sm) }
-.pick select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.pick .zone { color: var(--muted); font-size: 14px; padding-bottom: 9px }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-block: 16px 8px }
-@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0 }
-.simbox { margin-top: 16px; padding: 16px; border-radius: var(--radius-sm); background: var(--orange-soft); border: 1px solid var(--orange-line); font-size: 14px; color: var(--ink) }
-.simbox .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--orange-ink); border: 1px solid var(--orange-line); background: #fff; border-radius: 999px; padding: 1px 8px; margin-right: 6px }
-.simbox .more { display: flex; width: fit-content; max-width: 100%; margin-top: 10px; background: #fff }
-.stat b { display: block; font-family: var(--display); font-size: 32px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.1; margin-bottom: 4px }
-.stat span { font-size: 13px; color: var(--muted) }
-section.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-top: 24px }
-@media (max-width: 640px) { section.bloc { padding: 16px } }
-section.bloc > p { margin: 0 0 12px; max-width: 75ch }
-.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--orange-ink); margin-bottom: 4px }
-.tablewrap { overflow-x: auto; margin-block: 8px }
-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 560px }
-th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: bottom }
-td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
-tbody tr { transition: background-color .15s ease-out }
-tbody tr:hover { background: var(--bg) }
-tbody tr:last-child td { border-bottom: 0 }
-td.r, th.r { text-align: right }
-td small { display: block; color: var(--muted); font-size: 12px }
-.more { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 600; font-size: 14px; color: var(--accent); text-decoration: none;
-        border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; transition: background-color .15s ease-out, border-color .15s ease-out }
-.more:hover { background: var(--accent-soft); border-color: #bfdbfe }
-.note { font-size: 13px; color: var(--muted) }
-td.mention { font-size: 13px; letter-spacing: .01em }
-.hot { color: var(--orange-ink); font-weight: 600 }
-.hot small { font-weight: 400 }
-/* Jauge : part de l'académie (barre) et repère France (trait) ; orange si nettement au-dessus de la France */
-.meter { position: relative; height: 6px; background: var(--track); border-radius: 999px; margin: 6px 0 3px auto; width: 100%; max-width: 140px }
-.meter span { position: absolute; inset: 0 auto 0 0; background: var(--accent-mark); border-radius: 999px }
-.meter.hot span { background: var(--orange) }
-.meter i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); border-radius: 1px }
-.empty { color: var(--muted); font-style: italic }
-section.explain { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
-@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } }
-section.explain h2 { font-size: 19px }
-section.explain ul { padding-left: 18px; margin: 0 }
-/* Mobile : chaque ligne de tableau devient une fiche (libellé au-dessus de chaque valeur) */
-@media (max-width: 640px) {
-  .tablewrap { overflow: visible }
-  table { min-width: 0 }
-  thead { display: none }
-  table, tbody, td { display: block }
-  tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; padding-block: 12px; border-bottom: 1px solid var(--line) }
-  td { border: 0; padding: 0; text-align: left !important }
-  td:first-child { grid-column: 1 / -1; font-weight: 600 }
-  td:first-child small { font-weight: 400 }
-  td[data-l]::before { content: attr(data-l); display: block; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px }
-  .meter { margin-left: 0 }
-}
-footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
-</style>
+// @ts-nocheck — portage de l'interface ; types à resserrer progressivement
+import '../styles/commun.css';
+import '../styles/mon-academie.css';
+import { Spedago } from '../lib/commun';
+import { loadData, fillMeta } from '../lib/data';
+import { AcadCalc } from '../calc/mon-academie';
 
-<div class="wrap">
-  __NAV__
-  <main id="contenu" tabindex="-1">
-  <header>
-    <span class="badge">Projet indépendant · données publiques 2025</span>
-    <h1>Mon académie</h1>
-    <p class="lede">Les trois outils Spédago vus depuis une académie : la tension à l'entrée du supérieur, l'accès aux spécialités au lycée, l'admission en master. Chaque bloc renvoie à l'outil détaillé, où l'académie est déjà choisie.</p>
-  </header>
+async function main(D0: any) {
+  fillMeta({ rentree_po: D0.rentree_poursuite });
 
-  <form class="pick" id="pick" autocomplete="off">
-    <label for="acad">Académie <select id="acad"></select></label>
-    <label for="cmp">Comparer avec <select id="cmp"><option value="fr">France entière</option></select></label>
-    <span class="zone" id="zone"></span>
-  </form>
-
-  <div class="stats" id="stats"></div>
-
-  <section class="bloc" id="b-ps" aria-labelledby="h-ps">
-    <div class="kicker">Entrée dans le supérieur · Parcoursup 2025</div>
-    <h2 id="h-ps">Où la demande dépasse l'offre</h2>
-    <div id="ps"></div>
-  </section>
-
-  <section class="bloc" id="b-po" aria-labelledby="h-po">
-    <div class="kicker">Après le bac · rentrée __RENTREE_PO__</div>
-    <h2 id="h-po">Où poursuivent les bacheliers de l'académie</h2>
-    <div id="po"></div>
-  </section>
-
-  <section class="bloc" id="b-spe" aria-labelledby="h-spe">
-    <div class="kicker">Lycée · spécialités de 1re générale</div>
-    <h2 id="h-spe">Qui n'a pas accès à quelle spécialité</h2>
-    <div id="spe"></div>
-  </section>
-
-  <section class="bloc" id="b-mm" aria-labelledby="h-mm">
-    <div class="kicker">Après la licence · Mon Master 2025</div>
-    <h2 id="h-mm">Les chances d'admission en master</h2>
-    <div id="mm"></div>
-  </section>
-
-  <section class="explain">
-    <div>
-      <h2>Lire ces chiffres</h2>
-      <ul>
-        <li>Les vœux et les candidatures ne sont pas des personnes : un candidat compte dans chaque formation demandée.</li>
-        <li>Comparer la pression d'une filière à celle d'une autre n'a pas de sens (IFSI et PASS fonctionnent en listes communes) ; la colonne « France » sert de repère pour la même filière.</li>
-        <li>L'académie est celle du lieu de la formation ou du lycée, pas celle du domicile des candidats.</li>
-        <li>« Sans solution proche » : aucun lycée qui propose la spécialité à moins de 20 km, et trop peu d'élèves pour une ouverture commune (seuil 12, estimation basse).</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Ce que la page ne dit pas</h2>
-      <ul>
-        <li>Combien de candidats seraient admis en plus : il faudrait les vœux individuels, réservés aux chercheurs.</li>
-        <li>Le coût des places ou des ouvertures (enseignants, locaux, transports).</li>
-        <li>Les emplois du temps : deux lycées voisins ne peuvent partager un cours que si leurs horaires s'accordent.</li>
-        <li>Apprentissage et CNED exclus de Parcoursup ; masters hors plateforme nationale absents.</li>
-      </ul>
-    </div>
-  </section>
-
-  </main>
-
-  <footer>
-    Sources : ministère de l'Enseignement supérieur (Parcoursup 2025, Mon Master 2025) et ministère de l'Éducation nationale (DEPP, spécialités en 1re générale ; annuaire de l'éducation), Licence Ouverte 2.0 ; traitement Spédago.
-    Outil indépendant. Mêmes règles et mêmes nombres que les autres pages du site, vérifiés par des tests automatiques.
-  </footer>
-</div>
-
-<script type="application/json" id="data">__DATA__</script>
-<script id="calc">
-// Fonctions de calcul pures (aucun accès au DOM) : exécutées par la page ET par les tests (Node.js).
-const AcadCalc = (() => {
-  const Z = 1.96;
-  // Intervalle de Wilson à 95 % (identique à spedago.stats.wilson).
-  function wilson(k, n) {
-    if (!n) return [NaN, NaN];
-    const p = k / n, d = 1 + Z * Z / n, c = (p + Z * Z / (2 * n)) / d, h = (Z * Math.sqrt(p * (1 - p) / n + Z * Z / (4 * n * n))) / d;
-    return [c - h, c + h];
-  }
-  const ratio = (a, b) => (b ? a / b : NaN);
-  // [formations, places, admis, vœux, places des formations pleines, vacantes] -> indicateurs
-  function ps(t) {
-    const [formations, places, admis, voeux, sat, vac] = t;
-    return { formations, places, admis, voeux, sat, vac, vpp: ratio(voeux, places), remp: ratio(admis, places), partSat: ratio(sat, places) };
-  }
-  // Spécialités : une ligne par spécialité, les plus difficiles d'accès d'abord.
-  function speRows(spe) {
-    return spe.map((r, sp) => ({ sp, propose: r[0], incertain: r[1], voisin: r[2], commune: r[3], isole: r[4],
-                                 eVoisin: r[5], eCommune: r[6], eIsole: r[7], groupes: r[8] }))
-      .sort((a, b) => b.isole - a.isole || b.eIsole - a.eIsole || a.sp - b.sp);
-  }
-  // [formations, places, candidatures, propositions, candidatures L3 générale, propositions L3 générale]
-  function mm(t) {
-    const [formations, places, cand, prop, candL3, propL3] = t;
-    return { formations, places, cand, prop, candL3, propL3, taux: ratio(prop, cand), tauxL3: ratio(propL3, candL3) };
-  }
-  const indexOf = (D, slug) => D.academies.findIndex((a) => a.slug === slug);
-  return { wilson, ps, speRows, mm, indexOf };
-})();
-if (typeof module !== "undefined") module.exports = AcadCalc;
-</script>
-<script>
-(() => {
-  const C = AcadCalc, D = JSON.parse(document.getElementById("data").textContent);
+  const C = AcadCalc, D = D0;
   const $ = (id) => document.getElementById(id);
   const fmtInt = (x) => Math.round(x).toLocaleString("fr-FR");
   const fmtPct = (x, d = 0) => (isFinite(x) ? (x * 100).toFixed(d).replace(".", ",") + " %" : "–");
@@ -315,5 +153,6 @@ if (typeof module !== "undefined") module.exports = AcadCalc;
   window.addEventListener("hashchange", () => { if (Spedago.pick($("acad"))) render(); });
   document.addEventListener("spedago:profil", () => { if (!Spedago.hashSlug() && Spedago.pick($("acad"))) render(); });
   render();
-})();
-</script>
+}
+
+loadData('mon_academie').then(main);
