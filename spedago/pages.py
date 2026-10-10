@@ -70,7 +70,7 @@ def export_web(name: str, data) -> Path:
 def pied() -> str:
     """Mentions communes du pied de page : méthodes, licences (code AGPL-3.0, données Licence Ouverte 2.0)."""
     return ('<p class="pied-commun"><a href="methodes.html">Méthodes et sources</a> · '
-            'Code sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.html" hreflang="en">GNU AGPL-3.0</a> · '
+            '<a href="https://github.com/L0live/Spedago">Code source</a> sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.html" hreflang="en">GNU AGPL-3.0</a> · '
             'Données et textes sous <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence/">Licence Ouverte 2.0</a>, '
             'mention « Spédago, d\'après [producteur], [date] » · Aucun compte, aucun traceur.</p>')
 

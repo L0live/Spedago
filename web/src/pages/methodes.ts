@@ -5,6 +5,7 @@ import '../lib/commun';  // barre de navigation et panneau « Mon profil »
 import { loadData, fillMeta } from '../lib/data';
 import type { DonneesMethodes, Indicateur } from '../types/donnees';
 
+const DEPOT = 'https://github.com/L0live/Spedago';
 const esc = (s: string): string => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
 const pct = (v: number | string): string => (typeof v === 'number' && v > 0 && v < 1 ? `${Math.round(v * 100)} %` : String(v).replace('.', ','));
 
@@ -26,7 +27,7 @@ function fiche(i: Indicateur, D: DonneesMethodes): string {
       <dt>Limites</dt><dd><ul>${i.limites.map((l) => `<li>${esc(l)}</li>`).join('')}</ul></dd>
       <dt>Sources</dt><dd><ul>${sources}</ul></dd>
       <dt>Pages</dt><dd>${pages}</dd>
-      ${i.rapport ? `<dt>Rapport</dt><dd><code>reports/${esc(i.rapport)}</code></dd>` : ''}
+      ${i.rapport ? `<dt>Rapport</dt><dd><a href="${DEPOT}/blob/main/reports/${esc(i.rapport)}"><code>reports/${esc(i.rapport)}</code></a></dd>` : ''}
     </dl></article>`;
 }
 
