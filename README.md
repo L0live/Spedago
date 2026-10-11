@@ -11,7 +11,8 @@ Tout est calculé à partir de données publiques (data.gouv.fr, data.enseigneme
 | `scripts/` | téléchargement, profilage, analyses, export des données du site |
 | `spedago/` | bibliothèque Python commune (lecture, libellés, JSON-stat, export web) |
 | `reports/` | rapports méthodologiques (`.md`) et journal des corrections |
-| `web/` | application Vite + TypeScript (7 pages) |
+| `web/` | application Vite + TypeScript (8 pages) |
+| `design.md` | système visuel : jetons, composants, familles de pages |
 | `web/src/calc/` | calculs côté navigateur, typés et testés à l'identique de Python |
 | `web/public/data/` | JSON produits par le pipeline (non versionnés) |
 | `tests/` | pytest : données, parité Python ↔ TypeScript, accessibilité statique |
