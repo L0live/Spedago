@@ -136,7 +136,6 @@ Un **document**.
 
 Les pages déjà conformes aux règles communes (couleur, typographie, espace, composants) ne le sont pas encore toutes à
 leur famille. Écarts connus au moment de l'écriture, résorbés par la refonte page par page :
-- Accueil : portes en cartes à bande colorée ; nom de chaque public en capitales.
 - Carte des spécialités : compteurs séparés de la légende.
 - Mon académie, France et voisins : chiffres en cartes, sections en pile de cartes.
 - Simulateur, Boussole, Mes spécialités : chapeaux longs ; filtres de Mes spécialités en carte.

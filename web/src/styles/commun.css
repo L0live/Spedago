@@ -74,7 +74,7 @@ small { font-size: var(--text-xs) }
 }
 
 /* Surfaces : une seule élévation pour toutes les cartes de premier niveau */
-.stat, .panel, .row, .mapbox, .count, .controls, section.bloc, .door-card, .bloc { box-shadow: var(--shadow-sm) }
+.stat, .panel, .row, .mapbox, .count, .controls, section.bloc, .bloc { box-shadow: var(--shadow-sm) }
 section.bloc, .bloc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-lg); margin-top: var(--space-xl) }
 @media (max-width: 640px) { section.bloc, .bloc { padding: var(--space-md) } }
 /* Chiffres clés */
