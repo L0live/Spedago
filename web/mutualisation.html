@@ -26,10 +26,10 @@
     <label for="cherche">Lycée <input id="cherche" list="lycees" placeholder="Nom ou commune"><datalist id="lycees"></datalist></label>
   </form>
 
-  <div class="counts" id="counts"></div>
-
   <div class="layout">
     <div class="mapbox">
+      <h2 class="sr-only">Carte et comptes de la sélection</h2>
+      <div class="counts" id="counts"></div>
       <svg id="map" viewBox="0 0 600 620" role="img" aria-label="Carte des lycées de métropole ; les mêmes informations sont données par les compteurs, la fiche du lycée (champ « Lycée ») et la liste des ouvertures communes"></svg>
       <div class="legend" id="legend"></div>
     </div>

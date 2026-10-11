@@ -38,7 +38,8 @@ function main(D: DonneesCarte): void {
   const datalist = el('lycees');
   L.forEach((l) => { const o = document.createElement('option'); o.value = `${l[I.nom]} — ${l[I.com]}`; datalist.appendChild(o); });
   const byLabel = new Map(L.map((l, i) => [`${l[I.nom]} — ${l[I.com]}`, i]));
-  el('legend').innerHTML = ([0, 3, 4, 5, 2] as const).map((c) => `<span><i style="--c:var(${CAT[c][1]})${c === 2 ? ';background:none;border:1.5px solid var(--incertain)' : ''}"></i>${CAT[c][0]}</span>`).join('');
+  // Les quatre catégories comptées ont leur entrée de légende dans les comptes (au-dessus de la carte) ; reste « incertain », non compté.
+  el('legend').innerHTML = `<span><i class="anneau"></i>${CAT[2][0]} : case masquée (secret statistique), ni comptée présente ni comptée absente</span>`;
 
   // ---- carte
   const svg = E.map, gLines = document.createElementNS(NS, 'g'), gDots = document.createElementNS(NS, 'g');
