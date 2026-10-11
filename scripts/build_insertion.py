@@ -52,15 +52,15 @@ def build() -> dict:
     i = charge()
     f = par_formation(i)
     m = pd.read_csv(PROCESSED / "monmaster_formations.csv", sep=";", low_memory=False)
-    m = m[m.profil == "lg3"].sort_values("session").drop_duplicates("ifc", keep="last")[["ifc", "eta_uai", "mention"]]
+    m = m[m.profil == "lg3"].sort_values(["session", "ifc"], kind="mergesort").drop_duplicates("ifc", keep="last")[["ifc", "eta_uai", "mention"]]
     j = m.merge(f, left_on=["eta_uai", "mention"], right_on=["uai", "libelle_diplome"], how="left")
     # repère national par mention : diplômés en emploi / diplômés sortants, sur les lignes retenues (une par établissement)
     f["emploi"] = f.tx * f.n
     nat = f.drop_duplicates(["etablissement", "libelle_diplome"]).groupby("libelle_diplome")[["emploi", "n"]].sum()
     nat = (nat.emploi / nat.n).round(4)
     form = {str(r.ifc): [round(float(r.tx), 4), int(r.n), str(r.promo).replace(",", "-"), None if pd.isna(r.sal) else int(r.sal)]
-            for r in j[j.tx.notna()].itertuples()}
-    return {"mois": MOIS, "formations": form, "mentions": {k: float(v) for k, v in nat.items()},
+            for r in j[j.tx.notna()].sort_values("ifc", kind="mergesort").itertuples()}  # ordre fixe : fichier identique d'une construction à l'autre
+    return {"mois": MOIS, "formations": form, "mentions": {k: float(v) for k, v in sorted(nat.items())},
             "couverture": [int(j.tx.notna().sum()), int(len(j))]}
 
 

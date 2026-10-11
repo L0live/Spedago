@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedag
 from spedago.geo import EARTH_KM, haversine_matrix  # noqa: E402,F401
 from spedago.pages import export_web  # noqa: E402
 from spedago.libelles import SPECIALITES  # noqa: E402
-from spedago.referentiel import academie_canonique  # noqa: E402
+from spedago.referentiel import academie_canonique, annuaire_unique  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -123,7 +123,7 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, list[str], int]:
     an = int(t.rentree_scolaire.max())
     t = t[(t.rentree_scolaire == an) & t.effectif_total.notna()].reset_index(drop=True)
     a = pd.read_csv(RAW / "annuaire_lycees.csv", sep=";", dtype=str)
-    a = a.rename(columns={"identifiant_de_l_etablissement": "uai"}).drop_duplicates("uai")
+    a = annuaire_unique(a.rename(columns={"identifiant_de_l_etablissement": "uai"}))
     t = t.merge(a[["uai", "nom_etablissement", "nom_commune", "statut_public_prive", "libelle_academie",
                    "code_bassin_formation", "libelle_bassin_formation", "latitude", "longitude"]],
                 left_on="numero_etablissement", right_on="uai", how="inner")

@@ -47,3 +47,19 @@ def academie_canonique(nom) -> str:
 def slug(nom: str) -> str:
     """Identifiant d'ancre d'URL (#…) : lettres minuscules et tirets."""
     return cle(nom).lower().replace(" ", "-")
+
+
+# Mots qui signalent une ligne secondaire de l'annuaire (site annexe, pôle d'enseignement supérieur) plutôt que le lycée.
+_SECONDAIRE = re.compile(r"annexe|\bsite\b|campus|p[ôo]le|enseignement sup|\(sup|pr[ée]pas|esupec|[ée]cole", re.IGNORECASE)
+
+
+def annuaire_unique(a: "pd.DataFrame") -> "pd.DataFrame":
+    """Une ligne par UAI. L'annuaire a plusieurs lignes pour 33 établissements (sites, annexes, pôle supérieur), aux
+    mêmes coordonnées, et leur ordre change d'une extraction à l'autre. On garde, dans l'ordre : la ligne de la voie
+    générale, puis celle dont le nom ne désigne pas un site secondaire, puis le nom le plus court, puis l'ordre
+    alphabétique. Le résultat ne dépend donc pas de l'ordre du fichier (testé)."""
+    nom = a.nom_etablissement.fillna("")
+    a = a.assign(_vg=(a.voie_generale.astype(str) != "1").astype(int), _sec=nom.str.contains(_SECONDAIRE).astype(int),
+                 _len=nom.str.len())
+    cles = ["uai", "_vg", "_sec", "_len", "nom_etablissement", "nom_commune"]
+    return a.sort_values(cles, kind="mergesort").drop_duplicates("uai").drop(columns=["_vg", "_sec", "_len"])

@@ -18,7 +18,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
 from spedago.paths import PROCESSED, RAW, REPORTS  # noqa: E402
-from spedago.referentiel import academie_canonique  # noqa: E402
+from spedago.referentiel import academie_canonique, annuaire_unique  # noqa: E402
 
 SESSION = 2025
 OUT_ACAD = PROCESSED / "academies.csv"
@@ -47,7 +47,7 @@ def academies(src: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 
 def referentiel(src: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    a = src["annuaire"].rename(columns={"identifiant_de_l_etablissement": "uai"}).drop_duplicates("uai")
+    a = annuaire_unique(src["annuaire"].rename(columns={"identifiant_de_l_etablissement": "uai"}))
     base = pd.DataFrame({"uai": a.uai, "nom": a.nom_etablissement, "commune": a.nom_commune,
                          "statut": a.statut_public_prive, "academie": a.libelle_academie.map(academie_canonique),
                          "bassin": a.libelle_bassin_formation, "lat": pd.to_numeric(a.latitude),
