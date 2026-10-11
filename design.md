@@ -137,7 +137,7 @@ Un **document**.
 Les pages déjà conformes aux règles communes (couleur, typographie, espace, composants) ne le sont pas encore toutes à
 leur famille. Écarts connus au moment de l'écriture, résorbés par la refonte page par page :
 - Mon académie, France et voisins : chiffres en cartes, sections en pile de cartes.
-- Simulateur, Boussole, Mes spécialités : chapeaux longs ; filtres de Mes spécialités en carte.
+- Simulateur, Mes spécialités : chapeaux de trois phrases conservés en attendant une réécriture validée par l’auteur.
 
 ## Ce qu'une refonte ne touche pas
 

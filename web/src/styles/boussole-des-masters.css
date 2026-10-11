@@ -1,6 +1,7 @@
 /* Mise en page : barre de filtres puis résultats en liste ; chaque formation = une ligne de relevé.
    Niveaux d'estimation : --good (haut), --warn (moyen), --bad (bas), déclarés dans commun.css. */
-header { padding-block: var(--space-xl) var(--space-xs) }
+/* Famille « Réglage d'abord » (design.md) : en-tête compact, barre de réglages collante, résultats en liste */
+header { padding-block: var(--space-lg) var(--space-xs) }
 .filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: var(--z-sticky); background: var(--bg); padding-block: 14px; border-bottom: 1px solid var(--line); display: grid; gap: 10px;
            grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.4fr) minmax(0, 1fr) }
 .filters label { display: grid; gap: var(--space-2xs); font-size: var(--text-xs); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
@@ -53,7 +54,7 @@ table.rank tbody tr { cursor: pointer } table.rank tbody tr:hover { background: 
 table.rank .mention { font-weight: 600 }
 .star { font: inherit; font-size: var(--text-sm); font-weight: 600; color: var(--orange-ink); background: var(--surface); border: 1px solid var(--orange-line); border-radius: 999px; padding: 3px 10px; margin-top: 6px; cursor: pointer; min-height: 28px; white-space: nowrap }
 .star[aria-pressed="true"] { background: var(--orange-soft); border-color: var(--orange) }
-.mysel { margin-top: var(--space-xl); background: var(--surface); border: 1px solid var(--orange-line); border-top: 4px solid var(--orange); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm) }
+.mysel { margin-top: var(--space-xl); background: var(--surface); border: 1px solid var(--orange-line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm) }
 .mysel h2 { margin: 0 }
 table.rank#t-sel tbody tr { cursor: default }
 table.rank small { color: var(--muted); display: block }

@@ -1,5 +1,6 @@
 /* Mise en page : réglages à gauche (colonne étroite, collante), résultats à droite ; une colonne sur mobile */
-header { padding-block: var(--space-xl) var(--space-md) }
+/* Famille « Réglage d'abord » (design.md) : en-tête compact, colonne de réglages collante, résultats à côté */
+header { padding-block: var(--space-lg) var(--space-md) }
 h2 { font-size: var(--text-xl) }
 .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: var(--space-lg); align-items: start }
 @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr) } }

@@ -1,7 +1,9 @@
 /* Porte lycéens : deux spécialités en entrée, puis les formations demandées par les élèves qui ont les mêmes, avec leurs chances.
    Filtres en tête ; tableau triable ; détail d'un regroupement sous le tableau. */
-.filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-sm); margin-block: var(--space-lg) var(--space-xs); background: var(--surface); border: 1px solid var(--line);
-           border-radius: var(--radius); padding: var(--space-md); box-shadow: var(--shadow-sm) }
+/* Famille « Réglage d'abord » (design.md) : en-tête compact, puis la barre de réglages (filets, pas de carte) */
+header { padding-block: var(--space-lg) var(--space-xs) }
+.filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-sm); margin-block: var(--space-md) var(--space-xs);
+           padding-block: 14px; border-block: 1px solid var(--line) }
 .filters .wide { grid-column: span 2 }
 @media (max-width: 860px) { .filters { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 @media (max-width: 520px) { .filters { grid-template-columns: minmax(0, 1fr) } .filters .wide { grid-column: auto } }
@@ -10,7 +12,7 @@
            border-radius: var(--radius-sm); padding: var(--space-xs) 10px; width: 100%; min-width: 0 }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-sm); margin-block: var(--space-md) var(--space-xs) }
 @media (max-width: 760px) { .stats { grid-template-columns: minmax(0, 1fr) } }
-.lycee { border-top: 4px solid var(--orange) }
+section.bloc.lycee { border-color: var(--orange-line) }
 .lycee ul { list-style: none; padding: 0; margin: var(--space-xs) 0 0; display: grid; gap: var(--space-xs) }
 .lycee li { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
 .ok { color: var(--good); font-weight: 700 } .ko { color: var(--orange-ink); font-weight: 700 } .unk { color: var(--muted); font-weight: 700 }
