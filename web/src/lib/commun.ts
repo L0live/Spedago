@@ -172,10 +172,22 @@ export const Spedago = (() => {
     f.querySelector('[data-reset]')?.addEventListener('click', () => { saveProfil(null); fill({}); label(); announce('Profil effacé'); });
     const cp = document.getElementById('copy-link'); if (cp) cp.addEventListener('click', () => copyLink(cp));
   }
+  // ---- menu replié sur téléphone (même seuil que commun.css) ; sans JavaScript, le menu reste ouvert
+  function initMenu(): void {
+    const btn = document.querySelector<HTMLButtonElement>('.nav-toggle'), menu = document.getElementById('nav-menu'); if (!btn || !menu) return;
+    const mq = window.matchMedia('(max-width: 640px)');
+    const set = (open: boolean): void => { menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); };
+    const apply = (): void => { btn.hidden = !mq.matches; set(!mq.matches); };
+    btn.addEventListener('click', () => set(menu.hidden !== false));
+    menu.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mq.matches && !(e.target as HTMLElement).closest('#profil-panel')) { set(false); btn.focus(); } });
+    mq.addEventListener('change', apply);
+    apply();
+  }
+  function init(): void { syncNav(); initMenu(); initProfil(); }
   if (HAS_DOM) {
     // les modules sont différés : le DOM est déjà analysé quand ce code s'exécute
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { syncNav(); initProfil(); });
-    else { syncNav(); initProfil(); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
     window.addEventListener('hashchange', syncNav);
   }
   return { slug, parseHash, buildHash, hashSlug, param, setParams, setHash, syncNav, pick, bind, profil, saveProfil,

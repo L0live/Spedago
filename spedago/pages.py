@@ -45,7 +45,8 @@ def _profil_panel() -> str:
 
 
 def nav(current: str) -> str:
-    """Barre de navigation commune ; la page courante porte aria-current. Les liens gardent le #académie (JS)."""
+    """Barre de navigation commune ; la page courante porte aria-current. Les liens gardent le #académie (JS).
+    Sur téléphone, les portes et les outils se replient derrière le bouton « Menu » (commun.ts) ; sans JavaScript, tout reste visible."""
     portes: dict[str, list[str]] = {}
     for f, lib, porte in PAGES:
         if porte:
@@ -56,7 +57,8 @@ def nav(current: str) -> str:
     return ('<a class="skip" href="#contenu">Aller au contenu</a>'
             '<div class="sr-only" role="status" aria-live="polite" id="sr-status"></div>'
             f'<nav class="site-nav" aria-label="Spédago"><a class="brand" href="index.html" data-page="index.html"{cur}>Spédago</a>'
-            + '<span class="sep"></span>'.join(blocs) + _profil_panel() + "</nav>")
+            '<button type="button" class="nav-toggle" aria-expanded="true" aria-controls="nav-menu" hidden>Menu</button>'
+            '<div class="nav-menu" id="nav-menu">' + '<span class="sep"></span>'.join(blocs) + _profil_panel() + "</div></nav>")
 
 
 def export_web(name: str, data) -> Path:

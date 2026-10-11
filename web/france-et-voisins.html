@@ -14,16 +14,16 @@
   <!--NAV-->
   <main id="contenu" tabindex="-1">
   <header>
-    <span class="badge">Données Eurostat · <span data-meta="an0"></span>-<span data-meta="an1"></span></span>
     <h1>France et voisins</h1>
     <p class="lede">Combien de jeunes Français partent faire tout un cursus dans un pays voisin, et combien viennent en sens inverse ; puis, académie par académie, où en sont les régions de part et d'autre de la frontière sur les diplômes, le décrochage et l'insertion des jeunes.</p>
+    <p class="source">Données Eurostat · <span data-meta="an0"></span>-<span data-meta="an1"></span></p>
   </header>
 
   <section class="bloc" aria-labelledby="h-mob">
-    <div class="kicker">Mobilité diplômante · supérieur (licence à doctorat)</div>
     <h2 id="h-mob">Partir étudier à l'étranger</h2>
+    <p class="source">Mobilité diplômante · supérieur (licence à doctorat)</p>
     <div class="stats" id="mob-stats"></div>
-    <div class="legend" aria-hidden="true"><span><i style="background:#2563eb"></i>Français inscrits dans ce pays</span><span><i style="background:#ea580c"></i>Étudiants de ce pays inscrits en France</span><span><i class="ring"></i>Année signalée par Eurostat (voir le tableau)</span></div>
+    <div class="legend" aria-hidden="true"><span><i class="c-out"></i>Français inscrits dans ce pays</span><span><i class="c-in"></i>Étudiants de ce pays inscrits en France</span><span><i class="ring"></i>Année signalée par Eurostat (voir le tableau)</span></div>
     <p class="note">Chaque vignette a sa propre échelle (les effectifs vont de quelques centaines à près de 20 000). Survolez une vignette pour lire les valeurs.</p>
     <div class="multiples" id="multiples"></div>
     <details><summary>Tableau des valeurs et des signalements</summary><div class="tablewrap" tabindex="0" role="region" aria-label="Tableau de la mobilité (défilant)"><table id="t-mob"></table></div></details>
@@ -31,10 +31,10 @@
   </section>
 
   <section class="bloc" aria-labelledby="h-reg">
-    <div class="kicker">Régions frontalières · enquête Forces de travail</div>
     <h2 id="h-reg">De part et d'autre de la frontière</h2>
+    <p class="source">Régions frontalières · enquête Forces de travail</p>
     <form class="pick" id="pick" autocomplete="off"><label for="acad">Académie <select id="acad"></select></label><span class="note" id="reg-note"></span></form>
-    <div class="legend" aria-hidden="true"><span><i class="dot" style="background:#ea580c"></i>Région de l'académie</span><span><i class="dot" style="background:#2563eb"></i>Régions voisines</span><span><i class="ring"></i>Moyennes nationales et UE</span></div>
+    <div class="legend" aria-hidden="true"><span><i class="dot c-in"></i>Région de l'académie</span><span><i class="dot c-out"></i>Régions voisines</span><span><i class="ring"></i>Moyennes nationales et UE</span></div>
     <div class="dots" id="dots"></div>
     <details><summary>Tableau des valeurs</summary><div class="tablewrap" tabindex="0" role="region" aria-label="Tableau des régions (défilant)"><table id="t-reg"></table></div></details>
     <div class="toolbar"><span class="note">Moyenne des trois dernières années disponibles ; « peu fiable » : petit échantillon signalé par Eurostat.</span><button type="button" class="btn-ghost" id="export">Exporter (CSV)</button></div>

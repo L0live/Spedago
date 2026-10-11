@@ -63,7 +63,7 @@ function main(D: DonneesCarte): void {
       // Hiérarchie : « sans solution » et « ouverture commune » ressortent ; « incertain » = anneau vide (forme, pas seulement couleur)
       d.setAttribute('r', (R[c] * zf).toFixed(2));
       d.style.fill = c === 2 ? 'none' : `var(${CAT[c][1]})`;
-      d.style.stroke = c === 2 ? 'var(--incertain)' : c >= 4 ? '#fff' : 'none';
+      d.style.stroke = c === 2 ? 'var(--incertain)' : c >= 4 ? 'var(--surface)' : 'none';
       d.style.strokeWidth = String(c === 2 ? 1 : c >= 4 ? 0.8 : 0);
       d.style.opacity = String(OPA[c]);
       if (d.firstChild) d.firstChild.textContent = `${l[I.nom]} (${l[I.com]}) — ${CAT[c][0]}`;

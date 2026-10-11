@@ -1,58 +1,57 @@
-/* Mise en page : carte (points des lycées, projection simple) à gauche, fiche et groupes à droite ; empilé sur mobile */
+/* Mise en page : carte (points des lycées, projection simple) à gauche, fiche et groupes à droite ; empilé sur mobile.
+   Catégories de la carte : noms locaux (utilisés par mutualisation.ts) qui pointent vers les jetons communs. */
 :root {
-  --offre: #2f7d4f; --voisin: #b45309; --commun: #2c64c6; --isole: #c0413c; --incertain: #64748b; --land: #e9edf1;
+  --offre: var(--good); --voisin: var(--amber); --commun: var(--accent-mark); --isole: var(--bad); --incertain: var(--muted);
 }
-.wrap { max-width: 1180px; margin: 0 auto }
-header { padding-block: 32px 12px }
-h2 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0 0 8px }
-.lede { color: var(--muted); max-width: 72ch; margin: 0 }
-.filters { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 10px; margin-block: 14px }
-@media (max-width: 760px) { .filters { grid-template-columns: 1fr 1fr } }
-.filters label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
-.filters select, .filters input { font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0 }
-select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+header { padding-block: var(--space-xl) var(--space-sm) }
+h2 { font-size: var(--text-xl) }
+.filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); gap: 10px; margin-block: 14px }
+@media (max-width: 760px) { .filters { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.filters label { display: grid; gap: var(--space-2xs); font-size: var(--text-xs); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); min-width: 0 }
+.filters select, .filters input { font: inherit; font-size: var(--text-base); letter-spacing: 0; text-transform: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-xs) 10px; width: 100%; min-width: 0 }
 .counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px }
 @media (max-width: 760px) { .counts { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.count { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; border-left: 5px solid var(--c) }
-.count b { display: block; font-family: var(--display); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
-.count span { font-size: 13px; color: var(--muted) }
+/* Compteur : la pastille de la légende devant le nombre (même code couleur que la carte) */
+.count { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px var(--space-sm); min-width: 0 }
+.count b { display: flex; align-items: center; gap: var(--space-xs); font-family: var(--display); font-size: var(--text-3xl); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15 }
+.count b::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c) }
+.count span { font-size: var(--text-sm); color: var(--muted) }
 .layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start }
 @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) } }
-.mapbox { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; min-width: 0 }
-svg#map { width: 100%; height: auto; display: block; touch-action: manipulation }
+.mapbox { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-xs); min-width: 0 }
+/* Pleine largeur : la carte ne dépasse pas la hauteur de l'écran */
+svg#map { width: 100%; height: auto; max-height: 85vh; display: block; touch-action: manipulation }
 svg#map circle { cursor: pointer }
 svg#map circle, svg#map line { vector-effect: non-scaling-stroke }
 svg#map .grp { stroke: var(--commun); stroke-width: 1.4; opacity: .7 }
 svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); padding: 6px 4px 2px }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--text-sm); color: var(--muted); padding: 6px var(--space-2xs) 2px }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 5px; vertical-align: middle }
 .side { display: grid; gap: 14px; min-width: 0 }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0 }
-.fiche dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 14px }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px var(--space-md); min-width: 0 }
+.fiche dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px var(--space-sm); margin: 0; font-size: var(--text-md) }
 .fiche dt { color: var(--muted) } .fiche dd { margin: 0 }
-.spes { display: grid; gap: 4px; margin-top: 10px; font-size: 14px }
+.spes { display: grid; gap: var(--space-2xs); margin-top: 10px; font-size: var(--text-md) }
 .spes div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding-block: 3px }
 .spes small { color: var(--muted); text-align: right }
-.liste { margin-top: 24px; min-width: 0 }
+.liste { margin-top: var(--space-lg); min-width: 0 }
 .liste h2 { margin: 0 }
-.liste-ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
-.liste-ctl label { font-size: 13px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center }
-.liste-ctl select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 5px 8px }
-#t-lyc { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 640px }
-#t-lyc th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line) }
-#t-lyc td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top }
-#t-lyc .r { text-align: right } #t-lyc small { display: block; color: var(--muted); font-size: 12px }
-#t-lyc button.linklike { font: inherit; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px }
-#more-lyc { margin-top: 8px }
-.pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); background: color-mix(in srgb, var(--c) 14%, white); border: 1px solid var(--c); border-radius: 4px; padding: 0 5px }
-.groups { display: grid; gap: 8px; max-height: 520px; overflow-y: auto }
-.group { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 14px; cursor: pointer; background: transparent; text-align: left; font: inherit; color: inherit; width: 100% }
+.liste-ctl { display: flex; gap: var(--space-xs); align-items: center; flex-wrap: wrap }
+.liste-ctl label { font-size: var(--text-sm); color: var(--muted); display: inline-flex; gap: 6px; align-items: center }
+.liste-ctl select { font: inherit; font-size: var(--text-md); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 5px var(--space-xs) }
+#t-lyc { width: 100%; border-collapse: collapse; font-size: var(--text-md); min-width: 640px }
+#t-lyc th { padding: var(--space-xs); border-bottom: 1px solid var(--line) }
+#t-lyc td { padding: var(--space-xs); border-bottom: 1px solid var(--line); vertical-align: top }
+#t-lyc .r { text-align: right }
+#more-lyc { margin-top: var(--space-xs) }
+.pill { display: inline-block; font-size: var(--text-xs); font-weight: 700; color: var(--ink); background: color-mix(in srgb, var(--c) 14%, var(--surface)); border: 1px solid var(--c); border-radius: 4px; padding: 0 5px }
+/* Ouvertures communes : une liste à filets dans le panneau, pas de cartes dans la carte */
+.groups { display: grid; max-height: 520px; overflow-y: auto }
+.group { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: var(--space-xs) var(--space-2xs); cursor: pointer; background: transparent; text-align: left; font: inherit; font-size: var(--text-md); color: inherit; width: 100% }
+.group:last-child { border-bottom: 0 }
 .group:hover { background: var(--accent-soft) }
 .group b { font-variant-numeric: tabular-nums }
 .group small { color: var(--muted); display: block }
-.empty { color: var(--muted); font-size: 14px }
-section.explain { margin-top: 26px; display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)) }
-section.explain p, section.explain li { font-size: 14px; color: var(--muted); max-width: 64ch }
-section.explain ul { padding-left: 18px; margin: 0 }
-@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } }
-footer { margin-top: 30px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
+.empty { font-size: var(--text-md); font-style: normal }
+section.explain { margin-top: 26px }
+section.explain p, section.explain li { color: var(--muted) }

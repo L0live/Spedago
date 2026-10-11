@@ -66,7 +66,7 @@ function main(D: DonneesAcademie): void {
       ${toolbar('ps', 'la tension par filière')}
       <div class="tablewrap"><table id="t-ps"><caption class="sr-only">Tension Parcoursup par filière, comparée à ${esc(nom)}</caption><thead><tr><th>Filière</th><th class="r">Places</th><th class="r">Vœux par place</th><th class="r">Places pourvues</th><th class="r">Places dans des formations pleines</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="note"><span class="hot">▲ en orange</span> : au moins 10 points au-dessus de ${esc(nom)} pour la même filière. Barre : ${esc(a.nom)} ; trait : ${esc(nom)}.</p>
-      <div class="simbox"><span class="tag">Simulation</span>
+      <div class="simbox"><span class="tag">Simulation ·</span>
       Avec la règle de départ du simulateur (+${fmtPct(D.alpha)} de places aux formations pleines et parmi les plus demandées de leur filière),
       l'académie recevrait <strong>+${fmtInt(ajout)} places</strong> dans ${plural(visees, 'formation')}, soit ${fmtPct(ajout / ajFr, 1)} des places ajoutées en France.
       ${ajout ? `Au plus ${fmtInt(couvert)} (${fmtPct(couvert / ajout)}) pourraient venir de places restées vides dans une formation de même spécialité de l'académie (France : ${fmtPct(coFr / ajFr)}).` : ''}

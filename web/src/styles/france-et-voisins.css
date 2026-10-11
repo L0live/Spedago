@@ -1,55 +1,44 @@
 /* Deux parties : petits multiples (un pays par vignette, deux courbes) puis graphiques en points (une ligne par région).
-   Couleurs de données : bleu = Français partis / régions voisines ; orange = venus en France / votre région (validées : CVD ΔE ≥ 31). */
-.wrap { max-width: 1080px; margin: 0 auto }
-header { padding-block: 40px 8px }
-.lede { color: var(--muted); max-width: 70ch; margin: 0 }
-h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0 0 8px }
-.bloc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin-top: 24px; box-shadow: var(--shadow-sm) }
-@media (max-width: 640px) { .bloc { padding: 16px } }
-.kicker { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--orange-ink); margin-bottom: 4px }
-.bloc > p { max-width: 75ch; margin: 0 0 12px }
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-block: 8px 16px }
-@media (max-width: 760px) { .stats { grid-template-columns: 1fr } }
-.stat { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px }
-.stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1 }
-.stat span { font-size: 13px; color: var(--muted) }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 8px }
+   Couleurs de données : bleu (--accent-mark) = Français partis / régions voisines ; orange (--orange) = venus en France / votre région (validées : CVD ΔE ≥ 31). */
+.bloc > p { margin: 0 0 var(--space-sm) }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-block: var(--space-xs) var(--space-md) }
+@media (max-width: 760px) { .stats { grid-template-columns: minmax(0, 1fr) } }
+.legend { display: flex; gap: var(--space-md); flex-wrap: wrap; font-size: var(--text-sm); color: var(--muted); margin-bottom: var(--space-xs) }
 .legend i { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 6px; border-radius: 1px }
 .legend i.dot { width: 9px; height: 9px; border-radius: 50% }
 .legend i.ring { width: 9px; height: 9px; border-radius: 50%; background: none !important; border: 2px solid var(--ink) }
-.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px }
-.panel { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px; position: relative; min-width: 0 }
-.panel h3 { font-size: 15px; font-weight: 600; margin: 0 }
-.panel .last { font-size: 12px; color: var(--muted); margin: 2px 0 6px; font-variant-numeric: tabular-nums }
+.legend i.c-out { background: var(--accent-mark) } .legend i.c-in { background: var(--orange) }
+/* Petits multiples : un filet au-dessus de chaque vignette, pas de cartes dans le bloc */
+/* Vignettes d'au moins 240 px (= largeur du viewBox) : les graduations restent à 12 px ou plus */
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-lg) var(--space-md) }
+.multiples .panel { border-top: 1px solid var(--line); padding-top: var(--space-xs); position: relative; min-width: 0; box-shadow: none }
+.panel h3 { font-size: var(--text-base); font-weight: 600; margin: 0 }
+.panel .last { font-size: var(--text-xs); color: var(--muted); margin: 2px 0 6px; font-variant-numeric: tabular-nums }
 .panel svg { width: 100%; height: auto; display: block; overflow: visible }
 .grid line { stroke: var(--line); stroke-width: 1 }
-.axis text { font-size: 10px; fill: var(--muted); font-variant-numeric: tabular-nums }
-.l-out { stroke: #2563eb } .l-in { stroke: #ea580c }
+.axis text { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums }
+.l-out { stroke: var(--accent-mark) } .l-in { stroke: var(--orange) }
 .flag { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5 }
 .cross { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 2 }
-.tip { position: absolute; z-index: 5; pointer-events: none; background: var(--ink); color: #fff; font-size: 12px; line-height: 1.4; border-radius: 6px; padding: 6px 8px; max-width: calc(100% - 8px); box-shadow: var(--shadow-md) }
+.tip { position: absolute; z-index: var(--z-sticky); pointer-events: none; background: var(--ink); color: var(--surface); font-size: var(--text-xs); line-height: 1.4; border-radius: 6px; padding: 6px var(--space-xs); max-width: calc(100% - 8px); box-shadow: var(--shadow-md) }
 .tip b { font-variant-numeric: tabular-nums }
-.pick { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; margin-block: 8px 16px }
-.pick label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
-.pick select { font: inherit; font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; min-width: 240px }
+.pick { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-md); align-items: end; margin-block: var(--space-xs) var(--space-md) }
+.pick label { display: grid; gap: var(--space-2xs); font-size: var(--text-xs); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--muted) }
+.pick select { font: inherit; font-size: var(--text-input); text-transform: none; letter-spacing: 0; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-xs) var(--space-sm); min-width: min(240px, 100%) }
 .dots { display: grid; gap: 28px }
-.dots h3 { font-size: 16px; font-weight: 600; margin: 0 0 2px }
-.dots .sens { font-size: 12px; color: var(--muted); margin: 0 0 8px }
-.drow { display: grid; grid-template-columns: minmax(120px, 230px) minmax(0, 1fr) 56px; gap: 8px; align-items: center; padding-block: 3px; font-size: 13px }
+.dots h3 { font-size: var(--text-input); font-weight: 600; margin: 0 0 2px }
+.dots .sens { font-size: var(--text-xs); color: var(--muted); margin: 0 0 var(--space-xs) }
+.drow { display: grid; grid-template-columns: minmax(120px, 260px) minmax(0, 1fr) 56px; gap: var(--space-xs); align-items: center; padding-block: 3px; font-size: var(--text-sm) }
 .drow .nom { overflow-wrap: anywhere } .drow.moi .nom { font-weight: 700; color: var(--orange-ink) } .drow.ref .nom { color: var(--muted) }
 .drow .val { text-align: right; font-variant-numeric: tabular-nums } .drow.moi .val { font-weight: 700 }
 .track { position: relative; height: 16px }
 .track::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: var(--track); border-radius: 1px }
 .track span { position: absolute; top: 2px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; box-shadow: 0 0 0 2px var(--surface) }
-.drow.moi .track span { background: #ea580c } .drow.voisine .track span { background: #2563eb }
+.drow.moi .track span { background: var(--orange) } .drow.voisine .track span { background: var(--accent-mark) }
 .drow.ref .track span { background: var(--surface); border: 2px solid var(--ink); box-shadow: none; width: 10px; height: 10px; margin-left: -5px; top: 3px }
-.u { font-size: 11px; color: var(--muted) }
-details { margin-top: 16px } summary { cursor: pointer; font-weight: 600; color: var(--accent) }
-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; min-width: 640px; margin-top: 8px }
-th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line) }
-td { padding: 6px 8px; border-bottom: 1px solid var(--line) } td.r, th.r { text-align: right }
-.note { font-size: 13px; color: var(--muted) }
-section.explain { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px }
-@media (max-width: 760px) { section.explain { grid-template-columns: 1fr } .drow { grid-template-columns: minmax(0, 1fr) 52px } .drow .track { grid-column: 1 / -1; grid-row: 2 } }
-section.explain h2 { font-size: 19px } section.explain ul { padding-left: 18px; margin: 0 }
-footer { margin-top: 32px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px }
+.u { font-size: var(--text-xs); color: var(--muted) }
+details { margin-top: var(--space-md) } summary { cursor: pointer; font-weight: 600; color: var(--accent) }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); min-width: 640px; margin-top: var(--space-xs) }
+th { padding: 6px var(--space-xs); border-bottom: 1px solid var(--line) }
+td { padding: 6px var(--space-xs); border-bottom: 1px solid var(--line) }
+@media (max-width: 760px) { .drow { grid-template-columns: minmax(0, 1fr) 52px } .drow .track { grid-column: 1 / -1; grid-row: 2 } }
