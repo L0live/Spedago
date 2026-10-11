@@ -18,7 +18,7 @@ function fiche(i: Indicateur, D: DonneesMethodes): string {
     ? `<dt>Seuils</dt><dd><ul>${i.seuils.map((s) => `<li>${esc(s.libelle)} : <strong>${esc(pct(s.valeur))}</strong></li>`).join('')}</ul></dd>` : '';
   const pages = i.pages.map((p) => `<a href="${esc(p)}">${esc(D.pages[p] ?? p)}</a>`).join(', ');
   return `<article class="fiche" id="${esc(i.id)}" aria-labelledby="t-${esc(i.id)}">
-    <span class="theme">${esc(i.theme)}</span><h3 id="t-${esc(i.id)}">${esc(i.nom)}</h3>
+    <h3 id="t-${esc(i.id)}">${esc(i.nom)}</h3><p class="theme">${esc(i.theme)}</p>
     <p>${esc(i.definition)}</p>
     <dl>
       <dt>Calcul</dt><dd>${esc(i.formule)}</dd>
