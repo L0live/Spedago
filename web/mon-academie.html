@@ -12,7 +12,7 @@
 <body>
 <div class="wrap">
   <!--NAV-->
-  <main id="contenu" tabindex="-1">
+  <main id="contenu" class="rapport" tabindex="-1">
   <header>
     <h1>Mon académie</h1>
     <p class="lede">Les trois outils Spédago vus depuis une académie : la tension à l’entrée du supérieur, l’accès aux spécialités au lycée, l’admission en master. Chaque bloc renvoie à l’outil détaillé, où l’académie est déjà choisie.</p>
@@ -21,9 +21,9 @@
   <form class="pick" id="pick" autocomplete="off">
     <label for="acad">Académie <select id="acad"></select></label>
     <label for="cmp">Comparer avec <select id="cmp"><option value="fr">France entière</option></select></label>
-    <span class="zone" id="zone"></span>
   </form>
 
+  <p class="territoire"><span id="territoire"></span> <span class="zone" id="zone"></span></p>
   <div class="stats" id="stats"></div>
 
   <section class="bloc" id="b-ps" aria-labelledby="h-ps">

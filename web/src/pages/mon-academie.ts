@@ -17,7 +17,7 @@ function main(D: DonneesAcademie): void {
   const SPE = (i: number): string => (D.libelles_specialites || {})[D.specialites[i]] || D.specialites[i];
   const link = (page: string, a: AcademieFiche, txt: string): string => `<a class="more" href="${page}#${a.slug}">${txt} →</a>`;
   const plural = (n: number, w: string): string => `${fmtInt(n)} ${w}${n > 1 ? 's' : ''}`;
-  const E = { acad: select('acad'), cmp: select('cmp'), stats: el('stats'), zone: el('zone'),
+  const E = { acad: select('acad'), cmp: select('cmp'), stats: el('stats'), zone: el('zone'), territoire: el('territoire'),
               ps: el('ps'), prive: el('prive'), po: el('po'), spe: el('spe'), mm: el('mm') };
 
   // ---- sélecteurs : académie (adresse, sinon profil, sinon exemple) et point de comparaison
@@ -173,7 +173,7 @@ function main(D: DonneesAcademie): void {
 
   function render(): void {
     const a = D.academies[+E.acad.value];
-    E.zone.textContent = a.zone;
+    E.territoire.textContent = a.nom; E.zone.textContent = a.zone;
     stats(a); blocPs(a); blocPrive(a); blocPo(a); blocSpe(a); blocMm(a);
     Spedago.announce(`Fiche de l’académie ${a.nom}, comparée à ${cmpNom()}`);
   }

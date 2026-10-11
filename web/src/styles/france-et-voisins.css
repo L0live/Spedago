@@ -1,4 +1,4 @@
-/* Deux parties : petits multiples (un pays par vignette, deux courbes) puis graphiques en points (une ligne par région).
+/* France et voisins — famille « Conclusion d'abord » (design.md), deux parties à filets : petits multiples (un pays par vignette, deux courbes) puis graphiques en points (une ligne par région).
    Couleurs de données : bleu (--accent-mark) = Français partis / régions voisines ; orange (--orange) = venus en France / votre région (validées : CVD ΔE ≥ 31). */
 .bloc > p { margin: 0 0 var(--space-sm) }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-block: var(--space-xs) var(--space-md) }
