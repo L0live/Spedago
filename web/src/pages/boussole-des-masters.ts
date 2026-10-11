@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/boussole-des-masters.css';
 import { Spedago, type Profil } from '../lib/commun';
 import { loadData } from '../lib/data';
-import { el, input, select, table, tbody, esc, options, selectedText } from '../lib/dom';
+import { el, input, select, table, tbody, esc, options, selectedText, stat } from '../lib/dom';
 import { BoussoleCalc as C } from '../calc/boussole';
 import type { DonneesBoussole, FormationMaster } from '../types/donnees';
 
@@ -82,15 +82,15 @@ function main(D: DonneesBoussole): void {
     const tau = N ? K / N : NaN;
     const valid = rows.filter((r) => !isNaN(r.p)).map((r) => r.p).sort((a, b) => a - b);
     const med = valid.length ? valid[Math.floor(valid.length / 2)] : NaN;
-    E.summary.innerHTML = ([
-      [fmtInt(rows.length), 'formations'],
-      [fmtInt(places), `places en ${ANNEE}`],
-      [isNaN(tau) ? '–' : fmtPct(tau), 'taux global pour votre profil'],
-      [isNaN(med) ? '–' : fmtPct(med), "estimation médiane d'une formation"],
-    ] as [string, string][]).map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+    E.summary.innerHTML = [
+      stat('mm-proposition', fmtInt(rows.length), 'formations', 'mention et filtres choisis'),
+      stat('mm-proposition', fmtInt(places), `places en ${ANNEE}`, 'mention et filtres choisis'),
+      stat('mm-proposition', isNaN(tau) ? '–' : fmtPct(tau), 'taux global pour votre profil', 'candidats de votre profil, formations affichées'),
+      stat('mm-proposition', isNaN(med) ? '–' : fmtPct(med), "estimation médiane d’une formation", 'formations ayant une estimation'),
+    ].join('');
     if (NI && NE) {
       E.insider.hidden = false;
-      E.insider.innerHTML = `Dans cette sélection, les candidats déjà inscrits dans l'établissement du master ont reçu une proposition dans <strong>${fmtPct(KI / NI)}</strong> des cas, contre <strong>${fmtPct(KE / NE)}</strong> pour les autres (tous profils confondus, formations où les deux groupes ont au moins ${MIN} candidats).`;
+      E.insider.innerHTML = `Dans cette sélection, les candidats déjà inscrits dans l’établissement du master ont reçu une proposition dans <strong>${fmtPct(KI / NI)}</strong> des cas, contre <strong>${fmtPct(KE / NE)}</strong> pour les autres (tous profils confondus, formations où les deux groupes ont au moins ${MIN} candidats).`;
     } else E.insider.hidden = true;
 
     const tri = E.tri.value;

@@ -53,5 +53,4 @@ svg#map .sel { stroke: var(--ink); stroke-width: 2.2 }
 .group b { font-variant-numeric: tabular-nums }
 .group small { color: var(--muted); display: block }
 .empty { font-size: var(--text-md); font-style: normal }
-section.explain { margin-top: 26px }
 section.explain p, section.explain li { color: var(--muted) }

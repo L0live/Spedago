@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/mon-academie.css';
 import { Spedago } from '../lib/commun';
 import { loadData, fillMeta } from '../lib/data';
-import { el, select, esc, fmtInt, options } from '../lib/dom';
+import { el, select, esc, fmtInt, options, stat } from '../lib/dom';
 import { AcadCalc as C } from '../calc/mon-academie';
 import type { AcademieFiche, DonneesAcademie, OffrePrivee, PoursuiteAcad } from '../types/donnees';
 
@@ -31,13 +31,14 @@ function main(D: DonneesAcademie): void {
   function stats(a: AcademieFiche): void {
     const r = a.ref || [0, 0, 0, 0, 0, 0], p = a.ps ? C.ps(a.ps.total) : null, m = a.mm ? C.mm(a.mm.total) : null;
     const k = cmpObj(), kp = k.ps ? C.ps(k.ps.total) : null;
-    const cards: [string, string][] = [
-      [fmtInt(r[0]), `lycées, dont ${fmtInt(r[1])} avec une 1re générale`],
-      [p ? fmtInt(p.places) : '–', p ? `places Parcoursup ${D.session} dans ${plural(p.formations, 'formation')}` : 'pas de formation Parcoursup'],
-      [p ? fmtDec(p.vpp) : '–', p && kp ? `vœux par place (${cmpNom()} : ${fmtDec(kp.vpp)})` : 'vœux par place'],
-      [m ? fmtInt(m.places) : '–', m ? `places en master ${D.session} dans ${plural(m.formations, 'formation')}` : 'pas de master sur la plateforme'],
-    ];
-    E.stats.innerHTML = cards.map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join('');
+    E.stats.innerHTML = [
+      stat('spe-offre', fmtInt(r[0]), `lycées, dont ${fmtInt(r[1])} avec une 1re générale`, "annuaire de l’Éducation nationale"),
+      stat('ps-pression', p ? fmtInt(p.places) : '–', p ? `places Parcoursup ${D.session} dans ${plural(p.formations, 'formation')}` : 'pas de formation Parcoursup',
+           'hors CNED et capacités nulles, lieu de la formation'),
+      stat('ps-pression', p ? fmtDec(p.vpp) : '–', p && kp ? `vœux par place (${cmpNom()} : ${fmtDec(kp.vpp)})` : 'vœux par place', 'vœux confirmés, hors CNED'),
+      stat('mm-proposition', m ? fmtInt(m.places) : '–', m ? `places en master ${D.session} dans ${plural(m.formations, 'formation')}` : 'pas de master sur la plateforme',
+           'formations de Mon Master'),
+    ].join('');
   }
 
   const toolbar = (id: string, label: string): string => `<div class="toolbar"><span class="note">Cliquez un en-tête pour trier.</span><button type="button" class="btn-ghost" data-export="${id}">Exporter ${label} (CSV)</button></div>`;
@@ -46,7 +47,7 @@ function main(D: DonneesAcademie): void {
   function blocPs(a: AcademieFiche): void {
     if (!a.ps) { E.ps.innerHTML = '<p class="empty">Pas de formation Parcoursup recensée dans cette académie.</p>'; return; }
     const k = cmpObj(), nom = cmpNom();
-    if (!k.ps || !D.france.ps) { E.ps.innerHTML = "<p class=\"empty\">Pas de formation Parcoursup dans l'académie de comparaison.</p>"; return; }
+    if (!k.ps || !D.france.ps) { E.ps.innerHTML = "<p class=\"empty\">Pas de formation Parcoursup dans l’académie de comparaison.</p>"; return; }
     const t = C.ps(a.ps.total), f = C.ps(k.ps.total), ref = new Map(k.ps.filieres.map((r) => [r[0], C.ps(r.slice(1))]));
     const [ajout, couvert, visees] = a.ps.sim, [ajFr, coFr] = D.france.ps.sim;
     const rows = a.ps.filieres.map((r) => {
@@ -68,8 +69,8 @@ function main(D: DonneesAcademie): void {
       <p class="note"><span class="hot">▲ en orange</span> : au moins 10 points au-dessus de ${esc(nom)} pour la même filière. Barre : ${esc(a.nom)} ; trait : ${esc(nom)}.</p>
       <div class="simbox"><span class="tag">Simulation ·</span>
       Avec la règle de départ du simulateur (+${fmtPct(D.alpha)} de places aux formations pleines et parmi les plus demandées de leur filière),
-      l'académie recevrait <strong>+${fmtInt(ajout)} places</strong> dans ${plural(visees, 'formation')}, soit ${fmtPct(ajout / ajFr, 1)} des places ajoutées en France.
-      ${ajout ? `Au plus ${fmtInt(couvert)} (${fmtPct(couvert / ajout)}) pourraient venir de places restées vides dans une formation de même spécialité de l'académie (France : ${fmtPct(coFr / ajFr)}).` : ''}
+      l’académie recevrait <strong>+${fmtInt(ajout)} places</strong> dans ${plural(visees, 'formation')}, soit ${fmtPct(ajout / ajFr, 1)} des places ajoutées en France.
+      ${ajout ? `Au plus ${fmtInt(couvert)} (${fmtPct(couvert / ajout)}) pourraient venir de places restées vides dans une formation de même spécialité de l’académie (France : ${fmtPct(coFr / ajFr)}).` : ''}
       ${link('simulateur-parcoursup.html', a, 'Changer la règle dans le simulateur')}</div>`;
     trier('t-ps');
   }
@@ -94,9 +95,9 @@ function main(D: DonneesAcademie): void {
     }).join('');
     const h = C.prive(p.hors_app), ap = C.prive(p.app);
     E.prive.innerHTML = `
-      <p>Hors apprentissage, <strong>${fmtPct(h.part)}</strong> des formations proposées sur Parcoursup dans l'académie sont privées ;
-      en apprentissage, <strong>${fmtPct(ap.part)}</strong>. La part du privé dépend donc d'abord du périmètre : un chiffre cité sans dire lequel est trompeur.</p>
-      ${toolbar('prive', "l'offre publique et privée")}
+      <p>Hors apprentissage, <strong>${fmtPct(h.part)}</strong> des formations proposées sur Parcoursup dans l’académie sont privées ;
+      en apprentissage, <strong>${fmtPct(ap.part)}</strong>. La part du privé dépend donc d’abord du périmètre : un chiffre cité sans dire lequel est trompeur.</p>
+      ${toolbar('prive', "l’offre publique et privée")}
       <div class="tablewrap"><table id="t-prive"><caption class="sr-only">Formations et places Parcoursup portées par le privé, comparées à ${esc(nom)}</caption><thead><tr><th>Périmètre</th><th class="r">Formations</th><th class="r">Formations privées</th><th class="r">dont hors contrat</th><th class="r">Places</th><th class="r">Places dans le privé</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="note">Privé : sous contrat, enseignement supérieur privé et hors contrat. Les formations privées qui recrutent hors Parcoursup ne sont pas comptées. <a href="methodes.html#ps-prive">Méthode</a></p>`;
     trier('t-prive');
@@ -117,9 +118,9 @@ function main(D: DonneesAcademie): void {
     const tot = spe.spe.reduce((s, r) => s + r[4], 0);
     E.spe.innerHTML = `
       <p>${fmtInt(spe.lycees)} lycées avec une 1re générale (rentrée ${D.rentree}). Pour chaque spécialité, combien la proposent, et pour les autres :
-      un lycée voisin à moins de 20 km, une ouverture commune possible avec d'autres lycées, ou aucune solution proche.
+      un lycée voisin à moins de 20 km, une ouverture commune possible avec d’autres lycées, ou aucune solution proche.
       ${tot ? '' : '<strong>Aucun cas « sans solution proche » dans l\'académie.</strong>'}</p>
-      ${toolbar('spe', "l'accès aux spécialités")}
+      ${toolbar('spe', "l’accès aux spécialités")}
       <div class="tablewrap"><table id="t-spe"><caption class="sr-only">Accès aux spécialités de 1re générale</caption><thead><tr><th>Spécialité</th><th class="r">La proposent</th><th class="r">Voisin à moins de 20 km</th><th class="r">Ouverture commune possible</th><th class="r">Sans solution proche</th><th class="r">Part des lycées sans solution</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="note">« Incertain » : effectif masqué par le secret statistique, la spécialité est probablement proposée.</p>
       ${link('mutualisation.html', a, 'Voir les lycées sur la carte')}`;
@@ -136,8 +137,8 @@ function main(D: DonneesAcademie): void {
         <td class="r" data-l="Même mention, France" data-v="${kN / nN}">${fmtPct(kN / nN)}</td></tr>`;
     }).join('');
     E.mm.innerHTML = `
-      <p>${fmtInt(t.formations)} formations, ${fmtInt(t.places)} places, ${fmtInt(t.cand)} candidatures : <strong>${fmtPct(t.taux)}</strong> ont reçu une proposition d'admission${f ? ` (${esc(nom)} : ${fmtPct(f.taux)})` : ''}.
-      Pour les candidatures venant d'une 3e année de licence générale : ${fmtPct(t.tauxL3)}${f ? ` (${esc(nom)} : ${fmtPct(f.tauxL3)})` : ''}.</p>
+      <p>${fmtInt(t.formations)} formations, ${fmtInt(t.places)} places, ${fmtInt(t.cand)} candidatures : <strong>${fmtPct(t.taux)}</strong> ont reçu une proposition d’admission${f ? ` (${esc(nom)} : ${fmtPct(f.taux)})` : ''}.
+      Pour les candidatures venant d’une 3e année de licence générale : ${fmtPct(t.tauxL3)}${f ? ` (${esc(nom)} : ${fmtPct(f.tauxL3)})` : ''}.</p>
       ${toolbar('mm', 'les mentions')}
       <div class="tablewrap"><table id="t-mm"><caption class="sr-only">Masters : mentions qui offrent le plus de places</caption><thead><tr><th>Mentions qui offrent le plus de places</th><th class="r">Places</th><th class="r">Proposition, L3 générale</th><th class="r">Même mention, France</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${link('boussole-des-masters.html', a, 'Comparer les masters avec la Boussole')}`;
@@ -156,10 +157,10 @@ function main(D: DonneesAcademie): void {
         <td class="r" data-l="Poursuivent" data-v="${t}"><strong>${fmtPct(t)}</strong><small>${esc(nom)} ${fmtPct(tc)}</small></td>
         ${cols.map(([l, i]) => `<td class="r" data-l="${l}" data-v="${pc(r, i)}">${fmtPct(pc(r, i))}<small>${esc(nom)} ${fmtPct(pc(c, i))}</small></td>`).join('')}</tr>`;
     }).join('');
-    E.po.innerHTML = `<p>Part des bacheliers de la session ${D.rentree_poursuite}, ayant passé le bac dans l'académie, inscrits dans le supérieur à la rentrée suivante, où qu'ils étudient.</p>
-      ${toolbar('po', "la poursuite d'études")}
-      <div class="tablewrap"><table id="t-po"><caption class="sr-only">Poursuite d'études des bacheliers par voie et par filière</caption><thead><tr><th>Voie du bac</th><th class="r">Poursuivent</th>${cols.map(([l]) => `<th class="r">${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="note">Source : SIES, taux de poursuite des néo-bacheliers par académie d'obtention du bac. Apprentissage en BTS compris ; formations hors du champ du ministère non comptées.</p>`;
+    E.po.innerHTML = `<p>Part des bacheliers de la session ${D.rentree_poursuite}, ayant passé le bac dans l’académie, inscrits dans le supérieur à la rentrée suivante, où qu’ils étudient.</p>
+      ${toolbar('po', "la poursuite d’études")}
+      <div class="tablewrap"><table id="t-po"><caption class="sr-only">Poursuite d’études des bacheliers par voie et par filière</caption><thead><tr><th>Voie du bac</th><th class="r">Poursuivent</th>${cols.map(([l]) => `<th class="r">${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="note">Source : SIES, taux de poursuite des néo-bacheliers par académie d’obtention du bac. Apprentissage en BTS compris ; formations hors du champ du ministère non comptées.</p>`;
     trier('t-po');
   }
 
@@ -174,7 +175,7 @@ function main(D: DonneesAcademie): void {
     const a = D.academies[+E.acad.value];
     E.zone.textContent = a.zone;
     stats(a); blocPs(a); blocPrive(a); blocPo(a); blocSpe(a); blocMm(a);
-    Spedago.announce(`Fiche de l'académie ${a.nom}, comparée à ${cmpNom()}`);
+    Spedago.announce(`Fiche de l’académie ${a.nom}, comparée à ${cmpNom()}`);
   }
   E.acad.addEventListener('change', () => { Spedago.setHash(D.academies[+E.acad.value].nom); render(); });
   E.cmp.addEventListener('change', () => { Spedago.setParams({ cmp: E.cmp.value === 'fr' ? '' : D.academies[+E.cmp.value].slug }); render(); });

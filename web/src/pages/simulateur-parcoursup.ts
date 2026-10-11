@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/simulateur-parcoursup.css';
 import { Spedago } from '../lib/commun';
 import { loadData } from '../lib/data';
-import { el, input, select, table, tbody, esc, fmtInt, fmtPct, options, selectedText } from '../lib/dom';
+import { el, input, select, table, tbody, esc, fmtInt, fmtPct, options, selectedText, stat, resumeStats } from '../lib/dom';
 import { SimCalc as C, type ParamsSim, type LigneGroupe } from '../calc/simulateur';
 import type { DonneesSimulateur } from '../types/donnees';
 
@@ -45,19 +45,19 @@ function main(D: DonneesSimulateur): void {
     const idf = acad.filter((r) => r.idf).reduce((s, r) => s + r.ajout, 0);
     const couv = fil === '' ? res.couvert : (res.couvertFil.get(+fil) || 0);
     const visees = acad.reduce((s, r) => s + r.visees, 0);
-    E.summary.innerHTML = ([
-      [fmtInt(tot), 'places ajoutées'],
-      [pl ? fmtPct(tot / pl) : '–', 'des places de la sélection'],
-      [tot ? fmtPct(idf / tot, 0) : '–', 'en Île-de-France'],
-      [tot ? fmtPct(couv / tot, 0) : '–', 'récupérables sur des places vides'],
-    ] as const).map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
-    Spedago.announce(E.summary.innerText);
+    E.summary.innerHTML = [
+      stat('ps-simulation', fmtInt(tot), 'places ajoutées', "session simulée à partir de l’année précédente"),
+      stat('ps-simulation', pl ? fmtPct(tot / pl) : '–', 'des places de la sélection', 'formations de la sélection'),
+      stat('ps-simulation', tot ? fmtPct(idf / tot, 0) : '–', 'en Île-de-France', 'lieu de la formation'),
+      stat('ps-simulation', tot ? fmtPct(couv / tot, 0) : '–', 'récupérables sur des places vides', 'même académie, filière et spécialité'),
+    ].join('');
+    Spedago.announce(resumeStats(E.summary));
     E.lecture.innerHTML = tot
       ? `${fmtInt(visees)} formations recevraient des places. Sur ces <strong>${fmtInt(tot)}</strong> places, au plus <strong>${fmtInt(couv)}</strong> pourraient venir de places restées vides dans une formation de même spécialité de la même académie ; le reste (${fmtInt(tot - couv)}) demanderait des moyens nouveaux.`
       : 'Aucune formation ne remplit les conditions avec ces réglages.';
     const dm = C.demande(D, res.add, fil);
     E.demande.innerHTML = tot && dm.formationsRang
-      ? `<strong>Ces places trouveraient-elles preneur ?</strong> Dans <strong>${fmtPct(dm.couvertes / dm.formationsRang, 0)}</strong> des ${fmtInt(dm.formationsRang)} formations visées à liste d'appel propre, il restait au moins autant de candidats classés jamais appelés que de places ajoutées (médiane : ${fmtInt(dm.medianeRatio)} classés non appelés par place ajoutée). Ces chiffres comptent des candidatures, pas des personnes : un même candidat est classé dans plusieurs formations, et beaucoup ont été admis ailleurs. Ils disent que les places seraient remplies, pas combien d'élèves sans proposition en profiteraient.${dm.sansRang ? ` Pour ${fmtInt(dm.sansRang)} formations à liste commune (${fmtInt(dm.ajoutSansRang)} places), ce n'est pas mesurable.` : ''}`
+      ? `<strong>Ces places trouveraient-elles preneur ?</strong> Dans <strong>${fmtPct(dm.couvertes / dm.formationsRang, 0)}</strong> des ${fmtInt(dm.formationsRang)} formations visées à liste d’appel propre, il restait au moins autant de candidats classés jamais appelés que de places ajoutées (médiane : ${fmtInt(dm.medianeRatio)} classés non appelés par place ajoutée). Ces chiffres comptent des candidatures, pas des personnes : un même candidat est classé dans plusieurs formations, et beaucoup ont été admis ailleurs. Ils disent que les places seraient remplies, pas combien d’élèves sans proposition en profiteraient.${dm.sansRang ? ` Pour ${fmtInt(dm.sansRang)} formations à liste commune (${fmtInt(dm.ajoutSansRang)} places), ce n’est pas mesurable.` : ''}`
       : '';
     const maxA = Math.max(...acad.map((r) => r.ajout / (r.places || 1)), 1e-9);
     remplir(E.tAcad, acad.filter((r) => r.places > 0), (r) => `<td data-v="${esc(D.academies[r.key])}">${esc(D.academies[r.key])}</td><td class="r" data-v="${r.places}">${fmtInt(r.places)}</td><td class="r" data-v="${r.ajout}">${fmtInt(r.ajout)}</td>

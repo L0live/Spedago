@@ -39,7 +39,7 @@ def _profil_panel() -> str:
             + "".join(opt(k, v) for k, v in PROFILS_MASTER.items()) + '</select></label>'
             '<div class="row2"><label>Spécialité 1<select name="spe1">' + spe_opts + '</select></label>'
             '<label>Spécialité 2<select name="spe2">' + spe_opts + '</select></label></div>'
-            '<p>Gardé dans ce navigateur seulement ; rien n\'est envoyé. Chaque page s\'ouvre sur ces réglages.</p>'
+            '<p>Gardé dans ce navigateur seulement ; rien n’est envoyé. Chaque page s’ouvre sur ces réglages.</p>'
             '<div class="acts"><button type="button" data-reset>Effacer</button><button type="submit">Enregistrer</button></div>'
             '</form></div></div>')
 
@@ -74,7 +74,7 @@ def pied() -> str:
     return ('<p class="pied-commun"><a href="methodes.html">Méthodes et sources</a> · '
             '<a href="https://github.com/L0live/Spedago">Code source</a> sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.html" hreflang="en">GNU AGPL-3.0</a> · '
             'Données et textes sous <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence/">Licence Ouverte 2.0</a>, '
-            'mention « Spédago, d\'après [producteur], [date] » · Aucun compte, aucun traceur.</p>')
+            'mention « Spédago, d’après [producteur], [date] » · Aucun compte, aucun traceur.</p>')
 
 
 def export_nav() -> Path:

@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/mutualisation.css';
 import { Spedago } from '../lib/commun';
 import { loadData, fillMeta } from '../lib/data';
-import { el, input, select, table, tbody, esc, fmtInt, options } from '../lib/dom';
+import { el, input, select, table, tbody, esc, fmtInt, options, stat, resumeStats } from '../lib/dom';
 import { MutCalc } from '../calc/mutualisation';
 import type { DonneesCarte, LyceeCarte } from '../types/donnees';
 
@@ -74,8 +74,9 @@ function main(D: DonneesCarte): void {
     const ds = selected !== null ? dots[selected] : null; if (ds) gDots.appendChild(ds);
     E.counts.innerHTML = ([[0, n[0], 'lycées la proposent'], [3, n[3], `sans elle · voisin à moins de ${D.rayon_km} km`],
       [4, n[4], 'sans elle · ouverture commune possible'], [5, n[5], `sans elle · rien à moins de ${D.rayon_km} km (${fmtInt(eleves[5])} élèves de 1re)`]] as [Code, number, string][])
-      .map(([c, v, t]) => `<div class="count" style="--c:var(${CAT[c][1]})"><b>${fmtInt(v)}</b><span>${t}</span></div>`).join('');
-    Spedago.announce(E.counts.innerText);
+      .map(([c, v, t]) => stat(c === 0 ? 'spe-offre' : 'spe-mutualisation', fmtInt(v), t,
+                               c === 0 ? 'lycées de 1re générale, filtres choisis' : "même statut, distance à vol d’oiseau", 'stat count', `--c:var(${CAT[c][1]})`)).join('');
+    Spedago.announce(resumeStats(E.counts));
     renderListe();
     // groupes
     gLines.innerHTML = '';
@@ -142,7 +143,7 @@ function main(D: DonneesCarte): void {
     });
     Spedago.sortable(E.tLyc);
     E.moreLyc.hidden = rows.length <= shownLyc;
-    E.listeNote.textContent = `${fmtInt(rows.length)} lycée${rows.length > 1 ? 's' : ''}${rows.length > shownLyc ? `, ${fmtInt(shownLyc)} affichés (l'export les contient tous)` : ''} · ${LIB(D.specialites[sp])}`;
+    E.listeNote.textContent = `${fmtInt(rows.length)} lycée${rows.length > 1 ? 's' : ''}${rows.length > shownLyc ? `, ${fmtInt(shownLyc)} affichés (l’export les contient tous)` : ''} · ${LIB(D.specialites[sp])}`;
   }
   E.tLyc.addEventListener('click', (e) => {
     const b = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-lyc]') : null;

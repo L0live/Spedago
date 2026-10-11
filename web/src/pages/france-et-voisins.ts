@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/france-et-voisins.css';
 import { Spedago } from '../lib/commun';
 import { loadData, fillMeta } from '../lib/data';
-import { el, select, table, esc, options } from '../lib/dom';
+import { el, select, table, esc, options, stat } from '../lib/dom';
 import { VoisinsCalc as C, type LigneRegion } from '../calc/voisins';
 import type { DonneesVoisins } from '../types/donnees';
 
@@ -23,10 +23,12 @@ function main(D: DonneesVoisins): void {
   const tot = M.pays.reduce((s, [c]) => s + sortant(c), 0);
   const ue = M.ue.find((x) => x[0] === an)?.[1];
   const top = [...M.pays].sort((a, b) => sortant(b[0]) - sortant(a[0]))[0];
-  el('mob-stats').innerHTML = [[fmtInt(ue), `étudiants français en mobilité diplômante dans l'UE en ${an}`],
-    [fmtInt(tot), `dans les ${M.pays.length} pays ci-dessous en ${an}, dont ${fmtInt(M.sortants.CH[last][0])} en Suisse (hors UE, d'où un total supérieur)`],
-    [esc(top[1]), `premier pays d'accueil en ${an} (${fmtInt(M.sortants[top[0]][last][0])})`]]
-    .map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join('');
+  el('mob-stats').innerHTML = [
+    stat('eu-mobilite', fmtInt(ue), `étudiants français en mobilité diplômante dans l’UE en ${an}`, 'comptés par le pays d’accueil'),
+    stat('eu-mobilite', fmtInt(tot), `dans les ${M.pays.length} pays ci-dessous en ${an}, dont ${fmtInt(M.sortants.CH[last][0])} en Suisse (hors UE, d’où un total supérieur)`,
+         'pays voisins publiant la donnée (pas les Pays-Bas)'),
+    stat('eu-mobilite', esc(top[1]), `premier pays d’accueil en ${an} (${fmtInt(M.sortants[top[0]][last][0])})`, 'pays voisins publiant la donnée'),
+  ].join('');
 
   // ---- petits multiples
   const W = 240, H = 120, P = { l: 34, r: 6, t: 8, b: 18 };
@@ -76,15 +78,15 @@ function main(D: DonneesVoisins): void {
     M.pays.map(([c, nom]) => { const n = M.niveaux[c]; return n[1] == null ? null : `${nom} ${fmtInt(n[1])} / ${fmtInt(n[2])} / ${fmtInt(n[3])}`; }).filter(Boolean).join(' ; ') + '.';
 
   // ---- régions
-  const ROLES: Record<LigneRegion['role'], string> = { moi: "Région de l'académie", voisine: 'Voisine', ref: 'Référence' };
+  const ROLES: Record<LigneRegion['role'], string> = { moi: "Région de l’académie", voisine: 'Voisine', ref: 'Référence' };
   options(E.acad, D.academies.map(([nom], i): [number, string] => [i, nom]));
   if (!Spedago.pick(E.acad)) E.acad.value = String(Math.max(0, D.academies.findIndex((a) => a[1] === 'strasbourg')));
   function renderReg(): void {
     const ai = +E.acad.value, a = D.academies[ai], nv = a[3].length;
-    el('reg-note').textContent = nv ? `${nv} région${nv > 1 ? 's' : ''} voisine${nv > 1 ? 's' : ''}` : "Pas de frontière terrestre avec un pays couvert : comparaison avec la France et l'Union européenne.";
+    el('reg-note').textContent = nv ? `${nv} région${nv > 1 ? 's' : ''} voisine${nv > 1 ? 's' : ''}` : "Pas de frontière terrestre avec un pays couvert : comparaison avec la France et l’Union européenne.";
     el('dots').innerHTML = D.indicateurs.map(([key, lib, sensInd]) => {
       const rows = C.lignes(D, ai, key), vmax = Math.max(...rows.map((r) => r.v)) * 1.1;
-      return `<div><h3>${esc(lib)}</h3><p class="sens">${sensInd === 'haut' ? "Plus c'est haut, plus les jeunes adultes sont diplômés du supérieur." : "Plus c'est bas, mieux c'est."} Échelle de 0 à ${fmt1(vmax)} %.</p>
+      return `<div><h3>${esc(lib)}</h3><p class="sens">${sensInd === 'haut' ? "Plus c’est haut, plus les jeunes adultes sont diplômés du supérieur." : "Plus c’est bas, mieux c’est."} Échelle de 0 à ${fmt1(vmax)} %.</p>
         ${rows.map((r) => `<div class="drow ${r.role}"><span class="nom">${esc(r.nom)}${r.role === 'ref' ? '' : ` <small class="u">${esc(D.noms_pays[r.code.slice(0, 2)] || '')}</small>`}${r.u ? ' <small class="u">(peu fiable)</small>' : ''}</span>
           <span class="track" title="${esc(r.nom)} : ${fmt1(r.v)} % (moyenne ${r.de}-${r.a}, ${fmt1(r.dernier)} % en ${r.a})"><span style="left:${(r.v / vmax * 100).toFixed(1)}%"></span></span>
           <span class="val">${fmt1(r.v)} %</span></div>`).join('')}</div>`;

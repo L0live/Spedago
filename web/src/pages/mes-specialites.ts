@@ -2,7 +2,7 @@ import '../styles/commun.css';
 import '../styles/mes-specialites.css';
 import { Spedago, type Profil } from '../lib/commun';
 import { loadData, fillMeta } from '../lib/data';
-import { el, input, select, table, tbody, esc, fmtInt, options } from '../lib/dom';
+import { el, input, select, table, tbody, esc, fmtInt, options, stat } from '../lib/dom';
 import { SpeCalc as C, type LigneSpe } from '../calc/mes-specialites';
 import type { DonneesSpecialites } from '../types/donnees';
 
@@ -72,11 +72,12 @@ function main(D: DonneesSpecialites): void {
       E.bDetail.hidden = true; renderLycee(); return;
     }
     const s = C.resume(D, d);
-    E.stats.innerHTML = ([
-      [fmtInt(s.n), `bacheliers généraux avec ${esc(nomD())} en ${D.annee} (${fmtPct(s.part, 1)}, ${s.rang === 1 ? '1re' : s.rang + 'e'} doublette sur ${s.nb})`],
-      [fmtPct(s.k / s.n, 1), `ont reçu au moins une proposition (tous bacheliers généraux : ${fmtPct(s.pTous, 1)})`],
-      [fmtInt(C.groupes(D, d).filter((r) => r.n > 0).length), 'types de formation demandés au moins une fois'],
-    ] as [string, string][]).map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join('');
+    E.stats.innerHTML = [
+      stat('spe-propositions', fmtInt(s.n), `bacheliers généraux avec ${esc(nomD())} en ${D.annee} (${fmtPct(s.part, 1)}, ${s.rang === 1 ? '1re' : s.rang + 'e'} doublette sur ${s.nb})`,
+           'bacheliers généraux, niveau national'),
+      stat('spe-propositions', fmtPct(s.k / s.n, 1), `ont reçu au moins une proposition (tous bacheliers généraux : ${fmtPct(s.pTous, 1)})`, 'candidats ayant confirmé un vœu'),
+      stat('spe-propositions', fmtInt(C.groupes(D, d).filter((r) => r.n > 0).length), 'types de formation demandés au moins une fois', 'doublette choisie, niveau national'),
+    ].join('');
     const rows = lignes(), shown = all ? rows : rows.slice(0, 25);
     shown.forEach((r) => {
       const g = D.groupes[r.key], tr = document.createElement('tr'); if (ouvert === r.key) tr.className = 'cur';
@@ -118,7 +119,7 @@ function main(D: DonneesSpecialites): void {
       if (r.etat === 'incertain') return `<li><span class="unk">? Incertain</span> ${nom} <small class="note">(effectif masqué par le secret statistique)</small></li>`;
       if (r.etat !== 'absent') return `<li><span class="unk">– Non couverte</span> ${nom} <small class="note">(pas dans les données de la carte)</small></li>`;
       const ni = r.uai ? byUai.get(r.uai) : undefined, near = ni !== undefined ? D.lycees[ni] : null;
-      return `<li><span class="ko">✗ Pas proposée</span> ${nom}${near ? ` — la plus proche : <strong>${esc(near[1])}</strong> (${esc(near[2])}), ${String(r.km).replace('.', ',')} km à vol d'oiseau` : ''}</li>`;
+      return `<li><span class="ko">✗ Pas proposée</span> ${nom}${near ? ` — la plus proche : <strong>${esc(near[1])}</strong> (${esc(near[2])}), ${String(r.km).replace('.', ',')} km à vol d’oiseau` : ''}</li>`;
     }).join('')}</ul><p class="note">Offre de 1re (rentrée ${D.rentree_carte}), même statut public/privé pour le lycée le plus proche. <a href="mutualisation.html#${Spedago.slug(l[3])}">Voir la carte des spécialités →</a></p>
       ${ival ? `<h3 class="h3">Résultats du lycée au bac ${D.annee_ival}</h3><div class="ival">${([
         ['Réussite au bac', ival[0], ival[1]], ['Élèves de 2de qui obtiennent le bac dans le lycée', ival[2], ival[3]], ['Mentions', ival[4], ival[5]],

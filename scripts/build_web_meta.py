@@ -23,8 +23,8 @@ def sources() -> dict[str, dict]:
     out: dict[str, dict] = {}
     with open(RAW / "MANIFEST.csv", encoding="utf-8") as f:
         for r in csv.DictReader(f):
-            producteur = ("Ministère de l'Enseignement supérieur (MESR-SIES)" if "enseignementsup" in r["portail"]
-                          else "Ministère de l'Éducation nationale (DEPP)")
+            producteur = ("Ministère de l’Enseignement supérieur (MESR-SIES)" if "enseignementsup" in r["portail"]
+                          else "Ministère de l’Éducation nationale (DEPP)")
             out[r["fichier"]] = {"jeu": r["jeu"], "producteur": producteur, "url": f"https://{r['portail']}/explore/dataset/{r['jeu']}/",
                                  "telecharge_le": r["telecharge_le"], "sha256": r["sha256"], "lignes": int(r["lignes"])}
     with open(RAW / "MANIFEST_eurostat.csv", encoding="utf-8") as f:
@@ -52,7 +52,7 @@ def main() -> None:
     ind = par_id()
     # [valeur, libellé, champ, fiche méthodologique] : chaque chiffre de l'accueil dit d'où il vient
     chiffres = [[fr["ps"]["total"][0], f"formations Parcoursup {M['session']}", "hors CNED et capacités nulles", "ps-pression"],
-                [fr["spe"]["lycees"], f"lycées avec une 1re générale (rentrée {M['rentree']})", "géolocalisés dans l'annuaire", "spe-offre"],
+                [fr["spe"]["lycees"], f"lycées avec une 1re générale (rentrée {M['rentree']})", "géolocalisés dans l’annuaire", "spe-offre"],
                 [fr["mm"]["total"][0], f"masters sur Mon Master {M['session']}", "toutes mentions", "mm-proposition"]]
     assert all(c[3] in ind for c in chiffres)
     export_web("index", {"academies": [[a["nom"], a["slug"]] for a in M["academies"]], "chiffres": chiffres})

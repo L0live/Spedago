@@ -16,7 +16,7 @@ export async function loadData<T = any>(name: string): Promise<T> {
   } catch (e) {
     status.className = 'chargement erreur';
     status.setAttribute('role', 'alert');
-    status.textContent = `Les données de cette page n'ont pas pu être chargées (${(e as Error).message}). Rechargez la page ; si le problème persiste, la publication est peut-être en cours.`;
+    status.textContent = `Les données de cette page n’ont pas pu être chargées (${(e as Error).message}). Rechargez la page ; si le problème persiste, la publication est peut-être en cours.`;
     throw e;
   } finally {
     main?.removeAttribute('aria-busy');

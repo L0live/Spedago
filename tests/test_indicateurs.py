@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -56,3 +57,20 @@ def test_publication_a_jour():
     ids = {i.id for i in INDICATEURS}
     for c in json.loads((WEB_DATA / "index.json").read_text(encoding="utf-8"))["chiffres"]:
         assert c[3] in ids and c[2]
+
+
+def test_chiffres_cles_renvoient_a_leur_fiche():
+    """Chaque chiffre clé d'une page passe par stat() (lib/dom.ts) : il affiche son champ et renvoie à une fiche
+    du registre qui déclare cette page. Aucune carte de chiffre n'est construite à la main."""
+    fiches = {i.id: i for i in INDICATEURS}
+    vus = set()
+    for f, _, _ in PAGES:
+        src = (ROOT / "web" / "src" / "pages" / f.replace(".html", ".ts")).read_text(encoding="utf-8")
+        assert 'class="stat"' not in src and 'class="count"' not in src, f"{f} : chiffre clé construit sans stat()"
+        for fiche in re.findall(r"\bstat\(\s*(?:c === 0 \? )?'([\w-]+)'(?: : '([\w-]+)')?", src):
+            for fid in filter(None, fiche):
+                assert fid in fiches, f"{f} : fiche inconnue {fid}"
+                assert f in fiches[fid].pages, f"{f} : la fiche {fid} ne déclare pas cette page"
+                vus.add(f)
+    assert vus >= {"mon-academie.html", "mes-specialites.html", "boussole-des-masters.html",
+                   "simulateur-parcoursup.html", "mutualisation.html", "france-et-voisins.html"}

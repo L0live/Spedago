@@ -24,3 +24,13 @@ export function options(s: HTMLSelectElement, items: Iterable<[string | number, 
 }
 /** Libellé de l'option choisie d'un <select> ('' si aucune). */
 export const selectedText = (s: HTMLSelectElement): string => s.selectedOptions[0]?.textContent ?? '';
+
+/** Chiffre clé : valeur et libellé (HTML déjà échappé), puis son champ et le lien vers sa fiche de la page Méthodes.
+ *  La fiche vient en premier : les tests vérifient qu'elle existe dans spedago/indicateurs.py et qu'elle couvre la page. */
+export function stat(fiche: string, valeur: string, libelle: string, champ: string, classe = 'stat', style = ''): string {
+  return `<div class="${classe}"${style ? ` style="${style}"` : ''}><b>${valeur}</b><span>${libelle}</span>`
+    + `<a class="champ" href="methodes.html#${esc(fiche)}">${esc(champ)} · méthode</a></div>`;
+}
+/** Texte à annoncer pour une rangée de chiffres clés : valeurs et libellés, sans les liens vers les fiches. */
+export const resumeStats = (zone: HTMLElement): string =>
+  [...zone.children].map((c) => `${c.querySelector('b')?.textContent ?? ''} ${c.querySelector('span')?.textContent ?? ''}`).join(' ; ');
