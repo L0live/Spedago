@@ -1,21 +1,19 @@
-// @ts-nocheck — portage de l'interface ; types à resserrer progressivement
 import '../styles/commun.css';
 import '../styles/index.css';
 import { Spedago } from '../lib/commun';
-import { loadData, fillMeta } from '../lib/data';
+import { loadData } from '../lib/data';
+import { el, select, esc, fmtInt, options, selectedText } from '../lib/dom';
+import type { DonneesAccueil } from '../types/donnees';
 
-async function main(D0: any) {
-  const D = D0;
-
-  
-  const sel = document.getElementById("acad");
-  document.getElementById("figures").innerHTML = D.chiffres
-    .map(([n, t, champ, id]) => `<li><b>${Math.round(n).toLocaleString("fr-FR")}</b><span>${t}</span>`
-      + `<a class="champ" href="methodes.html#${id}">${champ} · méthode</a></li>`).join("");
-  D.academies.forEach(([nom, slug]) => { const o = document.createElement("option"); o.value = slug; o.textContent = nom; sel.appendChild(o); });
-  if (!Spedago.pick(sel)) sel.value = "poitiers";
-  document.getElementById("go").addEventListener("submit", (e) => { e.preventDefault(); location.href = "mon-academie.html#" + sel.value; });
-  sel.addEventListener("change", () => Spedago.setHash(sel.selectedOptions[0].textContent));
+function main(D: DonneesAccueil): void {
+  const sel = select('acad');
+  el('figures').innerHTML = D.chiffres
+    .map(([n, t, champ, id]) => `<li><b>${fmtInt(n)}</b><span>${esc(t)}</span>`
+      + `<a class="champ" href="methodes.html#${esc(id)}">${esc(champ)} · méthode</a></li>`).join('');
+  options(sel, D.academies.map(([nom, slug]): [string, string] => [slug, nom]));
+  if (!Spedago.pick(sel)) sel.value = 'poitiers';
+  el<HTMLFormElement>('go').addEventListener('submit', (e) => { e.preventDefault(); location.href = 'mon-academie.html#' + sel.value; });
+  sel.addEventListener('change', () => Spedago.setHash(selectedText(sel)));
 }
 
-loadData('index').then(main);
+loadData<DonneesAccueil>('index').then(main);

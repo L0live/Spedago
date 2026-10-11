@@ -1,5 +1,5 @@
 // Fonctions de calcul pures (aucun accès au DOM) : exécutées par la page ET par les tests (Node.js).
-import type { DonneesAcademie } from '../types/donnees';
+import type { DonneesAcademie, OffrePrivee } from '../types/donnees';
 
 export const AcadCalc = (() => {
   const Z = 1.96;
@@ -26,6 +26,15 @@ export const AcadCalc = (() => {
     const [formations, places, cand, prop, candL3, propL3] = t;
     return { formations, places, cand, prop, candL3, propL3, taux: ratio(prop, cand), tauxL3: ratio(propL3, candL3) };
   }
+  // Offre Parcoursup [formations, privées, dont hors contrat, places, places privées] -> parts (absente = zéros)
+  function prive(t: OffrePrivee | undefined) {
+    const [formations, privees, horsContrat, places, placesPrivees] = t ?? [0, 0, 0, 0, 0];
+    return { formations, privees, horsContrat, places, placesPrivees,
+             part: ratio(privees, formations), partHorsContrat: ratio(horsContrat, formations), partPlaces: ratio(placesPrivees, places) };
+  }
+  // Ensemble = hors apprentissage + apprentissage (les deux jeux Parcoursup sont disjoints)
+  const somme = (a: OffrePrivee | undefined, b: OffrePrivee | undefined): OffrePrivee =>
+    [0, 1, 2, 3, 4].map((i) => (a?.[i] ?? 0) + (b?.[i] ?? 0)) as OffrePrivee;
   const indexOf = (D: DonneesAcademie, slug: string): number => D.academies.findIndex((a) => a.slug === slug);
-  return { wilson, ps, speRows, mm, indexOf };
+  return { wilson, ps, speRows, mm, prive, somme, indexOf };
 })();

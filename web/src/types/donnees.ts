@@ -27,15 +27,22 @@ export interface DonneesCarte {
   taux: number[]; taux_haut: number[]; lycees: LyceeCarte[]; groupes: GroupeCarte[];
 }
 
+/** Mention de master : [mention, formations, places, candidats L3, propositions L3, candidats L3 France, propositions L3 France] */
+export type MentionAcad = [string, number, number, number, number, number, number];
+/** Poursuite : [voie du bac, bacheliers, université, IUT, CPGE, STS, autres] */
+export type PoursuiteAcad = [string, number, number, number, number, number, number];
+/** Offre Parcoursup : [formations, privées, dont hors contrat, places, places privées] */
+export type OffrePrivee = [number, number, number, number, number];
 export interface AcademieFiche {
   nom: string; slug: string; zone: string; ref: number[] | null;
   ps: { total: number[]; filieres: number[][]; sim: number[] } | null;
   spe: { lycees: number; spe: number[][] } | null;
-  mm: { total: number[]; mentions: (string | number)[][] } | null;
-  pours: (string | number)[][] | null;
+  mm: { total: number[]; mentions: MentionAcad[] } | null;
+  pours: PoursuiteAcad[] | null;
+  prive: { hors_app?: OffrePrivee; app?: OffrePrivee } | null;
 }
 export interface DonneesAcademie {
-  session: number; rentree: number; rentree_poursuite: number; alpha: number; filieres: string[]; specialites: string[];
+  session: number; rentree: number; rentree_poursuite: number; alpha: number; filieres: string[]; specialites: string[]; prive_colonnes: string[];
   libelles_filieres?: Record<string, string>; libelles_specialites?: Record<string, string>;
   france: Omit<AcademieFiche, 'slug' | 'zone'>; academies: AcademieFiche[];
 }
@@ -70,3 +77,6 @@ export interface SourceDonnee {
   lignes?: number; requete?: string; maj_producteur?: string;
 }
 export interface DonneesMethodes { indicateurs: Indicateur[]; sources: Record<string, SourceDonnee>; pages: Record<string, string> }
+
+/** Accueil : académies [nom, slug] ; chiffres [valeur, libellé, champ, fiche méthodologique] */
+export interface DonneesAccueil { academies: [string, string][]; chiffres: [number, string, string, string][] }

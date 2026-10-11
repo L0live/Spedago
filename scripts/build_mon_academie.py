@@ -149,6 +149,28 @@ def poursuite(p: pd.DataFrame) -> tuple[dict, list, int]:
     return {a: ligne(g) for a, g in p.groupby("academie")}, ligne(p), an
 
 
+PRIVE_COLS = ["formations", "privees", "hors_contrat", "places", "places_privees"]
+
+
+def offre_privee() -> tuple[dict, dict]:
+    """Part du privé dans l'offre Parcoursup de la session, hors apprentissage et en apprentissage (jeux séparés).
+    Toutes les formations de la session (variable contrat_etab) ; académie = lieu de la formation.
+    Par académie et France : {"hors_app": [formations, privées, dont hors contrat, places, places privées], "app": [...]}"""
+    jeux = {"hors_app": pd.read_csv(RAW / f"parcoursup_{SESSION}.csv", sep=";", low_memory=False),
+            "app": pd.read_csv(RAW / "parcoursup_apprentissage.csv", sep=";", low_memory=False).query("session == @SESSION")}
+    out: dict[str, dict] = {}
+    fr: dict[str, list[int]] = {}
+    for k, d in jeux.items():
+        d = d.assign(academie=d.acad_mies.map(academie_canonique), prive=d.contrat_etab.str.startswith("Privé"),
+                     hc=d.contrat_etab.eq("Privé hors contrat"))
+        d = d.assign(pl_prive=d.capa_fin.where(d.prive, 0))
+        agg = lambda g: [int(len(g)), int(g.prive.sum()), int(g.hc.sum()), int(g.capa_fin.sum()), int(g.pl_prive.sum())]  # noqa: E731
+        for a, g in d.groupby("academie"):
+            out.setdefault(a, {})[k] = agg(g)
+        fr[k] = agg(d)
+    return out, fr
+
+
 def zone(a: str) -> str:
     return "Île-de-France" if a in IDF else "Outre-mer" if a in OUTRE_MER else "Métropole hors Île-de-France"
 
@@ -161,13 +183,14 @@ def build() -> dict:
     mm, mm_fr = masters(pd.read_csv(PROCESSED / "monmaster_formations.csv", sep=";", low_memory=False))
     ref, ref_fr = referentiel(pd.read_csv(PROCESSED / "referentiel_uai.csv", sep=";", dtype={"uai": str}))
     po, po_fr, an_po = poursuite(pd.read_csv(RAW / "poursuite_academie.csv", sep=";"))
+    pv, pv_fr = offre_privee()
     noms = sorted((set(ps) | set(sp) | set(mm)) - {"Étranger"}, key=cle)
     assert all(academie_canonique(a) == a for a in noms)
     acads = [{"nom": a, "slug": slug(a), "zone": zone(a), "ref": ref.get(a), "ps": ps.get(a), "spe": sp.get(a), "mm": mm.get(a),
-              "pours": po.get(a)} for a in noms]
+              "pours": po.get(a), "prive": pv.get(a)} for a in noms]
     return {"session": SESSION, "rentree": M["rentree"], "alpha": ALPHA, "filieres": filieres, "specialites": M["specialites"],
-            "libelles_filieres": FILIERES, "libelles_specialites": SPECIALITES, "rentree_poursuite": an_po,
-            "france": {"nom": "France entière", "ref": ref_fr, "ps": ps_fr, "spe": sp_fr, "mm": mm_fr, "pours": po_fr},
+            "libelles_filieres": FILIERES, "libelles_specialites": SPECIALITES, "rentree_poursuite": an_po, "prive_colonnes": PRIVE_COLS,
+            "france": {"nom": "France entière", "ref": ref_fr, "ps": ps_fr, "spe": sp_fr, "mm": mm_fr, "pours": po_fr, "prive": pv_fr},
             "academies": acads}
 
 

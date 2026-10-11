@@ -62,6 +62,15 @@ INDICATEURS: list[Indicateur] = [
         limites=["Les deux seuils sont des conventions de Spédago ; la robustesse à leur choix est testée (simulation_ppl_art2.md, §4).",
                  "Places vacantes = places − admis, ramené à 0 si négatif ; le CNED (capacités nominales) en compterait environ 25 000 fictives, d'où son exclusion."]),
     Indicateur(
+        "ps-prive", "Part du privé dans l'offre Parcoursup", theme="Entrée dans le supérieur (Parcoursup)",
+        definition="Part des formations proposées sur Parcoursup portées par un établissement privé (sous contrat, enseignement supérieur privé ou hors contrat), séparément hors apprentissage et en apprentissage, et part des places correspondantes.",
+        formule="formations dont contrat_etab commence par « Privé » / formations de la session ; même calcul sur les places (capa_fin)",
+        champ="Toutes les formations de la session sur Parcoursup, jeu principal (hors apprentissage) et jeu apprentissage. Académie = lieu de la formation ; les formations situées à l'étranger ne sont comptées que dans le total national.",
+        sources=["parcoursup_2025.csv", "parcoursup_apprentissage.csv"], pages=["mon-academie.html"], rapport="",
+        limites=["Compte une offre de formations, pas des inscrits : une formation privée peut avoir peu de places ou rester vide.",
+                 "Le privé hors Parcoursup n'est pas compté : selon le comité éthique et scientifique de Parcoursup (8e rapport), aucune donnée n'existe sur les inscriptions de ces formations.",
+                 "Le résultat dépend fortement du périmètre : sans l'apprentissage, le privé est minoritaire ; en apprentissage, il est majoritaire. Ne jamais citer une part sans dire lequel."]),
+    Indicateur(
         "ps-non-appeles", "Candidats classés jamais appelés", theme="Entrée dans le supérieur (Parcoursup)",
         definition="Candidats classés en phase principale qui n'ont jamais reçu de proposition de la formation.",
         formule="classés en phase principale − rang du dernier appelé",

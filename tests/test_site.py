@@ -81,9 +81,11 @@ def test_typescript_sans_erreur():
     """Les calculs et le code commun sont vérifiés par le compilateur (mode strict)."""
     r = subprocess.run(["node", str(WEB / "node_modules" / "typescript" / "bin" / "tsc"), "--noEmit"], cwd=WEB, capture_output=True, text=True)
     assert r.returncode == 0, r.stdout[-2000:]
-    for f in ("src/lib/commun.ts", "src/lib/data.ts", *(f"src/calc/{x}" for x in ("boussole.ts", "simulateur.ts", "mutualisation.ts",
-              "mon-academie.ts", "mes-specialites.ts", "voisins.ts"))):
-        assert "@ts-nocheck" not in (WEB / f).read_text(encoding="utf-8"), f"{f} doit rester vérifié par TypeScript"
+    # tout le code est vérifié en mode strict : ni @ts-nocheck, ni any explicite, ni dépendance à un environnement tiers
+    for f in sorted((WEB / "src").rglob("*.ts")):
+        src = f.read_text(encoding="utf-8")
+        assert "@ts-nocheck" not in src and "@ts-ignore" not in src, f"{f.name} doit rester vérifié par TypeScript"
+        assert not re.search(r":\s*any\b|\bas any\b|<any>", src), f"{f.name} : type any explicite"
 
 
 def test_construction_a_jour():
@@ -126,8 +128,9 @@ def test_accessibilite_structure():
 
 
 def test_les_outils_lisent_l_ancre():
-    for f, sel in (("boussole-des-masters.html", 'Spedago.pick($("academie"))'), ("mutualisation.html", 'Spedago.pick($("acad"))'),
-                   ("mon-academie.html", 'Spedago.pick($("acad"))'), ("simulateur-parcoursup.html", 'Spedago.pick($("acad"))')):
+    for f, sel in (("boussole-des-masters.html", "Spedago.pick(E.academie)"), ("mutualisation.html", "Spedago.pick(E.acad)"),
+                   ("mon-academie.html", "Spedago.pick(E.acad)"), ("simulateur-parcoursup.html", "Spedago.pick(E.acad)"),
+                   ("france-et-voisins.html", "Spedago.pick(E.acad)"), ("index.html", "Spedago.pick(sel)")):
         assert sel in SRC[f], f
 
 
