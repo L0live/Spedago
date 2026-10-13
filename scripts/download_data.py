@@ -18,11 +18,13 @@ import argparse
 import csv
 import hashlib
 import sys
-import urllib.request
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.telechargement import reparer_copie_locale, telecharger, verifier_csv  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -77,17 +79,14 @@ def sha256(path: Path) -> str:
 
 
 def download(name: str, force: bool) -> Path:
+    """Copie locale valide (CSV UTF-8 « ; ») du jeu : réutilisée si elle l'est déjà, sinon téléchargée
+    (gzip décompressé, contenu contrôlé, trois essais ; voir spedago/telechargement.py)."""
     base, ds, *extra = DATASETS[name]
     path = RAW / f"{name}.csv"
-    if path.exists() and path.stat().st_size > 0 and not force:
+    if path.exists() and path.stat().st_size > 0 and not force and reparer_copie_locale(path, verifier_csv):
         return path
     url = f"{base}/{ds}/exports/csv?delimiter=%3B&use_labels=false" + (f"&{extra[0]}" if extra else "")
-    tmp = path.with_suffix(".part")
-    with urllib.request.urlopen(url, timeout=600) as r, open(tmp, "wb") as f:
-        while chunk := r.read(1 << 20):
-            f.write(chunk)
-    tmp.replace(path)
-    return path
+    return telecharger(url, path, verifier_csv)
 
 
 def check_content(name: str, path: Path) -> None:
@@ -102,7 +101,10 @@ def write_manifest() -> None:
     rows = []
     for name, (base, ds, *_) in DATASETS.items():
         p = RAW / f"{name}.csv"
-        n = len(pd.read_csv(p, sep=";", low_memory=False, dtype=str))  # lignes de données (champs multilignes gérés)
+        try:
+            n = len(pd.read_csv(p, sep=";", low_memory=False, dtype=str))  # lignes de données (champs multilignes gérés)
+        except (ValueError, UnicodeDecodeError) as e:
+            raise SystemExit(f"{p.name} illisible pour le MANIFEST : {e}") from e
         rows.append({"fichier": p.name, "jeu": ds, "portail": base.split("/")[2], "lignes": n,
                      "sha256": sha256(p), "telecharge_le": date.fromtimestamp(p.stat().st_mtime).isoformat()})
     with open(MANIFEST, "w", newline="", encoding="utf-8") as f:

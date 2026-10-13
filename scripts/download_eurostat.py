@@ -10,9 +10,12 @@ import argparse
 import csv
 import hashlib
 import json
-import urllib.request
+import sys
 from datetime import date
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # paquet spedago
+from spedago.telechargement import telecharger, verifier_json  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
@@ -34,9 +37,9 @@ def main() -> None:
     for nom, q in REQUETES.items():
         p = RAW / f"eurostat_{nom}.json"
         if a.force or not p.exists():
-            with urllib.request.urlopen(f"{API}/{q}", timeout=300) as r:
-                d = json.load(r)
-            p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+            # gzip décompressé, JSON contrôlé, trois essais ; puis réécriture compacte (forme des empreintes du MANIFEST)
+            telecharger(f"{API}/{q}", p, verifier_json, timeout=300)
+            p.write_text(json.dumps(json.loads(p.read_text(encoding="utf-8")), ensure_ascii=False), encoding="utf-8")
         d = json.loads(p.read_text(encoding="utf-8"))
         rows.append([p.name, q, hashlib.sha256(p.read_bytes()).hexdigest(), d.get("updated", ""), str(date.today())])
         print(f"{p.name} : {len(d['value'])} valeurs, mis à jour {d.get('updated')}")
