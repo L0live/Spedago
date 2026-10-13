@@ -134,9 +134,8 @@ Un **document**.
 
 ## Écarts restants
 
-Les pages déjà conformes aux règles communes (couleur, typographie, espace, composants) ne le sont pas encore toutes à
-leur famille. Écarts connus au moment de l'écriture, résorbés par la refonte page par page :
-- Mes spécialités : chapeau de trois phrases, conservé en attendant une réécriture validée par l’auteur.
+Aucun au 13 octobre 2026 : chaque page suit sa famille. Un écart constaté plus tard s’inscrit ici avec la page
+concernée, jusqu’à sa correction.
 
 ## Ce qu'une refonte ne touche pas
 

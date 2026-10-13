@@ -1,4 +1,4 @@
-/* Porte lycéens : deux spécialités en entrée, puis les formations demandées par les élèves qui ont les mêmes, avec leurs chances.
+/* Porte lycéens : deux spécialités en entrée, puis les formations demandées par les élèves qui ont les mêmes, et la part qui a reçu une proposition.
    Filtres en tête ; tableau triable ; détail d'un regroupement sous le tableau. */
 /* Famille « Réglage d'abord » (design.md) : en-tête compact, puis la barre de réglages (filets, pas de carte) */
 header { padding-block: var(--space-lg) var(--space-xs) }
