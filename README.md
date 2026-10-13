@@ -30,11 +30,13 @@ cd web && npm run dev          # serveur de développement (http://localhost:517
 
 `bash run_all.sh --fresh` recalcule tout depuis les données brutes.
 
-Accessibilité (axe-core, WCAG 2.2 AA) sur le site construit :
+Accessibilité (axe-core, WCAG 2.2 AA) sur le site construit, à 1280 et 390 px ; la CI le lance avant chaque publication
+et bloque sur une violation grave (versions d'axe-core et Playwright figées dans `tools/package.json`) :
 
 ```bash
-cd web && npx vite preview --port 4173 &
-npm i axe-core playwright && node tools/check_a11y.mjs web/dist node_modules/axe-core/axe.min.js http://localhost:4173/
+npm ci --prefix tools && tools/node_modules/.bin/playwright install chromium
+(cd web && npx vite preview --port 4173 &)
+node tools/check_a11y.mjs web/dist tools/node_modules/axe-core/axe.min.js http://localhost:4173/
 ```
 
 ## Publier sur GitHub Pages

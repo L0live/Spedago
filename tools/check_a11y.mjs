@@ -1,8 +1,9 @@
 // Spédago — scan d'accessibilité automatique (axe-core, WCAG 2.0/2.1/2.2 A-AA) des pages construites (web/dist).
 // Les pages chargent leurs données par fetch : il faut les servir en HTTP, pas en file://.
-// Usage : (cd web && npm run build && npx vite preview --port 4173 &)
-//         npm i axe-core playwright
-//         node tools/check_a11y.mjs web/dist node_modules/axe-core/axe.min.js http://localhost:4173/
+// Usage : npm ci --prefix tools && tools/node_modules/.bin/playwright install chromium   (versions figées dans tools/package.json)
+//         (cd web && npm run build && npx vite preview --port 4173 &)
+//         node tools/check_a11y.mjs web/dist tools/node_modules/axe-core/axe.min.js http://localhost:4173/
+// La CI (.github/workflows/site.yml) le lance à chaque construction, avant la publication.
 // Code de sortie 1 si une violation « serious » ou « critical » est trouvée (ordinateur 1280 px et téléphone 390 px).
 import fs from 'fs';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
