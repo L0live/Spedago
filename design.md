@@ -12,7 +12,12 @@ S'appliquent en plus, et priment sur toute considération visuelle :
 ## Principe
 
 Un observatoire public : le lecteur vient vérifier un fait, pas être convaincu. Le design sert la lecture des
-nombres et de leurs limites. Ton : éditorial et sobre — une serif de titre, des filets, peu de couleur, pas d'effet.
+nombres et de leurs limites. Ton : éditorial et sobre — une serif de titre, de l'espace, peu de couleur, pas d'effet.
+
+- **Sans bordures.** Aucun contour ni filet de séparation sur le site : la structure vient de l'espace, des
+  surfaces (cartes blanches `--surface` sur le fond `--bg`, `--zebra` une ligne sur deux) et de l'élévation `--shadow-sm`.
+  Seules exceptions : les champs de saisie (contour exigé par WCAG 1.4.11), l'anneau de focus et les marques de
+  données (cercle d'une légende, repère d'une jauge).
 
 - **Neutralité.** Aucun indicateur n'est mis en avant aux dépens d'un autre par la mise en page : pas de chiffre
   « vedette » choisi par le site. Quand plusieurs chiffres ouvrent une page, ils ont le même poids.
@@ -23,12 +28,12 @@ nombres et de leurs limites. Ton : éditorial et sobre — une serif de titre, d
 ## Couleur
 
 Neutres slate, deux couleurs fonctionnelles, règle 60-30-10 : neutres partout, **bleu pour agir**, **orange pour signaler**.
-Jamais de couleur décorative, de dégradé de fond ni de blanc pur (la surface est teintée).
+Jamais de couleur décorative ni de dégradé de fond. Fond `--bg` slate-100, cartes et bandes d'en-tête `--surface` blanches : c'est cet écart qui dessine la page.
 
 | Rôle | Jetons |
 |---|---|
 | Fond, surface, texte | `--bg`, `--surface`, `--ink`, `--muted` |
-| Filets | `--line` (séparation), `--line-strong` (survol, soulignés), `--track` (fond de jauge) |
+| Teintes de structure | `--zebra` (une ligne de tableau sur deux), `--track` (fond de jauge, onglets, étiquettes), `--line` / `--line-strong` (contour des seuls champs de saisie, soulignés) |
 | Agir : liens, boutons secondaires, focus, sélection | `--accent`, `--accent-strong`, `--accent-soft`, `--accent-line`, `--accent-mark` |
 | Signaler : académie choisie, valeur à surveiller, public « décideurs » | `--orange`, `--orange-ink`, `--orange-deep`, `--orange-soft`, `--orange-line` |
 | Données : niveaux et catégories | `--good`, `--warn` (barres seulement), `--bad`, `--amber`, `--violet` |
@@ -55,9 +60,10 @@ Jamais de couleur décorative, de dégradé de fond ni de blanc pur (la surface 
 
 - **Pleine largeur** : la page occupe l'écran, avec une gouttière `--gutter` de 16 à 40 px. Seuls les textes ont une largeur maximale.
 - Espacements sur l'échelle de 4 px (`--space-2xs` 4 → `--space-2xl` 48). Rythme vertical : 32 px entre blocs ;
-  48 px et un filet avant la section de fin « Lire ces chiffres / Ce que la page ne dit pas ».
+  48 px avant la section de fin « Lire ces chiffres / Ce que la page ne dit pas ». L'accueil respire plus :
+  `--space-3xl` (72 px) et `--space-4xl` (96 px) entre ses parties.
 - **Un seul niveau de contenant.** Une carte (`.bloc`, `.stat`, `.panel`) ne contient jamais une autre carte : à
-  l'intérieur, on sépare par des filets. Une seule élévation (`--shadow-sm`) ; `--shadow-md` pour les panneaux flottants.
+  l'intérieur, on sépare par l'espace ou une teinte. Une seule élévation (`--shadow-sm`) ; `--shadow-md` pour les panneaux flottants.
 - Pas de bande colorée épaisse sur un côté de carte.
 - Téléphone : rien ne déborde à 320 px ; les tableaux deviennent des fiches (libellé au-dessus de chaque valeur) ;
   un lien ou un bouton tient sur une ligne.
@@ -68,11 +74,12 @@ Jamais de couleur décorative, de dégradé de fond ni de blanc pur (la surface 
 |---|---|
 | Navigation | Marque, porte « Élèves », porte « Décideurs », outils (copier le lien, profil). Sous 640 px : repliée derrière « Menu » ; visible sans JavaScript. Identique sur toutes les pages (produite par `spedago/pages.py`). |
 | Ligne « champ · source » (`.source`) | Sous un titre de page ou de section, en casse normale, 13 px, `--muted`. Dit sur quoi porte la section (« Entrée dans le supérieur · Parcoursup 2025 »). |
-| Chiffre clé | Toujours par `stat()`. En carte quand les chiffres sont seuls sur la page ; en rangée à filets dans un bloc. |
-| Bloc de section (`.bloc`) | Surface, filet, rayon 12 px, 24 px de marge intérieure (16 px sur téléphone). |
+| Chiffre clé | Toujours par `stat()`. En carte quand les chiffres sont seuls sur la page ; en rangée espacée dans un bloc. |
+| Profil | Facultatif, gardé dans le navigateur. « Je suis » choisit les réglages montrés : lycéen (académie, spécialités), étudiant (académie, études), décideur·élu·journaliste (territoire suivi). Un interrupteur « Ouvrir les pages sur mon profil » le désactive sans l'effacer ; désactivé, aucune page ne le lit. |
+| Bloc de section (`.bloc`) | Surface, ombre `--shadow-sm`, rayon 12 px, 24 px de marge intérieure (16 px sur téléphone). |
 | Tableau | En-têtes 13 px en casse normale ; triable par bouton dans l'en-tête ; export CSV par `.btn-ghost` dans une `.toolbar`. |
 | Jauge | Barre = valeur de la page, trait = repère de comparaison ; orange seulement si l'écart est signalé dans le texte. |
-| Boutons | Secondaire : `.btn-ghost` (texte bleu, filet). Action principale d'une page (au plus une) : fond `--orange-ink` ou `--ink`, texte `--surface`. Pas d'effet d'échelle au survol. |
+| Boutons | Secondaire : `.btn-ghost` (texte bleu sur `--accent-soft`, sans contour). Action principale d'une page (au plus une) : fond `--orange-ink` ou `--ink`, texte `--surface`. Pas d'effet d'échelle au survol. |
 | Fin de page | « Lire ces chiffres » et « Ce que la page ne dit pas » côte à côte (empilés sur téléphone), puis le pied de page (sources, licences). |
 
 ## Mouvement et interaction
@@ -88,19 +95,24 @@ La forme d'une page dépend de sa tâche. Les pages d'une même famille partagen
 typographie et composants sont communs à toutes.
 
 ### Entrée — accueil (`index.html`)
-Un **index** : la page est la liste des outils.
-- En tête : titre, une phrase, les trois chiffres de cadrage (avec champ et fiche).
-- Puis un groupe par public — « Lycéens et étudiants », « Décideurs, élus, rectorats, syndicats, journalistes » —
-  dont le titre porte la couleur du public (`--accent` / `--orange-ink`), sans bande ni carte. Une ligne par outil
-  (nom, une phrase, flèche), séparée par des filets ; toute la ligne est cliquable.
-- Le choix d'académie reste dans le groupe « Décideurs », comme raccourci vers « Mon académie ».
-- Puis « Comment c'est fait ».
+Une **page d'accueil** : elle présente le site puis mène à chaque outil.
+- Ouverture en bande blanche pleine largeur, prolongeant la barre : à gauche le titre, le chapeau, deux portes à
+  poids égal (« Je suis lycéen ou étudiant », « Je décide, j'informe ») et l'invitation au profil ; à droite les
+  trois chiffres de cadrage, à poids égal (avec champ et fiche). Empilés sur téléphone.
+- Puis un groupe par public : titre (couleur du public : `--accent` / `--orange-ink`) et public visé au-dessus,
+  puis une carte par outil. Une carte = une **miniature dessinée de ce que l'outil affiche** (SVG en ligne,
+  formes pleines géométriques en `currentColor` à trois teintes, couleur du public, `aria-hidden`), le nom, une
+  phrase, une flèche ; toute la carte est le lien. Les dessins montrent une forme, jamais de vraies valeurs.
+- Le choix d'académie reste dans le groupe « Décideurs », à droite de son titre, comme raccourci vers « Mon académie ».
+- Puis « Comment c'est fait » en quatre points numérotés sur une carte, et le pied de page.
+
+Toutes les pages ouvrent sur une bande d'en-tête blanche (titre, chapeau, ligne de source) qui prolonge la barre.
 
 ### Conclusion d'abord — Mon académie, France et voisins
 Un **rapport** sur un territoire.
 - En tête : le sélecteur, puis le nom du territoire en grand et une **bande de chiffres clés à poids égal**
-  (même taille, filets entre eux, sans cartes). Aucun chiffre n'est agrandi seul.
-- Puis une section par thème, séparées par des filets et l'espace (pas une pile de cartes) : titre, ligne
+  (même taille, espacés, sans cartes). Aucun chiffre n'est agrandi seul.
+- Puis une section par thème, chacune sur une surface blanche (un seul niveau, rien d'imbriqué) : titre, ligne
   « champ · source », phrase de constat chiffrée, tableau ou graphique, renvoi vers l'outil détaillé.
 
 ### Réglage d'abord — Simulateur, Boussole des masters, Mes spécialités
@@ -119,8 +131,8 @@ Une **carte** organise la page.
 ### Lecture — Méthodes
 Un **document**.
 - Sur grand écran : sommaire fixe à gauche, fiches à droite. Sur téléphone : sommaire en tête.
-- Chaque fiche est une section de texte séparée par un filet (pas une carte) : titre, thème, définition, calcul,
-  champ, sources, seuils, limites. La fiche visée par un lien (`#id`) est signalée par un filet orange.
+- Chaque fiche est une section de texte séparée par l'espace (pas une carte) : titre, thème, définition, calcul,
+  champ, sources, seuils, limites. La fiche visée par un lien (`#id`) est signalée par un fond `--orange-soft`.
 
 ## Textes
 

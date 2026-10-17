@@ -3,7 +3,7 @@
 //  - Profil : réglages de la personne (rôle, académie, profil d'études, spécialités), gardés dans ce navigateur seulement.
 //  - Annonces pour lecteurs d'écran, tableaux triables, export CSV, copie du lien de la vue.
 
-export interface Profil { role?: string; academie?: string; profilMaster?: string; specialites?: string[] }
+export interface Profil { role?: string; academie?: string; profilMaster?: string; specialites?: string[]; actif?: boolean }
 export interface EtatAdresse { acad: string; params: Record<string, string> }
 type Controle = HTMLInputElement | HTMLSelectElement;
 type Cellule = string | number | boolean | null | undefined;
@@ -52,11 +52,13 @@ export const Spedago = (() => {
     document.querySelectorAll<HTMLAnchorElement>('.site-nav a[data-page]').forEach((x) => { x.href = (x.dataset.page ?? '') + (a ? '#' + a : ''); });
   }
   // ---- profil (ce navigateur seulement)
+  //  profilGarde() : ce qui est enregistré ; profil() : ce que les pages lisent — rien quand l'interrupteur est coupé.
   const KEY = 'spedago.profil';
-  function profil(): Profil { try { return JSON.parse(localStorage.getItem(KEY) ?? 'null') || {}; } catch { return {}; } }
+  function profilGarde(): Profil { try { return JSON.parse(localStorage.getItem(KEY) ?? 'null') || {}; } catch { return {}; } }
+  function profil(): Profil { const p = profilGarde(); return p.actif === false ? {} : p; }
   function saveProfil(p: Profil | null): void {
     try { if (p) localStorage.setItem(KEY, JSON.stringify(p)); else localStorage.removeItem(KEY); } catch { /* stockage indisponible */ }
-    if (HAS_DOM) document.dispatchEvent(new CustomEvent('spedago:profil', { detail: p || {} }));
+    if (HAS_DOM) document.dispatchEvent(new CustomEvent('spedago:profil', { detail: profil() }));
   }
   // Sélectionne l'option du <select> qui correspond à l'académie de l'adresse, sinon à celle du profil.
   function pick(select: HTMLSelectElement | null): boolean {
@@ -152,24 +154,51 @@ export const Spedago = (() => {
     const btn = document.getElementById('profil-btn'), panel = document.getElementById('profil-panel'); if (!btn || !panel) return;
     const f = panel.querySelector('form'); if (!f) return;
     const sel = (n: string): HTMLSelectElement => f.elements.namedItem(n) as HTMLSelectElement;
+    const actif = f.elements.namedItem('actif') as HTMLInputElement, reglages = f.querySelector('fieldset')!;
+    // « Je suis » montre les réglages utiles à ce public ; sans rôle, tous.
+    const montrer = (): void => {
+      const r = sel('role').value;
+      f.querySelectorAll<HTMLElement>('[data-pour]').forEach((x) => { x.hidden = !!r && !(x.dataset.pour ?? '').split(' ').includes(r); });
+      const lib = f.querySelector<HTMLElement>('[data-lib-decideur]');
+      if (lib) { lib.dataset.libDefaut ??= lib.textContent ?? ''; lib.textContent = r === 'decideur' ? lib.dataset.libDecideur! : lib.dataset.libDefaut; }
+    };
     const fill = (q: Profil): void => {
       sel('role').value = q.role || ''; sel('academie').value = q.academie || ''; sel('profilMaster').value = q.profilMaster || '';
       sel('spe1').value = (q.specialites || [])[0] || ''; sel('spe2').value = (q.specialites || [])[1] || '';
+      actif.checked = q.actif !== false; reglages.disabled = !actif.checked; montrer();
     };
-    fill(profil());
-    const label = (): void => { const q = profil(), a = sel('academie').selectedOptions[0]; btn.querySelector('span')!.textContent = q.academie && a ? a.textContent : 'Mon profil'; };
+    fill(profilGarde());
+    const lire = (): Profil => ({ role: sel('role').value, academie: sel('academie').value, profilMaster: sel('profilMaster').value,
+                                  specialites: [sel('spe1').value, sel('spe2').value].filter(Boolean), actif: actif.checked });
+    const label = (): void => {
+      const q = profilGarde(), a = sel('academie').selectedOptions[0], vide = !q.role && !q.academie && !q.profilMaster && !(q.specialites || []).length;
+      btn.dataset.etat = q.actif === false ? 'off' : vide ? 'vide' : 'on';
+      btn.querySelector('span')!.textContent = q.actif === false ? 'Profil désactivé' : q.academie && a ? a.textContent : 'Mon profil';
+    };
     label();
     const close = (): void => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
-    btn.addEventListener('click', () => { const o = panel.hidden; panel.hidden = !o; btn.setAttribute('aria-expanded', String(o)); if (o) sel('role').focus(); });
+    btn.addEventListener('click', () => { const o = panel.hidden; panel.hidden = !o; btn.setAttribute('aria-expanded', String(o)); if (o) actif.focus(); });
     panel.addEventListener('keydown', (e) => { if (e.key === 'Escape') { close(); btn.focus(); } });
+    sel('role').addEventListener('change', montrer);
+    // L'interrupteur s'applique tout de suite, sans effacer les réglages gardés.
+    actif.addEventListener('change', () => {
+      reglages.disabled = !actif.checked; saveProfil({ ...profilGarde(), actif: actif.checked }); label();
+      announce(actif.checked ? 'Profil activé : les pages s’ouvrent sur vos réglages' : 'Profil désactivé : les pages s’ouvrent sans vos réglages, qui restent gardés');
+    });
     f.addEventListener('submit', (e) => {
       e.preventDefault();
-      const q: Profil = { role: sel('role').value, academie: sel('academie').value, profilMaster: sel('profilMaster').value,
-                          specialites: [sel('spe1').value, sel('spe2').value].filter(Boolean) };
-      saveProfil(q); label(); close(); btn.focus(); announce('Profil enregistré dans ce navigateur');
-      if (q.academie && !hashSlug() && !ancresLocales()) { const st = current(); st.acad = q.academie; writeHash(st); window.dispatchEvent(new HashChangeEvent('hashchange')); }
+      const q = lire();
+      saveProfil(q); label(); close(); btn.focus(); announce(q.actif ? 'Profil enregistré dans ce navigateur' : 'Profil enregistré, désactivé');
+      if (q.actif && q.academie && !hashSlug() && !ancresLocales()) { const st = current(); st.acad = q.academie; writeHash(st); window.dispatchEvent(new HashChangeEvent('hashchange')); }
     });
     f.querySelector('[data-reset]')?.addEventListener('click', () => { saveProfil(null); fill({}); label(); announce('Profil effacé'); });
+    // Liens « régler mon profil » ailleurs dans la page (accueil)
+    document.querySelectorAll<HTMLElement>('[data-ouvre-profil]').forEach((x) => x.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (document.getElementById('nav-menu')?.hidden) document.querySelector<HTMLButtonElement>('.nav-toggle')?.click();
+      if (panel.hidden) btn.click(); else actif.focus();
+      btn.scrollIntoView({ block: 'nearest' });
+    }));
     const cp = document.getElementById('copy-link'); if (cp) cp.addEventListener('click', () => copyLink(cp));
   }
   // ---- menu replié sur téléphone (même seuil que commun.css) ; sans JavaScript, le menu reste ouvert
@@ -190,6 +219,6 @@ export const Spedago = (() => {
     else init();
     window.addEventListener('hashchange', syncNav);
   }
-  return { slug, parseHash, buildHash, hashSlug, param, setParams, setHash, syncNav, pick, bind, profil, saveProfil,
+  return { slug, parseHash, buildHash, hashSlug, param, setParams, setHash, syncNav, pick, bind, profil, profilGarde, saveProfil,
            announce, sortable, applySort, csv, tableRows, download };
 })();

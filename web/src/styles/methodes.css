@@ -8,16 +8,16 @@
 .sommaire { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); font-size: var(--text-md); align-content: start }
 @media (min-width: 1100px) {
   .sommaire { grid-template-columns: minmax(0, 1fr); position: sticky; top: var(--space-md); max-height: calc(100vh - 2 * var(--space-md)); overflow-y: auto;
-              padding-right: var(--space-sm); border-right: 1px solid var(--line) }
+              padding-right: var(--space-sm) }
 }
 .sommaire h2 { font-family: var(--body); font-size: var(--text-md); font-weight: 700; letter-spacing: 0; color: var(--ink); margin: 0 0 var(--space-2xs) }
 .sommaire ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
 .sommaire a { text-decoration: none } .sommaire a:hover { text-decoration: underline; text-underline-offset: 2px }
 
 /* Fiches : sections de texte */
-.fiche { border-top: 1px solid var(--line); padding-block: var(--space-lg); scroll-margin-top: var(--space-md) }
-.fiche:first-child { border-top: 0; padding-top: 0 }
-.fiche:target, .fiche.visee { border-top: 3px solid var(--orange) }
+.fiche { padding-block: var(--space-xl); scroll-margin-top: var(--space-md) }
+.fiche:first-child { padding-top: 0 }
+.fiche:target, .fiche.visee { background: var(--orange-soft); border-radius: var(--radius); padding: var(--space-lg) }
 .fiche:first-child:target, .fiche:first-child.visee { padding-top: var(--space-md) }
 .fiche h3 { font-family: var(--display); font-weight: 600; font-size: var(--text-2xl); line-height: 1.2; margin: 0 }
 .fiche .theme { font-size: var(--text-sm); color: var(--muted); margin: var(--space-2xs) 0 var(--space-sm) }
@@ -29,7 +29,7 @@
 @media (max-width: 560px) { .fiche dl { grid-template-columns: minmax(0, 1fr) } .fiche dd { margin-bottom: var(--space-2xs) } }
 
 /* Sources et règles communes : à la suite des fiches */
-.bloc-sources { border-top: 1px solid var(--line); padding-top: var(--space-lg); margin-top: var(--space-lg); font-size: var(--text-md) }
+.bloc-sources { padding-top: var(--space-xl); margin-top: var(--space-lg); font-size: var(--text-md) }
 table { border-collapse: collapse; width: 100%; font-size: var(--text-sm) }
-th, td { text-align: left; padding: 6px var(--space-xs); border-bottom: 1px solid var(--line); vertical-align: top }
+th, td { text-align: left; padding: 6px var(--space-xs); vertical-align: top }
 td code { font-size: var(--text-xs) }

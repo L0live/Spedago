@@ -29,18 +29,24 @@ def _profil_panel() -> str:
     acads = sorted({v for v in ACADEMIES.values() if v != "Étranger"}, key=cle)
     opt = lambda v, t: f'<option value="{escape(v)}">{escape(t)}</option>'  # noqa: E731
     spe_opts = opt("", "—") + "".join(opt(i, lib) for i, lib, _, _ in EDS)
+    # « Je suis » choisit les réglages montrés (data-pour, commun.ts) ; sans rôle, tout est montré.
+    # L'interrupteur désactive le profil sans l'effacer : désactivé, aucune page ne le lit.
     return ('<div class="site-tools"><button type="button" id="copy-link">Copier le lien</button>'
             '<button type="button" id="profil-btn" aria-expanded="false" aria-controls="profil-panel"><span>Mon profil</span></button>'
             '<div id="profil-panel" hidden><form autocomplete="off">'
-            '<label>Je suis<select name="role">' + opt("", "—") + opt("lyceen", "Lycéen·ne") + opt("etudiant", "Étudiant·e")
-            + opt("decideur", "Décideur, élu, journaliste…") + '</select></label>'
-            '<label>Mon académie<select name="academie">' + opt("", "—") + "".join(opt(slug(a), a) for a in acads) + '</select></label>'
-            '<label>Mes études (masters)<select name="profilMaster">' + opt("", "—")
+            '<label class="switch"><input type="checkbox" name="actif" role="switch" checked>'
+            '<span>Ouvrir les pages sur mon profil</span></label>'
+            '<fieldset class="reglages"><legend class="sr-only">Réglages du profil</legend>'
+            '<label>Je suis<select name="role">' + opt("", "Je préfère ne pas le dire") + opt("lyceen", "Lycéen·ne")
+            + opt("etudiant", "Étudiant·e") + opt("decideur", "Décideur, élu, rectorat, syndicat, journaliste") + '</select></label>'
+            '<label data-pour="lyceen etudiant decideur"><span data-lib-decideur="Territoire suivi">Mon académie</span><select name="academie">'
+            + opt("", "—") + "".join(opt(slug(a), a) for a in acads) + '</select></label>'
+            '<label data-pour="etudiant">Mes études (masters)<select name="profilMaster">' + opt("", "—")
             + "".join(opt(k, v) for k, v in PROFILS_MASTER.items()) + '</select></label>'
-            '<div class="row2"><label>Spécialité 1<select name="spe1">' + spe_opts + '</select></label>'
-            '<label>Spécialité 2<select name="spe2">' + spe_opts + '</select></label></div>'
-            '<p>Gardé dans ce navigateur seulement ; rien n’est envoyé. Chaque page s’ouvre sur ces réglages.</p>'
-            '<div class="acts"><button type="button" data-reset>Effacer</button><button type="submit">Enregistrer</button></div>'
+            '<div class="row2" data-pour="lyceen"><label>Spécialité 1<select name="spe1">' + spe_opts + '</select></label>'
+            '<label>Spécialité 2<select name="spe2">' + spe_opts + '</select></label></div></fieldset>'
+            '<p>Facultatif. Gardé dans ce navigateur seulement ; rien n’est envoyé.</p>'
+            '<div class="acts"><button type="button" data-reset>Tout effacer</button><button type="submit">Enregistrer</button></div>'
             '</form></div></div>')
 
 
