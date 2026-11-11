@@ -12,6 +12,7 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
 from spedago.referentiel import academie_canonique  # noqa: E402
+from build_mon_academie import normalise_poursuite  # noqa: E402
 
 RAW, PROC = ROOT / "data" / "raw", ROOT / "data" / "processed"
 pytestmark = pytest.mark.skipif(not (PROC / "insertion_master.json").exists(), reason="données absentes")
@@ -46,11 +47,12 @@ def test_insertion_dans_la_boussole():
 
 def test_poursuite_academies_egale_france():
     D = json.loads((PROC / "mon_academie.json").read_text(encoding="utf-8"))
-    p = pd.read_csv(RAW / "poursuite_academie.csv", sep=";")
+    p = normalise_poursuite(pd.read_csv(RAW / "poursuite_academie.csv", sep=";"))
     p = p[p.rentree_session == D["rentree_poursuite"]]
     fr = {r[0]: r for r in D["france"]["pours"]}
     for voie, g in p.groupby("voie_du_baccalaureat"):
         tot = sum(g[c].sum() for c in g.columns if c.endswith(("_flux", "_stable")))
+        assert tot > 0, "colonnes de poursuite introuvables : schéma SIES modifié ?"
         assert fr[voie][1] == g.bacheliers.sum() and abs(sum(fr[voie][2:]) - tot) <= 5
     # la somme des académies présentes redonne la France (aucune académie perdue au renommage)
     noms = {academie_canonique(a) for a in p.aca_lib}

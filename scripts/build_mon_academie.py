@@ -136,10 +136,22 @@ POURSUITE_COLS = {"univ": ["univ"], "iut": ["iut"], "cpge": ["cpge_prive", "cpge
                   "autre": ["autre_nr", "autre_prive", "autre_public"]}
 
 
+def normalise_poursuite(p: pd.DataFrame) -> pd.DataFrame:
+    """Ramène le jeu SIES à un seul schéma, quelle que soit sa version.
+    Depuis octobre 2026, « <filière>_flux » est scindé en « _flux_ar » + « _flux_a » (somme identique à l'ancienne
+    colonne, vérifié sur toutes les lignes) et « autre_* » est renommé « autres_formations_* »."""
+    p = p.rename(columns=lambda c: "autre_" + c.removeprefix("autres_formations_") if c.startswith("autres_formations_") else c)
+    for c in {c.removesuffix("_flux_ar") for c in p.columns if c.endswith("_flux_ar")}:
+        if f"{c}_flux" not in p:
+            p[f"{c}_flux"] = p[f"{c}_flux_ar"] + p[f"{c}_flux_a"]
+    return p.drop(columns=[c for c in p.columns if c.endswith(("_flux_ar", "_flux_a"))])
+
+
 def poursuite(p: pd.DataFrame) -> tuple[dict, list, int]:
     """Néo-bacheliers de la dernière session qui poursuivent dans le supérieur, par voie et filière (SIES).
     Les colonnes « _flux » et « _stable » s'additionnent (leur somme redonne le taux de poursuite publié) ;
     on ne commente pas leur partage, non documenté dans la fiche du jeu."""
+    p = normalise_poursuite(p)
     an = int(p.rentree_session.max())
     p = p[p.rentree_session == an].assign(academie=lambda x: x.aca_lib.map(academie_canonique))
     for k, cs in POURSUITE_COLS.items():
