@@ -19,6 +19,6 @@ ips_lycees_ap2023.csv,fr-en-ips-lycees-ap2023,data.education.gouv.fr,10905,31b2a
 eloignement_lycees.csv,fr-en-indice_eloignement_lycee_ap2020,data.education.gouv.fr,24883,cdb1af274e6623a8ef518851049b48427cdb701771b81b97a0ceb70e9351f358,2026-10-09
 remplacement_2nd_degre.csv,fr-en-remplacement-second-degre,data.education.gouv.fr,30,161d5dd128403521cfbd1ac588e5a28b88576933a9b6e59a6847a8abe20e2054,2026-10-09
 insersup_master.csv,fr-esr-insersup,data.enseignementsup-recherche.gouv.fr,22020,09a3ae2a5978d0ad848f1b66d771eac7252fe5ae06ce8305eb5b859a1855f049,2026-10-10
-poursuite_academie.csv,fr-esr-taux-poursuite-enseignement-superieur-par-academie,data.enseignementsup-recherche.gouv.fr,2874,fd518a4da8f5aa19270e2cb02e70b0a4b7b058d47fe016a8857eb3c52c36b7a6,2026-10-10
+poursuite_academie.csv,fr-esr-taux-poursuite-enseignement-superieur-par-academie,data.enseignementsup-recherche.gouv.fr,2874,2e39e400197e7af12306dcf75036d3f9c7b6f1cb32a2787c64f4191785c4c9d7,2026-11-11
 ival_lycees_gt.csv,fr-en-indicateurs-de-resultat-des-lycees-gt_v2,data.education.gouv.fr,32485,6ab77b391e3405f5157bb942d4548d5f1cfbacd94e76dd52b93db9b370de8658,2026-10-10
 annuaire_lycees.csv,fr-en-annuaire-education,data.education.gouv.fr,5644,5151d17db8c18086eadd00c25a70997ab098de6064a4d87bf7c3a5e6c09aed00,2026-10-10

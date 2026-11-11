@@ -11,7 +11,7 @@
 /* Petits multiples : un filet au-dessus de chaque vignette, pas de cartes dans le bloc */
 /* Vignettes d'au moins 240 px (= largeur du viewBox) : les graduations restent à 12 px ou plus */
 .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-lg) var(--space-md) }
-.multiples .panel { border-top: 1px solid var(--line); padding-top: var(--space-xs); position: relative; min-width: 0; box-shadow: none }
+.multiples .panel { padding-top: var(--space-xs); position: relative; min-width: 0; box-shadow: none }
 .panel h3 { font-size: var(--text-base); font-weight: 600; margin: 0 }
 .panel .last { font-size: var(--text-xs); color: var(--muted); margin: 2px 0 6px; font-variant-numeric: tabular-nums }
 .panel svg { width: 100%; height: auto; display: block; overflow: visible }
@@ -39,6 +39,6 @@
 .u { font-size: var(--text-xs); color: var(--muted) }
 details { margin-top: var(--space-md) } summary { cursor: pointer; font-weight: 600; color: var(--accent) }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); min-width: 640px; margin-top: var(--space-xs) }
-th { padding: 6px var(--space-xs); border-bottom: 1px solid var(--line) }
-td { padding: 6px var(--space-xs); border-bottom: 1px solid var(--line) }
+th { padding: 6px var(--space-xs) }
+td { padding: 6px var(--space-xs) }
 @media (max-width: 760px) { .drow { grid-template-columns: minmax(0, 1fr) 52px } .drow .track { grid-column: 1 / -1; grid-row: 2 } }
